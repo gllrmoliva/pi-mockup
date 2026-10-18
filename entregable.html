@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informe de avance 1 · Hito</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<a class="salto" href="#contenido">Saltar al contenido</a>
+
+<nav class="maqueta" aria-label="Navegación de la maqueta">
+  <details class="maqueta-rol">
+    <summary class="maqueta-marca">
+      <span>Maqueta</span>
+      <span class="maqueta-rol-actual" data-rol-actual>Profesor</span>
+      <svg class="maqueta-rol-flecha" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+    <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
+      <p class="maqueta-menu-titulo">Ver como</p>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
+    </div>
+  </details>
+  <ul class="maqueta-lista">
+    <li><a href="index.html">Ingreso</a></li>
+    <li><a href="proyectos.html">Proyectos</a></li>
+    <li><a href="proyecto.html">Detalle del proyecto</a></li>
+    <li><a href="kanban.html">Tablero</a></li>
+    <li data-rol="profesor"><a href="entregable.html" aria-current="page">Entregable (profesora)</a></li>
+    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable (estudiante)</a></li>
+    <li data-rol="profesor"><a href="proyecto-crear.html">Crear proyecto</a></li>
+    <li data-rol="profesor"><a href="proyecto-editar.html">Editar proyecto</a></li>
+  </ul>
+  <span class="maqueta-nota">Datos ficticios, no es la aplicación real</span>
+</nav>
+
+<header class="cabecera">
+  <div class="cabecera-fila">
+    <p class="marca">
+      <span class="marca-nombre">Hito</span>
+      <span class="marca-lema">Gestión de memorias y tesis</span>
+    </p>
+    <details class="cuenta">
+      <summary class="cuenta-trigger">
+        <span class="avatar" aria-hidden="true">CS</span>
+        <span class="cuenta-nombre">Camila Soto</span>
+        <svg class="cuenta-flecha" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="cuenta-menu">
+        <p class="cuenta-rol">Profesora guía</p>
+        <button class="cuenta-opcion" type="button" data-aviso="En la aplicación real se abriría la configuración de la cuenta.">Configuración</button>
+        <a class="cuenta-opcion" href="index.html">Cerrar sesión</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main id="contenido" class="contenedor">
+  <p class="volver"><a href="proyecto.html">Volver al proyecto</a></p>
+
+  <div class="pagina-cabecera">
+    <div>
+      <h1 class="titulo">Informe de avance 1</h1>
+      <p class="bajada">Hito «Desarrollo y validación», memoria de título de Javiera Contreras.</p>
+    </div>
+  </div>
+
+  <section class="panel" aria-label="Estado del entregable">
+    <div class="tira-estado">
+      <div class="tira-datos">
+        <span class="chip es-entregado"><span class="chip-punto"></span>Entregado</span>
+        <p class="tira-texto">Javiera entregó la versión 2 y espera tu revisión.</p>
+      </div>
+      <p class="tenue chico">Fecha límite: <span class="tabular">20 nov 2026</span></p>
+    </div>
+  </section>
+
+  <div class="columnas mt-22">
+    <div class="pila principal">
+      <section class="panel" aria-labelledby="ultima-entrega">
+        <div class="encabezado-seccion">
+          <h2 class="panel-titulo" id="ultima-entrega">Última entrega</h2>
+          <span class="version-etiqueta">Versión 2</span>
+        </div>
+        <p class="tenue chico">Entregada por Javiera Contreras el 15 de octubre de 2026 a las 21:14.</p>
+        <div class="archivo">
+          <svg class="archivo-icono" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 3v5h5"/>
+          </svg>
+          <div class="archivo-datos">
+            <p class="archivo-nombre">informe-avance-1-v2.pdf</p>
+            <p class="archivo-peso">PDF, 3,4 MB</p>
+          </div>
+          <button class="boton boton--linea boton--chico" type="button" data-aviso="En la aplicación real se descargaría el archivo.">Descargar</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="tu-revision">
+        <h2 class="panel-titulo" id="tu-revision">Tu revisión</h2>
+        <p class="panel-nota">La decisión queda registrada sobre la versión 2 y es visible para todos los participantes.</p>
+        <div class="opciones mt-14">
+          <label class="opcion">
+            <input type="radio" name="decision" value="aprobar">
+            <span class="opcion-caja">
+              <span class="opcion-punto" aria-hidden="true"></span>
+              <span>
+                <span class="opcion-titulo">Aprobar la entrega</span>
+                <span class="opcion-desc">El entregable pasa a Aprobado. Javiera recibe un aviso por correo.</span>
+              </span>
+            </span>
+          </label>
+          <label class="opcion">
+            <input type="radio" name="decision" value="cambios">
+            <span class="opcion-caja">
+              <span class="opcion-punto" aria-hidden="true"></span>
+              <span>
+                <span class="opcion-titulo">Solicitar cambios</span>
+                <span class="opcion-desc">El entregable pasa a Cambios solicitados. Javiera podrá subir una nueva versión.</span>
+              </span>
+            </span>
+          </label>
+        </div>
+        <div class="campo mt-18">
+          <label for="comentario-revision">Comentario para el estudiante</label>
+          <textarea class="entrada" id="comentario-revision" placeholder="Explica qué está bien y qué debe corregirse"></textarea>
+        </div>
+        <div class="acciones-panel">
+          <button class="boton" type="button" data-aviso="En la aplicación real, la revisión quedaría registrada y Javiera recibiría un aviso por correo.">Registrar revisión</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="historial">
+        <h2 class="panel-titulo" id="historial">Historial de versiones</h2>
+        <p class="panel-nota">Solo el equipo gestor ve el historial completo. Cada entrega genera una versión nueva: ninguna se edita ni se borra.</p>
+        <ul class="mt-14">
+          <li class="version">
+            <div class="version-cabecera">
+              <span class="version-etiqueta">Versión 2</span>
+              <span class="version-fecha">Entregada por Javiera Contreras el 15 de octubre de 2026 a las 21:14</span>
+              <span class="chip es-entregado"><span class="chip-punto"></span>Espera revisión</span>
+            </div>
+          </li>
+          <li class="version">
+            <div class="version-cabecera">
+              <span class="version-etiqueta">Versión 1</span>
+              <span class="version-fecha">Entregada por Javiera Contreras el 8 de octubre de 2026 a las 19:02</span>
+            </div>
+            <div class="version-revision">
+              <div class="version-cabecera">
+                <span class="chip es-cambios"><span class="chip-punto"></span>Cambios solicitados</span>
+                <span class="version-fecha">Revisada por Camila Soto el 10 de octubre de 2026</span>
+              </div>
+              <p class="version-comentario">Falta contrastar los trabajos citados en la sección 2.3 con al menos dos artículos de 2025, y ajustar la tabla de resultados al formato de la carrera.</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="panel" aria-labelledby="foro">
+        <h2 class="panel-titulo" id="foro">Foro del entregable</h2>
+        <p class="panel-nota">Un espacio para coordinar la entrega. Los mensajes nuevos se resumen en un aviso diario por correo.</p>
+        <ul class="mt-14">
+          <li class="mensaje">
+            <span class="avatar avatar--chico" aria-hidden="true">JC</span>
+            <div>
+              <p class="mensaje-cabecera"><span class="mensaje-autor">Javiera Contreras</span><span class="mensaje-fecha">8 oct 2026, 19:02</span></p>
+              <p class="mensaje-texto">Hola Camila, subí la versión 1 del informe de avance. Incluye la revisión bibliográfica y el primer experimento con el conjunto de datos reducido.</p>
+            </div>
+          </li>
+          <li class="mensaje">
+            <span class="avatar avatar--chico" aria-hidden="true">CS</span>
+            <div>
+              <p class="mensaje-cabecera"><span class="mensaje-autor">Camila Soto</span><span class="mensaje-fecha">10 oct 2026, 12:40</span></p>
+              <p class="mensaje-texto">Gracias, Javiera. Dejé la revisión de la versión 1 con los cambios que hay que incorporar, sobre todo en la sección 2.3 y en la tabla de resultados.</p>
+            </div>
+          </li>
+          <li class="mensaje">
+            <span class="avatar avatar--chico" aria-hidden="true">JC</span>
+            <div>
+              <p class="mensaje-cabecera"><span class="mensaje-autor">Javiera Contreras</span><span class="mensaje-fecha">15 oct 2026, 21:14</span></p>
+              <p class="mensaje-texto">Subí la versión 2 con las correcciones. Agregué dos artículos de 2025 y rehice la tabla según el formato de la carrera.</p>
+            </div>
+          </li>
+        </ul>
+        <div class="foro-form">
+          <div class="campo">
+            <label for="mensaje-foro">Escribe un mensaje</label>
+            <textarea class="entrada" id="mensaje-foro" placeholder="Mensaje para los participantes del proyecto"></textarea>
+            <p class="error-campo oculto" id="error-foro">El comentario no puede estar vacío.</p>
+          </div>
+          <div class="acciones-panel">
+            <button class="boton boton--linea" type="button" data-aviso="El mensaje se publicaría en el foro del entregable.">Publicar mensaje</button>
+          </div>
+        </div>
+        <button class="demo mt-14" type="button" data-demo="error-foro" data-alternar="Ocultar el error">Ver el error de comentario vacío</button>
+      </section>
+    </div>
+
+    <aside class="lateral">
+      <section class="panel" aria-labelledby="ficha">
+        <h2 class="panel-titulo" id="ficha">Ficha del entregable</h2>
+        <dl class="ficha mt-14">
+          <dt>Proyecto</dt>
+          <dd><a href="proyecto.html">Reconocimiento de gestos para interfaces sin contacto</a></dd>
+          <dt>Hito</dt>
+          <dd>Desarrollo y validación, 2.º de 3</dd>
+          <dt>Fecha límite</dt>
+          <dd class="tabular">20 de noviembre de 2026</dd>
+          <dt>Formatos admitidos</dt>
+          <dd>PDF, ZIP</dd>
+          <dt>Tamaño máximo</dt>
+          <dd>50 MB por archivo</dd>
+          <dt>Entregas</dt>
+          <dd class="tabular">2 versiones</dd>
+          <dt>Última actualización</dt>
+          <dd>15 de octubre de 2026</dd>
+        </dl>
+      </section>
+
+      <section class="panel" aria-labelledby="avisos-entregable">
+        <h2 class="panel-titulo" id="avisos-entregable">Avisos</h2>
+        <p class="panel-nota">Las entregas y las revisiones avisan por correo a los participantes del proyecto.</p>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div class="toast-zona" aria-live="polite"></div>
+<script src="js/mockup.js"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablero de entregables · Hito</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<a class="salto" href="#contenido">Saltar al contenido</a>
+
+<nav class="maqueta" aria-label="Navegación de la maqueta">
+  <details class="maqueta-rol">
+    <summary class="maqueta-marca">
+      <span>Maqueta</span>
+      <span class="maqueta-rol-actual" data-rol-actual>Profesor</span>
+      <svg class="maqueta-rol-flecha" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+    <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
+      <p class="maqueta-menu-titulo">Ver como</p>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
+    </div>
+  </details>
+  <ul class="maqueta-lista">
+    <li><a href="index.html">Ingreso</a></li>
+    <li><a href="proyectos.html">Proyectos</a></li>
+    <li><a href="proyecto.html">Detalle del proyecto</a></li>
+    <li><a href="kanban.html" aria-current="page">Tablero</a></li>
+    <li data-rol="profesor"><a href="entregable.html">Entregable (profesora)</a></li>
+    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable (estudiante)</a></li>
+    <li data-rol="profesor"><a href="proyecto-crear.html">Crear proyecto</a></li>
+    <li data-rol="profesor"><a href="proyecto-editar.html">Editar proyecto</a></li>
+  </ul>
+  <span class="maqueta-nota">Datos ficticios, no es la aplicación real</span>
+</nav>
+
+<header class="cabecera">
+  <div class="cabecera-fila">
+    <p class="marca">
+      <span class="marca-nombre">Hito</span>
+      <span class="marca-lema">Gestión de memorias y tesis</span>
+    </p>
+    <details class="cuenta" data-cuenta="compartida">
+      <summary class="cuenta-trigger">
+        <span class="avatar" aria-hidden="true">CS</span>
+        <span class="cuenta-nombre">Camila Soto</span>
+        <svg class="cuenta-flecha" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="cuenta-menu">
+        <p class="cuenta-rol">Profesora guía</p>
+        <button class="cuenta-opcion" type="button" data-aviso="En la aplicación real se abriría la configuración de la cuenta.">Configuración</button>
+        <a class="cuenta-opcion" href="index.html">Cerrar sesión</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main id="contenido" class="contenedor">
+  <p class="volver"><a href="proyectos.html">Volver a tus proyectos</a></p>
+
+  <div class="pagina-cabecera">
+    <div>
+      <h1 class="titulo">Tablero de entregables</h1>
+      <p class="bajada">Reconocimiento de gestos para interfaces sin contacto en laboratorios clínicos, memoria de título de Javiera Contreras.</p>
+    </div>
+  </div>
+
+  <nav class="pestanas" aria-label="Vistas del proyecto">
+    <a href="proyecto.html">Estructura</a>
+    <a href="kanban.html" aria-current="page">Tablero</a>
+  </nav>
+
+  <p class="aviso-caja">El tablero es una vista de solo lectura. En la aplicación real las tarjetas cambian de columna cuando un colaborador entrega o un gestor registra una revisión, y no se arrastran. En esta demo puedes arrastrarlas entre columnas para probar el gesto: no cambia ningún estado y el orden no se guarda.</p>
+
+  <p class="solo-lectores" aria-live="polite" id="tablero-aviso"></p>
+
+  <div class="tablero mt-22">
+    <section class="columna" aria-labelledby="col-pendiente">
+      <div class="columna-cabecera">
+        <h2 class="columna-nombre" id="col-pendiente"><span class="columna-punto punto-pendiente"></span>Pendiente</h2>
+        <span class="columna-cuenta">3</span>
+      </div>
+      <article class="tarjeta">
+        <h3 class="tarjeta-titulo">Demostración en laboratorio</h3>
+        <p class="tarjeta-meta">Javiera Contreras</p>
+        <p class="tarjeta-meta">Vence el 4 dic 2026</p>
+        <p class="tarjeta-meta">Desarrollo y validación</p>
+      </article>
+      <article class="tarjeta">
+        <h3 class="tarjeta-titulo">Informe final</h3>
+        <p class="tarjeta-meta">Javiera Contreras</p>
+        <p class="tarjeta-meta">Vence el 15 ene 2027</p>
+        <p class="tarjeta-meta">Informe final y defensa</p>
+      </article>
+      <article class="tarjeta">
+        <h3 class="tarjeta-titulo">Presentación de defensa</h3>
+        <p class="tarjeta-meta">Javiera Contreras</p>
+        <p class="tarjeta-meta">Vence el 22 ene 2027</p>
+        <p class="tarjeta-meta">Informe final y defensa</p>
+      </article>
+    </section>
+
+    <section class="columna" aria-labelledby="col-entregado">
+      <div class="columna-cabecera">
+        <h2 class="columna-nombre" id="col-entregado"><span class="columna-punto punto-entregado"></span>Entregado</h2>
+        <span class="columna-cuenta">1</span>
+      </div>
+      <article class="tarjeta">
+        <h3 class="tarjeta-titulo"><a href="entregable.html" data-entregable>Informe de avance 1</a></h3>
+        <p class="tarjeta-meta">Javiera Contreras</p>
+        <p class="tarjeta-meta">Vence el 20 nov 2026</p>
+        <p class="tarjeta-meta">Desarrollo y validación</p>
+        <span class="tarjeta-version">v2</span>
+      </article>
+    </section>
+
+    <section class="columna" aria-labelledby="col-atrasado">
+      <div class="columna-cabecera">
+        <h2 class="columna-nombre" id="col-atrasado"><span class="columna-punto punto-atrasado"></span>Atrasado</h2>
+        <span class="columna-cuenta">1</span>
+      </div>
+      <article class="tarjeta">
+        <h3 class="tarjeta-titulo"><a href="entregable.html" data-entregable>Prototipo funcional</a></h3>
+        <p class="tarjeta-meta">Javiera Contreras</p>
+        <p class="tarjeta-meta">Venció el 12 oct 2026</p>
+        <p class="tarjeta-meta">Entrega tardía: 14 oct 2026</p>
+        <span class="tarjeta-version">v1</span>
+      </article>
+    </section>
+
+    <section class="columna" aria-labelledby="col-aprobado">
+      <div class="columna-cabecera">
+        <h2 class="columna-nombre" id="col-aprobado"><span class="columna-punto punto-aprobado"></span>Aprobado</h2>
+        <span class="columna-cuenta">2</span>
+      </div>
+      <article class="tarjeta">
+        <h3 class="tarjeta-titulo">Anteproyecto</h3>
+        <p class="tarjeta-meta">Javiera Contreras</p>
+        <p class="tarjeta-meta">Aprobado el 4 sep 2026</p>
+        <p class="tarjeta-meta">Propuesta de memoria</p>
+        <span class="tarjeta-version">v2</span>
+      </article>
+      <article class="tarjeta">
+        <h3 class="tarjeta-titulo">Estado del arte</h3>
+        <p class="tarjeta-meta">Javiera Contreras</p>
+        <p class="tarjeta-meta">Aprobado el 11 sep 2026</p>
+        <p class="tarjeta-meta">Propuesta de memoria</p>
+        <span class="tarjeta-version">v1</span>
+      </article>
+    </section>
+
+    <section class="columna" aria-labelledby="col-cambios">
+      <div class="columna-cabecera">
+        <h2 class="columna-nombre" id="col-cambios"><span class="columna-punto punto-cambios"></span>Cambios solicitados</h2>
+        <span class="columna-cuenta">1</span>
+      </div>
+      <article class="tarjeta">
+        <h3 class="tarjeta-titulo">Revisión bibliográfica ampliada</h3>
+        <p class="tarjeta-meta">Javiera Contreras</p>
+        <p class="tarjeta-meta">Revisada el 2 oct 2026</p>
+        <p class="tarjeta-meta">Desarrollo y validación</p>
+        <span class="tarjeta-version">v1</span>
+      </article>
+    </section>
+  </div>
+</main>
+
+<div class="toast-zona" aria-live="polite"></div>
+<script src="js/mockup.js"></script>
+</body>
+</html>

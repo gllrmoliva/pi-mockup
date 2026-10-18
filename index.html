@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inicia sesión · Hito</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<a class="salto" href="#contenido">Saltar al contenido</a>
+
+<nav class="maqueta" aria-label="Navegación de la maqueta">
+  <details class="maqueta-rol">
+    <summary class="maqueta-marca">
+      <span>Maqueta</span>
+      <span class="maqueta-rol-actual" data-rol-actual>Profesor</span>
+      <svg class="maqueta-rol-flecha" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+    <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
+      <p class="maqueta-menu-titulo">Ver como</p>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
+    </div>
+  </details>
+  <ul class="maqueta-lista">
+    <li><a href="index.html" aria-current="page">Ingreso</a></li>
+    <li><a href="proyectos.html">Proyectos</a></li>
+    <li><a href="proyecto.html">Detalle del proyecto</a></li>
+    <li><a href="kanban.html">Tablero</a></li>
+    <li data-rol="profesor"><a href="entregable.html">Entregable (profesora)</a></li>
+    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable (estudiante)</a></li>
+    <li data-rol="profesor"><a href="proyecto-crear.html">Crear proyecto</a></li>
+    <li data-rol="profesor"><a href="proyecto-editar.html">Editar proyecto</a></li>
+  </ul>
+  <span class="maqueta-nota">Datos ficticios, no es la aplicación real</span>
+</nav>
+
+<main id="contenido" class="ingreso">
+  <div class="hoja">
+    <p class="hoja-marca">
+      <span class="marca-nombre">Hito</span>
+      <span class="marca-lema">Gestión de memorias y tesis</span>
+    </p>
+
+    <h1 class="titulo">Inicia sesión</h1>
+    <p class="bajada">Entra con tu correo institucional para ver tus proyectos, entregas y revisiones.</p>
+
+    <div class="alerta oculto mt-18" id="error-credenciales" role="alert">
+      <span>Correo o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.</span>
+    </div>
+
+    <form action="proyectos.html" method="get">
+      <div class="campo">
+        <label for="correo">Correo institucional</label>
+        <input class="entrada" type="email" id="correo" name="correo" autocomplete="email" placeholder="nombre@correo.cl" required>
+      </div>
+      <div class="campo">
+        <label for="clave">Contraseña</label>
+        <input class="entrada" type="password" id="clave" name="clave" autocomplete="current-password" placeholder="Tu contraseña" required>
+        <p class="ayuda"><a href="#" data-aviso="En la aplicación real se enviaría un correo para restablecer la contraseña.">¿Olvidaste tu contraseña?</a></p>
+      </div>
+      <button class="boton ancho" type="submit">Ingresar</button>
+    </form>
+
+    <button class="demo mt-14" type="button" data-demo="error-credenciales" data-alternar="Ocultar el error">
+      Ver el error de credenciales
+    </button>
+  </div>
+</main>
+
+<div class="toast-zona" aria-live="polite"></div>
+<script src="js/mockup.js"></script>
+</body>
+</html>

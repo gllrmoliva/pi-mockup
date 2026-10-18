@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tus proyectos · Hito</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<a class="salto" href="#contenido">Saltar al contenido</a>
+
+<nav class="maqueta" aria-label="Navegación de la maqueta">
+  <details class="maqueta-rol">
+    <summary class="maqueta-marca">
+      <span>Maqueta</span>
+      <span class="maqueta-rol-actual" data-rol-actual>Profesor</span>
+      <svg class="maqueta-rol-flecha" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+    <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
+      <p class="maqueta-menu-titulo">Ver como</p>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
+    </div>
+  </details>
+  <ul class="maqueta-lista">
+    <li><a href="index.html">Ingreso</a></li>
+    <li><a href="proyectos.html" aria-current="page">Proyectos</a></li>
+    <li><a href="proyecto.html">Detalle del proyecto</a></li>
+    <li><a href="kanban.html">Tablero</a></li>
+    <li data-rol="profesor"><a href="entregable.html">Entregable (profesora)</a></li>
+    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable (estudiante)</a></li>
+    <li data-rol="profesor"><a href="proyecto-crear.html">Crear proyecto</a></li>
+    <li data-rol="profesor"><a href="proyecto-editar.html">Editar proyecto</a></li>
+  </ul>
+  <span class="maqueta-nota">Datos ficticios, no es la aplicación real</span>
+</nav>
+
+<header class="cabecera">
+  <div class="cabecera-fila">
+    <p class="marca">
+      <span class="marca-nombre">Hito</span>
+      <span class="marca-lema">Gestión de memorias y tesis</span>
+    </p>
+    <details class="cuenta" data-cuenta="compartida">
+      <summary class="cuenta-trigger">
+        <span class="avatar" aria-hidden="true">CS</span>
+        <span class="cuenta-nombre">Camila Soto</span>
+        <svg class="cuenta-flecha" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="cuenta-menu">
+        <p class="cuenta-rol">Profesora guía</p>
+        <button class="cuenta-opcion" type="button" data-aviso="En la aplicación real se abriría la configuración de la cuenta.">Configuración</button>
+        <a class="cuenta-opcion" href="index.html">Cerrar sesión</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main id="contenido" class="contenedor">
+  <div class="pagina-cabecera">
+    <div>
+      <h1 class="titulo" data-texto-profesor="Hola, Camila" data-texto-estudiante="Hola, Javiera">Hola, Camila</h1>
+      <p class="bajada" data-texto-profesor="Tienes 3 entregas por revisar. Al registrar una revisión, el estado del entregable se actualiza y el estudiante recibe un aviso por correo." data-texto-estudiante="Revisa el estado de tus entregables, sube nuevas versiones y sigue tus plazos.">Tienes 3 entregas por revisar. Al registrar una revisión, el estado del entregable se actualiza y el estudiante recibe un aviso por correo.</p>
+    </div>
+    <div class="pagina-acciones" data-solo-profesor>
+      <a class="boton" href="proyecto-crear.html">Nuevo proyecto</a>
+    </div>
+  </div>
+
+  <section class="panel bandeja" aria-labelledby="bandeja-titulo" data-solo-profesor>
+    <div class="encabezado-seccion">
+      <h2 class="panel-titulo" id="bandeja-titulo">Esperan tu revisión</h2>
+      <span class="chip chip--neutral">3 entregas</span>
+    </div>
+    <ul class="bandeja-lista">
+      <li class="bandeja-fila">
+        <div class="bandeja-datos">
+          <p class="bandeja-titulo"><a href="entregable.html">Informe de avance 1</a></p>
+          <p class="bandeja-meta">Javiera Contreras, memoria de título</p>
+        </div>
+        <div class="bandeja-estado">
+          <span class="chip es-entregado"><span class="chip-punto"></span>Entregado</span>
+          <span class="bandeja-fecha">Versión 2 entregada el 15 oct 2026</span>
+        </div>
+        <a class="boton boton--chico" href="entregable.html">Revisar</a>
+      </li>
+      <li class="bandeja-fila">
+        <div class="bandeja-datos">
+          <p class="bandeja-titulo"><a href="entregable.html">Prototipo funcional</a></p>
+          <p class="bandeja-meta">Javiera Contreras, memoria de título</p>
+        </div>
+        <div class="bandeja-estado">
+          <span class="chip es-atrasado"><span class="chip-punto"></span>Atrasado</span>
+          <span class="bandeja-fecha">Entrega tardía: versión 1, 14 oct 2026</span>
+        </div>
+        <a class="boton boton--chico" href="entregable.html">Revisar</a>
+      </li>
+      <li class="bandeja-fila">
+        <div class="bandeja-datos">
+          <p class="bandeja-titulo"><a href="entregable.html">Manuscrito del segundo artículo</a></p>
+          <p class="bandeja-meta">Fernanda Torres, tesis de doctorado</p>
+        </div>
+        <div class="bandeja-estado">
+          <span class="chip es-entregado"><span class="chip-punto"></span>Entregado</span>
+          <span class="bandeja-fecha">Versión 3 entregada el 7 oct 2026</span>
+        </div>
+        <a class="boton boton--chico" href="entregable.html">Revisar</a>
+      </li>
+    </ul>
+  </section>
+
+  <div class="encabezado-seccion">
+    <h2 class="panel-titulo">Tus proyectos</h2>
+    <p class="tenue chico">Ordenados por última modificación</p>
+  </div>
+
+  <ul class="lista-proyectos">
+    <li class="proyecto-fila">
+      <div class="proyecto-datos">
+        <h3 class="proyecto-titulo"><a href="proyecto.html">Reconocimiento de gestos para interfaces sin contacto en laboratorios clínicos</a></h3>
+        <p class="proyecto-meta">Memoria de título, Javiera Contreras</p>
+        <div class="progreso">
+          <span class="progreso-barra" aria-hidden="true">
+            <span class="progreso-segmento es-completado"></span>
+            <span class="progreso-segmento es-encurso"></span>
+            <span class="progreso-segmento"></span>
+          </span>
+          <span class="progreso-texto">1 de 3 hitos completados</span>
+        </div>
+      </div>
+      <div class="proyecto-lado">
+        <span class="chip es-atrasado"><span class="chip-punto"></span>1 entregable atrasado</span>
+        <p class="proyecto-plazo">Próximo plazo: 20 nov 2026</p>
+        <a class="boton boton--linea boton--chico" href="proyecto.html">Abrir</a>
+      </div>
+    </li>
+
+    <li class="proyecto-fila">
+      <div class="proyecto-datos">
+        <h3 class="proyecto-titulo"><a href="proyecto.html">Reconstrucción 3D de sitios patrimoniales con fotogrametría</a></h3>
+        <p class="proyecto-meta">Memoria de título, Benjamín Aravena</p>
+        <div class="progreso">
+          <span class="progreso-texto">Sin hitos todavía</span>
+        </div>
+      </div>
+      <div class="proyecto-lado">
+        <p class="proyecto-plazo">Creado el 16 oct 2026</p>
+        <a class="boton boton--linea boton--chico" href="proyecto.html">Abrir</a>
+      </div>
+    </li>
+
+    <li class="proyecto-fila">
+      <div class="proyecto-datos">
+        <h3 class="proyecto-titulo"><a href="proyecto.html">Modelos de lenguaje para retroalimentación automática de escritura</a></h3>
+        <p class="proyecto-meta">Tesis de magíster, Matías Riquelme</p>
+        <div class="progreso">
+          <span class="progreso-barra" aria-hidden="true">
+            <span class="progreso-segmento es-encurso"></span>
+            <span class="progreso-segmento"></span>
+          </span>
+          <span class="progreso-texto">0 de 2 hitos completados</span>
+        </div>
+      </div>
+      <div class="proyecto-lado">
+        <span class="chip es-atrasado"><span class="chip-punto"></span>Propuesta de tesis atrasada</span>
+        <p class="proyecto-plazo">Próximo plazo: 11 dic 2026</p>
+        <a class="boton boton--linea boton--chico" href="proyecto.html">Abrir</a>
+      </div>
+    </li>
+
+    <li class="proyecto-fila">
+      <div class="proyecto-datos">
+        <h3 class="proyecto-titulo"><a href="proyecto.html">Verificación formal de protocolos de consenso</a></h3>
+        <p class="proyecto-meta">Tesis de doctorado, Fernanda Torres</p>
+        <div class="progreso">
+          <span class="progreso-barra" aria-hidden="true">
+            <span class="progreso-segmento es-completado"></span>
+            <span class="progreso-segmento es-completado"></span>
+            <span class="progreso-segmento es-encurso"></span>
+          </span>
+          <span class="progreso-texto">2 de 3 hitos completados</span>
+        </div>
+      </div>
+      <div class="proyecto-lado">
+        <span class="chip es-entregado" data-solo-profesor><span class="chip-punto"></span>1 entrega por revisar</span>
+        <p class="proyecto-plazo">Próximo plazo: 18 dic 2026</p>
+        <a class="boton boton--linea boton--chico" href="proyecto.html">Abrir</a>
+      </div>
+    </li>
+
+    <li class="proyecto-fila">
+      <div class="proyecto-datos">
+        <h3 class="proyecto-titulo"><a href="proyecto.html">Monitoreo de humedales urbanos con sensores de bajo costo</a></h3>
+        <p class="proyecto-meta">Proyecto de investigación, Tomás Vargas</p>
+        <div class="progreso">
+          <span class="progreso-barra" aria-hidden="true">
+            <span class="progreso-segmento es-completado"></span>
+            <span class="progreso-segmento es-encurso"></span>
+          </span>
+          <span class="progreso-texto">1 de 2 hitos completados</span>
+        </div>
+      </div>
+      <div class="proyecto-lado">
+        <p class="proyecto-plazo">Próximo plazo: 30 nov 2026</p>
+        <a class="boton boton--linea boton--chico" href="proyecto.html">Abrir</a>
+      </div>
+    </li>
+  </ul>
+</main>
+
+<div class="toast-zona" aria-live="polite"></div>
+<script src="js/mockup.js"></script>
+</body>
+</html>

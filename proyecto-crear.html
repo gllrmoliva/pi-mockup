@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuevo proyecto · Hito</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<a class="salto" href="#contenido">Saltar al contenido</a>
+
+<nav class="maqueta" aria-label="Navegación de la maqueta">
+  <details class="maqueta-rol">
+    <summary class="maqueta-marca">
+      <span>Maqueta</span>
+      <span class="maqueta-rol-actual" data-rol-actual>Profesor</span>
+      <svg class="maqueta-rol-flecha" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+    <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
+      <p class="maqueta-menu-titulo">Ver como</p>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
+    </div>
+  </details>
+  <ul class="maqueta-lista">
+    <li><a href="index.html">Ingreso</a></li>
+    <li><a href="proyectos.html">Proyectos</a></li>
+    <li><a href="proyecto.html">Detalle del proyecto</a></li>
+    <li><a href="kanban.html">Tablero</a></li>
+    <li data-rol="profesor"><a href="entregable.html">Entregable (profesora)</a></li>
+    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable (estudiante)</a></li>
+    <li data-rol="profesor"><a href="proyecto-crear.html" aria-current="page">Crear proyecto</a></li>
+    <li data-rol="profesor"><a href="proyecto-editar.html">Editar proyecto</a></li>
+  </ul>
+  <span class="maqueta-nota">Datos ficticios, no es la aplicación real</span>
+</nav>
+
+<header class="cabecera">
+  <div class="cabecera-fila">
+    <p class="marca">
+      <span class="marca-nombre">Hito</span>
+      <span class="marca-lema">Gestión de memorias y tesis</span>
+    </p>
+    <details class="cuenta">
+      <summary class="cuenta-trigger">
+        <span class="avatar" aria-hidden="true">CS</span>
+        <span class="cuenta-nombre">Camila Soto</span>
+        <svg class="cuenta-flecha" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="cuenta-menu">
+        <p class="cuenta-rol">Profesora guía</p>
+        <button class="cuenta-opcion" type="button" data-aviso="En la aplicación real se abriría la configuración de la cuenta.">Configuración</button>
+        <a class="cuenta-opcion" href="index.html">Cerrar sesión</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main id="contenido" class="contenedor contenedor--angosto">
+  <p class="volver"><a href="proyectos.html">Volver a tus proyectos</a></p>
+
+  <div class="pagina-cabecera">
+    <div>
+      <h1 class="titulo">Nuevo proyecto</h1>
+      <p class="bajada">Define el tema, quiénes participan y cómo se organiza el trabajo.</p>
+    </div>
+  </div>
+
+  <form class="formulario">
+    <fieldset class="grupo">
+      <legend class="leyenda">Datos del proyecto</legend>
+      <div class="campo">
+        <label for="tema">Tema del proyecto</label>
+        <input class="entrada" type="text" id="tema" placeholder="Por ejemplo: Reconocimiento de gestos para interfaces sin contacto">
+      </div>
+      <div class="campo">
+        <label for="tipo">Tipo de proyecto</label>
+        <select class="entrada" id="tipo">
+          <option selected>Memoria de título</option>
+          <option>Tesis de magíster</option>
+          <option>Tesis de doctorado</option>
+          <option>Proyecto de investigación</option>
+        </select>
+      </div>
+      <div class="campos-fila">
+        <div class="campo">
+          <label for="fecha-inicio">Fecha de inicio</label>
+          <input class="entrada" type="date" id="fecha-inicio" value="2026-10-18">
+        </div>
+        <div class="campo">
+          <label for="fecha-termino">Término previsto</label>
+          <input class="entrada" type="date" id="fecha-termino">
+          <p class="ayuda">Opcional. Puedes ajustarlo más adelante.</p>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="grupo">
+      <legend class="leyenda">Participantes</legend>
+      <div class="campo">
+        <p class="etiqueta-campo">Gestoras y gestores</p>
+        <div class="chips-personas">
+          <span class="chip-persona"><span class="avatar avatar--chico">CS</span>Camila Soto <span class="rol">Tú, gestora</span></span>
+        </div>
+        <div class="agregar-persona">
+          <input class="entrada" type="email" id="gestor-correo" placeholder="nombre@correo.cl" aria-label="Correo del gestor o gestora que quieres invitar">
+          <button class="boton boton--linea" type="button" data-aviso="En la aplicación real se enviaría una invitación por correo a la persona indicada.">Agregar</button>
+        </div>
+        <p class="ayuda">Quien crea el proyecto queda como gestor automáticamente. Puedes sumar co-guías o profesores externos.</p>
+      </div>
+      <div class="campo">
+        <p class="etiqueta-campo">Colaboradores</p>
+        <div class="chips-personas"></div>
+        <div class="agregar-persona">
+          <input class="entrada" type="email" id="colaborador-correo" placeholder="nombre@correo.cl" aria-label="Correo del colaborador o colaboradora que quieres invitar">
+          <button class="boton boton--linea" type="button" data-aviso="En la aplicación real se enviaría una invitación por correo a la persona indicada.">Agregar</button>
+        </div>
+        <p class="ayuda">Al menos una persona que entregue avances y reciba la retroalimentación.</p>
+        <p class="error-campo oculto" id="error-colaboradores">El proyecto requiere tener al menos un colaborador.</p>
+        <button class="demo mt-10" type="button" data-demo="error-colaboradores" data-alternar="Ocultar el error">Ver el error sin colaboradores</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="grupo">
+      <legend class="leyenda">Plantilla de hitos</legend>
+      <p class="ayuda mb-10">La plantilla se copia al crear el proyecto y después puedes editarla. Los cambios no afectan a otros proyectos.</p>
+      <div class="plantillas">
+        <label class="plantilla">
+          <input type="radio" name="plantilla" value="memoria" checked>
+          <span class="plantilla-caja">
+            <span class="plantilla-punto" aria-hidden="true"></span>
+            <span>
+              <span class="plantilla-nombre">Memoria de título, Ing. Civil Informática</span>
+              <span class="plantilla-hitos">5 hitos: Propuesta de memoria, Informe de avance 1, Informe de avance 2, Informe final, Defensa.</span>
+            </span>
+          </span>
+        </label>
+        <label class="plantilla">
+          <input type="radio" name="plantilla" value="magister">
+          <span class="plantilla-caja">
+            <span class="plantilla-punto" aria-hidden="true"></span>
+            <span>
+              <span class="plantilla-nombre">Tesis de magíster, Ciencias de la Computación</span>
+              <span class="plantilla-hitos">5 hitos: Propuesta de tesis, Avance 1, Avance 2, Publicación, Defensa.</span>
+            </span>
+          </span>
+        </label>
+        <label class="plantilla">
+          <input type="radio" name="plantilla" value="ninguna">
+          <span class="plantilla-caja">
+            <span class="plantilla-punto" aria-hidden="true"></span>
+            <span>
+              <span class="plantilla-nombre">Sin plantilla</span>
+              <span class="plantilla-sin">Crea los hitos manualmente después de guardar el proyecto.</span>
+            </span>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="acciones-formulario">
+      <a class="boton boton--linea" href="proyectos.html">Cancelar</a>
+      <button class="boton" type="submit" data-aviso="En la aplicación real, el proyecto se crearía con los hitos de la plantilla y quedarías como gestora.">Crear proyecto</button>
+    </div>
+  </form>
+</main>
+
+<div class="toast-zona" aria-live="polite"></div>
+<script src="js/mockup.js"></script>
+</body>
+</html>

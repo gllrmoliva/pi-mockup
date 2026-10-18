@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reconocimiento de gestos · Hito</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<a class="salto" href="#contenido">Saltar al contenido</a>
+
+<nav class="maqueta" aria-label="Navegación de la maqueta">
+  <details class="maqueta-rol">
+    <summary class="maqueta-marca">
+      <span>Maqueta</span>
+      <span class="maqueta-rol-actual" data-rol-actual>Profesor</span>
+      <svg class="maqueta-rol-flecha" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </summary>
+    <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
+      <p class="maqueta-menu-titulo">Ver como</p>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
+      <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
+    </div>
+  </details>
+  <ul class="maqueta-lista">
+    <li><a href="index.html">Ingreso</a></li>
+    <li><a href="proyectos.html">Proyectos</a></li>
+    <li><a href="proyecto.html" aria-current="page">Detalle del proyecto</a></li>
+    <li><a href="kanban.html">Tablero</a></li>
+    <li data-rol="profesor"><a href="entregable.html">Entregable (profesora)</a></li>
+    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable (estudiante)</a></li>
+    <li data-rol="profesor"><a href="proyecto-crear.html">Crear proyecto</a></li>
+    <li data-rol="profesor"><a href="proyecto-editar.html">Editar proyecto</a></li>
+  </ul>
+  <span class="maqueta-nota">Datos ficticios, no es la aplicación real</span>
+</nav>
+
+<header class="cabecera">
+  <div class="cabecera-fila">
+    <p class="marca">
+      <span class="marca-nombre">Hito</span>
+      <span class="marca-lema">Gestión de memorias y tesis</span>
+    </p>
+    <details class="cuenta" data-cuenta="compartida">
+      <summary class="cuenta-trigger">
+        <span class="avatar" aria-hidden="true">CS</span>
+        <span class="cuenta-nombre">Camila Soto</span>
+        <svg class="cuenta-flecha" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <div class="cuenta-menu">
+        <p class="cuenta-rol">Profesora guía</p>
+        <button class="cuenta-opcion" type="button" data-aviso="En la aplicación real se abriría la configuración de la cuenta.">Configuración</button>
+        <a class="cuenta-opcion" href="index.html">Cerrar sesión</a>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main id="contenido" class="contenedor">
+  <p class="volver"><a href="proyectos.html">Volver a tus proyectos</a></p>
+
+  <div class="pagina-cabecera">
+    <div>
+      <h1 class="titulo titulo--ancho">Reconocimiento de gestos para interfaces sin contacto en laboratorios clínicos</h1>
+      <p class="bajada">Memoria de título de Javiera Contreras, iniciada el 3 de agosto de 2026.</p>
+      <ul class="participantes">
+        <li class="participante"><span class="avatar avatar--chico">CS</span>Camila Soto <span class="rol">Gestora</span></li>
+        <li class="participante"><span class="avatar avatar--chico">RP</span>Rodrigo Peña <span class="rol">Gestor</span></li>
+        <li class="participante"><span class="avatar avatar--chico avatar--claro">JC</span>Javiera Contreras <span class="rol">Colaboradora</span></li>
+      </ul>
+    </div>
+    <div class="pagina-acciones" data-solo-profesor>
+      <button class="boton boton--linea" type="button" data-aviso="En la aplicación real se descargaría un archivo .ics con las fechas de entrega del proyecto.">Exportar plazos (.ics)</button>
+      <a class="boton boton--linea" href="proyecto-editar.html">Editar proyecto</a>
+      <button class="boton" type="button" data-abrir="modal-nuevo-hito">Nuevo hito</button>
+    </div>
+  </div>
+
+  <nav class="pestanas" aria-label="Vistas del proyecto">
+    <a href="proyecto.html" aria-current="page">Estructura</a>
+    <a href="kanban.html">Tablero</a>
+  </nav>
+
+  <section class="panel" aria-labelledby="estructura-titulo">
+    <div class="encabezado-seccion">
+      <h2 class="panel-titulo" id="estructura-titulo">Hitos y entregables</h2>
+      <button class="demo" type="button" data-demo="sin-hitos" data-oculta="cronologia" data-alternar="Volver a la vista con hitos">
+        Ver el estado sin hitos
+      </button>
+    </div>
+
+    <div class="vacio oculto" id="sin-hitos">
+      <h3 class="hito-nombre">No existen hitos para este proyecto</h3>
+      <p>Crea el primer hito para empezar a definir entregables y fechas.</p>
+      <button class="boton" type="button" data-abrir="modal-nuevo-hito" data-solo-profesor>Crear el primer hito</button>
+    </div>
+
+    <ol class="cronologia" id="cronologia">
+      <li class="hito">
+        <span class="marcador es-completado" aria-hidden="true">1</span>
+        <div class="hito-cabecera">
+          <h3 class="hito-nombre">Propuesta de memoria</h3>
+          <span class="chip es-aprobado"><span class="chip-punto"></span>Completado</span>
+          <p class="hito-fecha">Completado el 11 de septiembre de 2026</p>
+          <div class="hito-acciones" data-solo-profesor>
+            <button class="boton boton--sutil" type="button" data-abrir="modal-editar-hito">Editar hito</button>
+            <button class="boton boton--sutil" type="button" data-abrir="modal-nuevo-entregable">Nuevo entregable</button>
+          </div>
+        </div>
+        <ul class="entregables">
+          <li class="entregable-fila">
+            <div>
+              <p class="entregable-titulo">Anteproyecto</p>
+              <p class="entregable-meta">Vence el 4 sep 2026. Última entrega: versión 2, 28 ago 2026.</p>
+            </div>
+            <span class="chip es-aprobado"><span class="chip-punto"></span>Aprobado</span>
+            <div class="entregable-acciones">
+              <button class="boton boton--sutil" type="button" data-abrir="modal-editar-entregable" data-solo-profesor>Editar</button>
+            </div>
+          </li>
+          <li class="entregable-fila">
+            <div>
+              <p class="entregable-titulo">Estado del arte</p>
+              <p class="entregable-meta">Vence el 9 sep 2026. Última entrega: versión 1, 9 sep 2026.</p>
+            </div>
+            <span class="chip es-aprobado"><span class="chip-punto"></span>Aprobado</span>
+            <div class="entregable-acciones">
+              <button class="boton boton--sutil" type="button" data-abrir="modal-editar-entregable" data-solo-profesor>Editar</button>
+            </div>
+          </li>
+        </ul>
+      </li>
+
+      <li class="hito">
+        <span class="marcador es-encurso" aria-hidden="true">2</span>
+        <div class="hito-cabecera">
+          <h3 class="hito-nombre">Desarrollo y validación</h3>
+          <span class="chip es-encurso"><span class="chip-punto"></span>En curso</span>
+          <p class="hito-fecha">4 entregables, 1 atrasado</p>
+          <div class="hito-acciones" data-solo-profesor>
+            <button class="boton boton--sutil" type="button" data-abrir="modal-editar-hito">Editar hito</button>
+            <button class="boton boton--sutil" type="button" data-abrir="modal-nuevo-entregable">Nuevo entregable</button>
+          </div>
+        </div>
+        <ul class="entregables">
+          <li class="entregable-fila">
+            <div>
+              <p class="entregable-titulo">Revisión bibliográfica ampliada</p>
+              <p class="entregable-meta">Venció el 30 sep 2026. Última entrega: versión 1, 29 sep 2026.</p>
+            </div>
+            <span class="chip es-cambios"><span class="chip-punto"></span>Cambios solicitados</span>
+            <div class="entregable-acciones">
+              <button class="boton boton--sutil" type="button" data-abrir="modal-editar-entregable" data-solo-profesor>Editar</button>
+            </div>
+          </li>
+          <li class="entregable-fila">
+            <div>
+              <p class="entregable-titulo"><a href="entregable.html" data-entregable>Informe de avance 1</a></p>
+              <p class="entregable-meta">Vence el 20 nov 2026. Última entrega: versión 2, 15 oct 2026.</p>
+            </div>
+            <span class="chip es-entregado"><span class="chip-punto"></span>Entregado</span>
+            <div class="entregable-acciones">
+              <a class="boton boton--chico" href="entregable.html" data-solo-profesor>Revisar</a>
+              <button class="boton boton--sutil" type="button" data-abrir="modal-editar-entregable" data-solo-profesor>Editar</button>
+            </div>
+          </li>
+          <li class="entregable-fila">
+            <div>
+              <p class="entregable-titulo"><a href="entregable.html" data-entregable>Prototipo funcional</a></p>
+              <p class="entregable-meta">Venció el 12 oct 2026. Entrega tardía: versión 1, 14 oct 2026.</p>
+            </div>
+            <span class="chip es-atrasado"><span class="chip-punto"></span>Atrasado</span>
+            <div class="entregable-acciones">
+              <a class="boton boton--chico" href="entregable.html" data-solo-profesor>Revisar</a>
+              <button class="boton boton--sutil" type="button" data-abrir="modal-editar-entregable" data-solo-profesor>Editar</button>
+            </div>
+          </li>
+          <li class="entregable-fila">
+            <div>
+              <p class="entregable-titulo">Demostración en laboratorio</p>
+              <p class="entregable-meta">Vence el 4 dic 2026. Sin entregas.</p>
+            </div>
+            <span class="chip es-pendiente"><span class="chip-punto"></span>Pendiente</span>
+            <div class="entregable-acciones">
+              <button class="boton boton--sutil" type="button" data-abrir="modal-editar-entregable" data-solo-profesor>Editar</button>
+            </div>
+          </li>
+        </ul>
+      </li>
+
+      <li class="hito">
+        <span class="marcador" aria-hidden="true">3</span>
+        <div class="hito-cabecera">
+          <h3 class="hito-nombre">Informe final y defensa</h3>
+          <span class="chip es-pendiente"><span class="chip-punto"></span>Pendiente</span>
+          <p class="hito-fecha">2 entregables</p>
+          <div class="hito-acciones" data-solo-profesor>
+            <button class="boton boton--sutil" type="button" data-abrir="modal-editar-hito">Editar hito</button>
+            <button class="boton boton--sutil" type="button" data-abrir="modal-nuevo-entregable">Nuevo entregable</button>
+          </div>
+        </div>
+        <ul class="entregables">
+          <li class="entregable-fila">
+            <div>
+              <p class="entregable-titulo">Informe final</p>
+              <p class="entregable-meta">Vence el 15 ene 2027. Sin entregas.</p>
+            </div>
+            <span class="chip es-pendiente"><span class="chip-punto"></span>Pendiente</span>
+            <div class="entregable-acciones">
+              <button class="boton boton--sutil" type="button" data-abrir="modal-editar-entregable" data-solo-profesor>Editar</button>
+            </div>
+          </li>
+          <li class="entregable-fila">
+            <div>
+              <p class="entregable-titulo">Presentación de defensa</p>
+              <p class="entregable-meta">Vence el 22 ene 2027. Sin entregas.</p>
+            </div>
+            <span class="chip es-pendiente"><span class="chip-punto"></span>Pendiente</span>
+            <div class="entregable-acciones">
+              <button class="boton boton--sutil" type="button" data-abrir="modal-editar-entregable" data-solo-profesor>Editar</button>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ol>
+  </section>
+</main>
+
+<!-- Modal: nuevo hito -->
+<dialog class="modal" id="modal-nuevo-hito" aria-labelledby="titulo-nuevo-hito">
+  <div class="modal-cabecera">
+    <div>
+      <h2 class="modal-titulo" id="titulo-nuevo-hito">Nuevo hito</h2>
+      <p class="modal-contexto">Reconocimiento de gestos para interfaces sin contacto</p>
+    </div>
+    <button class="modal-cerrar" type="button" data-cerrar aria-label="Cerrar">✕</button>
+  </div>
+  <div class="modal-cuerpo">
+    <div class="campo">
+      <label for="hito-nombre">Nombre del hito</label>
+      <input class="entrada" type="text" id="hito-nombre" placeholder="Por ejemplo: Informe de avance 2">
+    </div>
+    <div class="campo">
+      <label for="hito-posicion">Posición en la lista</label>
+      <select class="entrada" id="hito-posicion">
+        <option>Al final de la lista</option>
+        <option>Después de «Propuesta de memoria»</option>
+        <option>Después de «Desarrollo y validación»</option>
+      </select>
+    </div>
+    <div class="alerta oculto" id="error-hito-nombre">
+      <span>El Hito debe tener un nombre.</span>
+    </div>
+  </div>
+  <div class="modal-acciones">
+    <button class="boton boton--linea" type="button" data-cerrar>Cancelar</button>
+    <button class="boton" type="button" data-aviso="El hito se agregaría al proyecto en la posición elegida." data-cerrar>Crear hito</button>
+  </div>
+  <div class="demo-barra">
+    <button class="demo" type="button" data-demo="error-hito-nombre" data-alternar="Ocultar el error">Ver el error de nombre vacío</button>
+  </div>
+</dialog>
+
+<!-- Modal: editar hito -->
+<dialog class="modal" id="modal-editar-hito" aria-labelledby="titulo-editar-hito">
+  <div class="modal-cabecera">
+    <div>
+      <h2 class="modal-titulo" id="titulo-editar-hito">Editar hito</h2>
+      <p class="modal-contexto">Hito 2 de 3 del proyecto</p>
+    </div>
+    <button class="modal-cerrar" type="button" data-cerrar aria-label="Cerrar">✕</button>
+  </div>
+  <div class="modal-cuerpo">
+    <div class="campo">
+      <label for="hito-editar-nombre">Nombre del hito</label>
+      <input class="entrada" type="text" id="hito-editar-nombre" value="Desarrollo y validación">
+      <p class="ayuda">El nombre es visible para todos los participantes del proyecto.</p>
+    </div>
+  </div>
+  <div class="modal-acciones">
+    <button class="boton boton--linea" type="button" data-cerrar>Cancelar</button>
+    <button class="boton" type="button" data-aviso="El nombre del hito se actualizaría." data-cerrar>Guardar cambios</button>
+  </div>
+</dialog>
+
+<!-- Modal: nuevo entregable -->
+<dialog class="modal" id="modal-nuevo-entregable" aria-labelledby="titulo-nuevo-entregable">
+  <div class="modal-cabecera">
+    <div>
+      <h2 class="modal-titulo" id="titulo-nuevo-entregable">Nuevo entregable</h2>
+      <p class="modal-contexto">Hito «Desarrollo y validación»</p>
+    </div>
+    <button class="modal-cerrar" type="button" data-cerrar aria-label="Cerrar">✕</button>
+  </div>
+  <div class="modal-cuerpo">
+    <div class="alerta oculto" id="error-entregable">
+      <span>Los campos no pueden estar vacíos. Ingrese una fecha de entrega válida.</span>
+    </div>
+    <div class="campo">
+      <label for="ent-nombre">Nombre del entregable</label>
+      <input class="entrada" type="text" id="ent-nombre" placeholder="Por ejemplo: Informe de avance 2">
+    </div>
+    <div class="campo">
+      <label for="ent-descripcion">Descripción</label>
+      <textarea class="entrada" id="ent-descripcion" placeholder="Qué debe contener esta entrega y en qué formato"></textarea>
+    </div>
+    <div class="campo">
+      <label for="ent-fecha">Fecha de entrega</label>
+      <input class="entrada" type="date" id="ent-fecha">
+      <p class="ayuda">Debe ser una fecha futura.</p>
+    </div>
+    <div class="campos-fila">
+      <div class="campo">
+        <label for="ent-formatos">Formatos admitidos</label>
+        <select class="entrada" id="ent-formatos">
+          <option selected>PDF y ZIP</option>
+          <option>Solo PDF</option>
+          <option>PDF, ZIP y DOCX</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="ent-tamano">Tamaño máximo por archivo (MB)</label>
+        <input class="entrada" type="number" id="ent-tamano" value="50" min="1">
+      </div>
+    </div>
+    <div class="campo">
+      <label for="ent-posicion">Posición dentro del hito</label>
+      <select class="entrada" id="ent-posicion">
+        <option>Al final del hito</option>
+        <option>Antes de «Informe de avance 1»</option>
+        <option>Antes de «Prototipo funcional»</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-acciones">
+    <button class="boton boton--linea" type="button" data-cerrar>Cancelar</button>
+    <button class="boton" type="button" data-aviso="El entregable se guardaría dentro del hito, en la posición elegida." data-cerrar>Crear entregable</button>
+  </div>
+  <div class="demo-barra">
+    <button class="demo" type="button" data-demo="error-entregable" data-alternar="Ocultar los errores">Ver los errores de validación</button>
+  </div>
+</dialog>
+
+<!-- Modal: editar entregable -->
+<dialog class="modal" id="modal-editar-entregable" aria-labelledby="titulo-editar-entregable">
+  <div class="modal-cabecera">
+    <div>
+      <h2 class="modal-titulo" id="titulo-editar-entregable">Editar entregable</h2>
+      <p class="modal-contexto">Informe de avance 1, hito «Desarrollo y validación»</p>
+    </div>
+    <button class="modal-cerrar" type="button" data-cerrar aria-label="Cerrar">✕</button>
+  </div>
+  <div class="modal-cuerpo">
+    <div class="alerta oculto" id="error-editar-entregable">
+      <span>Los campos no pueden estar vacíos. Ingrese una fecha de entrega válida.</span>
+    </div>
+    <div class="campo">
+      <label for="ented-nombre">Nombre del entregable</label>
+      <input class="entrada" type="text" id="ented-nombre" value="Informe de avance 1">
+    </div>
+    <div class="campo">
+      <label for="ented-descripcion">Descripción</label>
+      <textarea class="entrada" id="ented-descripcion">Segundo avance del trabajo de título. Debe incluir el estado del arte corregido, el diseño de la solución y los primeros resultados.</textarea>
+    </div>
+    <div class="campo">
+      <label for="ented-fecha">Fecha de entrega</label>
+      <input class="entrada" type="date" id="ented-fecha" value="2026-11-20">
+    </div>
+    <div class="campos-fila">
+      <div class="campo">
+        <label for="ented-formatos">Formatos admitidos</label>
+        <select class="entrada" id="ented-formatos">
+          <option selected>PDF y ZIP</option>
+          <option>Solo PDF</option>
+          <option>PDF, ZIP y DOCX</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="ented-tamano">Tamaño máximo por archivo (MB)</label>
+        <input class="entrada" type="number" id="ented-tamano" value="50" min="1">
+      </div>
+    </div>
+    <div class="campo">
+      <label for="ented-posicion">Posición dentro del hito</label>
+      <select class="entrada" id="ented-posicion">
+        <option>Primero del hito</option>
+        <option>Segundo del hito</option>
+        <option>Al final del hito</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-acciones">
+    <button class="boton boton--linea" type="button" data-cerrar>Cancelar</button>
+    <button class="boton" type="button" data-aviso="Los cambios del entregable se guardarían." data-cerrar>Guardar cambios</button>
+  </div>
+  <div class="demo-barra">
+    <button class="demo" type="button" data-demo="error-editar-entregable" data-alternar="Ocultar los errores">Ver los errores de validación</button>
+  </div>
+</dialog>
+
+<div class="toast-zona" aria-live="polite"></div>
+<script src="js/mockup.js"></script>
+</body>
+</html>
