@@ -56,6 +56,15 @@
     });
   });
 
+  /* --- Proyectos de cada estudiante: desplegable nativo al pulsar ------ */
+  $$(".estudiante-desplegable").forEach((detalle) => {
+    detalle.addEventListener("keydown", (evento) => {
+      if (evento.key !== "Escape") return;
+      detalle.open = false;
+      $("summary", detalle).focus();
+    });
+  });
+
   /* --- Menú de cuenta ------------------------------------------------- */
 
   $$(".cuenta").forEach((cuenta) => {
@@ -113,7 +122,7 @@
     const opciones = $$("[data-rol-opcion]", maqueta);
     const nombres = { profesor: "Profesor", estudiante: "Estudiante" };
     const PERSONAS = {
-      profesor: { iniciales: "CS", nombre: "Camila Soto", rol: "Profesora guía" },
+      profesor: { iniciales: "CS", nombre: "Camila Soto", rol: "Profesor guía" },
       estudiante: { iniciales: "JC", nombre: "Javiera Contreras", rol: "Memorista" }
     };
 
@@ -168,6 +177,9 @@
         guardarRol(rol);
         aplicarRol(rol);
         if (detalle) detalle.open = false;
+        const resumen = detalle && $("summary", detalle);
+        if (resumen) resumen.focus();
+        avisar(`Vista de ${nombres[rol]} activada. Los enlaces y acciones compartidos se adaptaron a este tipo de usuario.`, resumen, "Vista actualizada");
       });
     });
   }
@@ -176,24 +188,60 @@
 
   const zona = $(".toast-zona");
 
-  const avisar = (texto) => {
+  const avisar = (texto, origen, titulo = "Maqueta · Acción simulada") => {
     if (!zona) return;
     const aviso = document.createElement("div");
     aviso.className = "toast";
-    aviso.setAttribute("role", "status");
-    aviso.textContent = texto;
-    zona.appendChild(aviso);
+    const volver = origen?.getClientRects().length ? origen
+      : origen?.closest("details")?.querySelector("summary") || document.activeElement;
+    const contenido = document.createElement("div");
+    const encabezado = document.createElement("strong");
+    encabezado.className = "feedback-titulo";
+    encabezado.textContent = titulo;
+    const mensaje = document.createElement("p");
+    mensaje.textContent = texto;
+    contenido.append(encabezado, mensaje);
+    const cerrar = document.createElement("button");
+    cerrar.type = "button";
+    cerrar.className = "toast-cerrar";
+    cerrar.setAttribute("aria-label", "Cerrar aviso");
+    cerrar.textContent = "×";
+    cerrar.addEventListener("click", () => {
+      if (aviso.contains(document.activeElement) && volver?.isConnected) volver.focus();
+      aviso.remove();
+    });
+    aviso.append(contenido, cerrar);
+    // Un solo aviso, sin caducidad: se puede leer y cerrar al propio ritmo.
+    zona.replaceChildren(aviso);
     requestAnimationFrame(() => aviso.classList.add("visible"));
-    window.setTimeout(() => {
-      aviso.classList.remove("visible");
-      window.setTimeout(() => aviso.remove(), 250);
-    }, 4200);
+  };
+
+  const confirmarDemo = (elemento) => {
+    const retorno = document.getElementById(elemento.dataset.retorno);
+    if (retorno) {
+      retorno.textContent = `Demostración: ${elemento.dataset.aviso}`;
+    } else {
+      avisar(elemento.dataset.aviso, elemento);
+    }
   };
 
   $$("[data-aviso]").forEach((elemento) => {
+    // El feedback de envío espera la validación nativa del formulario.
+    if (elemento.type === "submit" && elemento.form) return;
     elemento.addEventListener("click", (evento) => {
       if (elemento.getAttribute("href") === "#") evento.preventDefault();
-      avisar(elemento.dataset.aviso);
+      confirmarDemo(elemento);
+    });
+  });
+
+  /* Solo muestra los nombres seleccionados; no lee ni sube los archivos. */
+  $$(".entrada-archivo").forEach((entrada) => {
+    entrada.addEventListener("change", () => {
+      const seleccion = document.getElementById(entrada.dataset.seleccion);
+      if (!seleccion) return;
+      seleccion.textContent = entrada.files.length
+        ? `Selección local: ${Array.from(entrada.files, (archivo) => archivo.name).join(", ")}. No se han subido archivos.`
+        : "No hay archivos seleccionados.";
     });
   });
 
@@ -389,7 +437,8 @@
         actualizarCuentas();
         const titulo = $(".tarjeta-titulo", tarjeta).textContent.trim();
         const nombre = $(".columna-nombre", columnaDestino).textContent.trim();
-        anunciar(`Tarjeta «${titulo}» movida a la columna ${nombre}.`);
+        const mensaje = `Demo: tarjeta «${titulo}» movida visualmente a ${nombre}. Su estado no cambió; al recargar vuelve a su posición original.`;
+        anunciar(mensaje);
       }
     };
 
@@ -541,7 +590,11 @@
 
   $$("form").forEach((formulario) => {
     if (!formulario.getAttribute("action")) {
-      formulario.addEventListener("submit", (evento) => evento.preventDefault());
+      formulario.addEventListener("submit", (evento) => {
+        evento.preventDefault();
+        const boton = evento.submitter || $('[type="submit"]', formulario);
+        if (boton?.dataset.aviso) confirmarDemo(boton);
+      });
     }
   });
 })();

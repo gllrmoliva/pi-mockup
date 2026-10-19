@@ -4,37 +4,43 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reconocimiento de gestos · Hito</title>
-<link rel="stylesheet" href="css/estilos.css">
+<link rel="stylesheet" href="css/estilos.css?v=20261019-estudiante-activo">
 </head>
 <body>
 <a class="salto" href="#contenido">Saltar al contenido</a>
 
 <nav class="maqueta" aria-label="Navegación de la maqueta">
   <details class="maqueta-rol">
-    <summary class="maqueta-marca">
-      <span>Maqueta</span>
-      <span class="maqueta-rol-actual" data-rol-actual>Profesor</span>
-      <svg class="maqueta-rol-flecha" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-        <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <summary class="maqueta-marca" aria-label="Seleccionar vistas de la maqueta" title="Seleccionar vistas">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </summary>
-    <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
-      <p class="maqueta-menu-titulo">Ver como</p>
-      <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
-      <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
-    </div>
-  </details>
+    <div class="maqueta-panel">
+      <a class="maqueta-inicio" href="index.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Volver a inicio
+      </a>
+      <p class="maqueta-panel-titulo">Vistas de la maqueta</p>
+      <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
+        <p class="maqueta-menu-titulo">Ver como <span class="maqueta-rol-actual" data-rol-actual>Profesor</span></p>
+        <div class="maqueta-opciones">
+          <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
+          <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
+        </div>
+      </div>
   <ul class="maqueta-lista">
-    <li><a href="index.html">Ingreso</a></li>
+    <li><a href="ingreso.html">Ingreso</a></li>
     <li><a href="proyectos.html">Proyectos</a></li>
+    <li data-rol="profesor"><a href="estudiantes.html">Estudiantes</a></li>
     <li><a href="proyecto.html" aria-current="page">Detalle del proyecto</a></li>
     <li><a href="kanban.html">Tablero</a></li>
-    <li data-rol="profesor"><a href="entregable.html">Entregable (profesora)</a></li>
-    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable (estudiante)</a></li>
+    <li data-rol="profesor"><a href="entregable.html">Entregable</a></li>
+    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable</a></li>
     <li data-rol="profesor"><a href="proyecto-crear.html">Crear proyecto</a></li>
     <li data-rol="profesor"><a href="proyecto-editar.html">Editar proyecto</a></li>
   </ul>
-  <span class="maqueta-nota">Datos ficticios, no es la aplicación real</span>
+      <p class="maqueta-nota">Datos ficticios, no es la aplicación real.</p>
+    </div>
+  </details>
 </nav>
 
 <header class="cabecera">
@@ -43,6 +49,10 @@
       <span class="marca-nombre">Hito</span>
       <span class="marca-lema">Gestión de memorias y tesis</span>
     </p>
+    <nav class="navegacion-principal" aria-label="Navegación principal">
+      <a href="proyectos.html">Proyectos</a>
+      <a href="estudiantes.html" data-solo-profesor>Estudiantes</a>
+    </nav>
     <details class="cuenta" data-cuenta="compartida">
       <summary class="cuenta-trigger">
         <span class="avatar" aria-hidden="true">CS</span>
@@ -52,25 +62,23 @@
         </svg>
       </summary>
       <div class="cuenta-menu">
-        <p class="cuenta-rol">Profesora guía</p>
+        <p class="cuenta-rol">Profesor guía</p>
         <button class="cuenta-opcion" type="button" data-aviso="En la aplicación real se abriría la configuración de la cuenta.">Configuración</button>
-        <a class="cuenta-opcion" href="index.html">Cerrar sesión</a>
+        <a class="cuenta-opcion" href="ingreso.html">Cerrar sesión</a>
       </div>
     </details>
   </div>
 </header>
 
 <main id="contenido" class="contenedor">
-  <p class="volver"><a href="proyectos.html">Volver a tus proyectos</a></p>
-
   <div class="pagina-cabecera">
     <div>
       <h1 class="titulo titulo--ancho">Reconocimiento de gestos para interfaces sin contacto en laboratorios clínicos</h1>
       <p class="bajada">Memoria de título de Javiera Contreras, iniciada el 3 de agosto de 2026.</p>
       <ul class="participantes">
-        <li class="participante"><span class="avatar avatar--chico">CS</span>Camila Soto <span class="rol">Gestora</span></li>
+        <li class="participante"><span class="avatar avatar--chico">CS</span>Camila Soto <span class="rol">Gestor</span></li>
         <li class="participante"><span class="avatar avatar--chico">RP</span>Rodrigo Peña <span class="rol">Gestor</span></li>
-        <li class="participante"><span class="avatar avatar--chico avatar--claro">JC</span>Javiera Contreras <span class="rol">Colaboradora</span></li>
+        <li class="participante"><span class="avatar avatar--chico avatar--claro">JC</span>Javiera Contreras <span class="rol">Colaborador</span></li>
       </ul>
     </div>
     <div class="pagina-acciones" data-solo-profesor>
@@ -100,7 +108,7 @@
     </div>
 
     <ol class="cronologia" id="cronologia">
-      <li class="hito">
+      <li class="hito hito--completado">
         <span class="marcador es-completado" aria-hidden="true">1</span>
         <div class="hito-cabecera">
           <h3 class="hito-nombre">Propuesta de memoria</h3>
@@ -111,11 +119,16 @@
             <button class="boton boton--sutil" type="button" data-abrir="modal-nuevo-entregable">Nuevo entregable</button>
           </div>
         </div>
+        <div class="hito-avance">
+          <label for="avance-hito-1">2 de 2 entregables aprobados</label>
+          <progress id="avance-hito-1" value="2" max="2">2 de 2</progress>
+        </div>
         <ul class="entregables">
           <li class="entregable-fila">
             <div>
               <p class="entregable-titulo">Anteproyecto</p>
-              <p class="entregable-meta">Vence el 4 sep 2026. Última entrega: versión 2, 28 ago 2026.</p>
+              <p class="entregable-plazo">Vence el 4 sep 2026</p>
+              <p class="entregable-meta">Última entrega: versión 2, 28 ago 2026.</p>
             </div>
             <span class="chip es-aprobado"><span class="chip-punto"></span>Aprobado</span>
             <div class="entregable-acciones">
@@ -125,7 +138,8 @@
           <li class="entregable-fila">
             <div>
               <p class="entregable-titulo">Estado del arte</p>
-              <p class="entregable-meta">Vence el 9 sep 2026. Última entrega: versión 1, 9 sep 2026.</p>
+              <p class="entregable-plazo">Vence el 9 sep 2026</p>
+              <p class="entregable-meta">Última entrega: versión 1, 9 sep 2026.</p>
             </div>
             <span class="chip es-aprobado"><span class="chip-punto"></span>Aprobado</span>
             <div class="entregable-acciones">
@@ -135,7 +149,7 @@
         </ul>
       </li>
 
-      <li class="hito">
+      <li class="hito hito--actual">
         <span class="marcador es-encurso" aria-hidden="true">2</span>
         <div class="hito-cabecera">
           <h3 class="hito-nombre">Desarrollo y validación</h3>
@@ -146,11 +160,16 @@
             <button class="boton boton--sutil" type="button" data-abrir="modal-nuevo-entregable">Nuevo entregable</button>
           </div>
         </div>
+        <div class="hito-avance">
+          <label for="avance-hito-2">0 de 4 entregables aprobados</label>
+          <progress id="avance-hito-2" value="0" max="4">0 de 4</progress>
+        </div>
         <ul class="entregables">
           <li class="entregable-fila">
             <div>
               <p class="entregable-titulo">Revisión bibliográfica ampliada</p>
-              <p class="entregable-meta">Venció el 30 sep 2026. Última entrega: versión 1, 29 sep 2026.</p>
+              <p class="entregable-plazo entregable-plazo--vencido">Venció el 30 sep 2026</p>
+              <p class="entregable-meta">Última entrega: versión 1, 29 sep 2026.</p>
             </div>
             <span class="chip es-cambios"><span class="chip-punto"></span>Cambios solicitados</span>
             <div class="entregable-acciones">
@@ -160,7 +179,8 @@
           <li class="entregable-fila">
             <div>
               <p class="entregable-titulo"><a href="entregable.html" data-entregable>Informe de avance 1</a></p>
-              <p class="entregable-meta">Vence el 20 nov 2026. Última entrega: versión 2, 15 oct 2026.</p>
+              <p class="entregable-plazo">Vence el 20 nov 2026</p>
+              <p class="entregable-meta">Última entrega: versión 2, 15 oct 2026.</p>
             </div>
             <span class="chip es-entregado"><span class="chip-punto"></span>Entregado</span>
             <div class="entregable-acciones">
@@ -171,7 +191,8 @@
           <li class="entregable-fila">
             <div>
               <p class="entregable-titulo"><a href="entregable.html" data-entregable>Prototipo funcional</a></p>
-              <p class="entregable-meta">Venció el 12 oct 2026. Entrega tardía: versión 1, 14 oct 2026.</p>
+              <p class="entregable-plazo entregable-plazo--vencido">Venció el 12 oct 2026</p>
+              <p class="entregable-meta">Entrega tardía: versión 1, 14 oct 2026.</p>
             </div>
             <span class="chip es-atrasado"><span class="chip-punto"></span>Atrasado</span>
             <div class="entregable-acciones">
@@ -182,7 +203,8 @@
           <li class="entregable-fila">
             <div>
               <p class="entregable-titulo">Demostración en laboratorio</p>
-              <p class="entregable-meta">Vence el 4 dic 2026. Sin entregas.</p>
+              <p class="entregable-plazo">Vence el 4 dic 2026</p>
+              <p class="entregable-meta">Sin entregas.</p>
             </div>
             <span class="chip es-pendiente"><span class="chip-punto"></span>Pendiente</span>
             <div class="entregable-acciones">
@@ -203,11 +225,16 @@
             <button class="boton boton--sutil" type="button" data-abrir="modal-nuevo-entregable">Nuevo entregable</button>
           </div>
         </div>
+        <div class="hito-avance">
+          <label for="avance-hito-3">0 de 2 entregables aprobados</label>
+          <progress id="avance-hito-3" value="0" max="2">0 de 2</progress>
+        </div>
         <ul class="entregables">
           <li class="entregable-fila">
             <div>
               <p class="entregable-titulo">Informe final</p>
-              <p class="entregable-meta">Vence el 15 ene 2027. Sin entregas.</p>
+              <p class="entregable-plazo">Vence el 15 ene 2027</p>
+              <p class="entregable-meta">Sin entregas.</p>
             </div>
             <span class="chip es-pendiente"><span class="chip-punto"></span>Pendiente</span>
             <div class="entregable-acciones">
@@ -217,7 +244,8 @@
           <li class="entregable-fila">
             <div>
               <p class="entregable-titulo">Presentación de defensa</p>
-              <p class="entregable-meta">Vence el 22 ene 2027. Sin entregas.</p>
+              <p class="entregable-plazo">Vence el 22 ene 2027</p>
+              <p class="entregable-meta">Sin entregas.</p>
             </div>
             <span class="chip es-pendiente"><span class="chip-punto"></span>Pendiente</span>
             <div class="entregable-acciones">
@@ -403,6 +431,6 @@
 </dialog>
 
 <div class="toast-zona" aria-live="polite"></div>
-<script src="js/mockup.js"></script>
+<script src="js/mockup.js?v=20261019-solo-pulsar"></script>
 </body>
 </html>

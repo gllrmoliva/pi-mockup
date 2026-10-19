@@ -4,37 +4,43 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nuevo proyecto · Hito</title>
-<link rel="stylesheet" href="css/estilos.css">
+<link rel="stylesheet" href="css/estilos.css?v=20261019-estudiante-activo">
 </head>
 <body>
 <a class="salto" href="#contenido">Saltar al contenido</a>
 
 <nav class="maqueta" aria-label="Navegación de la maqueta">
   <details class="maqueta-rol">
-    <summary class="maqueta-marca">
-      <span>Maqueta</span>
-      <span class="maqueta-rol-actual" data-rol-actual>Profesor</span>
-      <svg class="maqueta-rol-flecha" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-        <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <summary class="maqueta-marca" aria-label="Seleccionar vistas de la maqueta" title="Seleccionar vistas">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </summary>
-    <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
-      <p class="maqueta-menu-titulo">Ver como</p>
-      <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
-      <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
-    </div>
-  </details>
+    <div class="maqueta-panel">
+      <a class="maqueta-inicio" href="index.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Volver a inicio
+      </a>
+      <p class="maqueta-panel-titulo">Vistas de la maqueta</p>
+      <div class="maqueta-menu" role="group" aria-label="Tipo de usuario de la maqueta">
+        <p class="maqueta-menu-titulo">Ver como <span class="maqueta-rol-actual" data-rol-actual>Profesor</span></p>
+        <div class="maqueta-opciones">
+          <button class="maqueta-opcion" type="button" data-rol-opcion="profesor" aria-pressed="true">Profesor</button>
+          <button class="maqueta-opcion" type="button" data-rol-opcion="estudiante" aria-pressed="false">Estudiante</button>
+        </div>
+      </div>
   <ul class="maqueta-lista">
-    <li><a href="index.html">Ingreso</a></li>
+    <li><a href="ingreso.html">Ingreso</a></li>
     <li><a href="proyectos.html">Proyectos</a></li>
+    <li data-rol="profesor"><a href="estudiantes.html">Estudiantes</a></li>
     <li><a href="proyecto.html">Detalle del proyecto</a></li>
     <li><a href="kanban.html">Tablero</a></li>
-    <li data-rol="profesor"><a href="entregable.html">Entregable (profesora)</a></li>
-    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable (estudiante)</a></li>
+    <li data-rol="profesor"><a href="entregable.html">Entregable</a></li>
+    <li data-rol="estudiante"><a href="entregable-colaborador.html">Entregable</a></li>
     <li data-rol="profesor"><a href="proyecto-crear.html" aria-current="page">Crear proyecto</a></li>
     <li data-rol="profesor"><a href="proyecto-editar.html">Editar proyecto</a></li>
   </ul>
-  <span class="maqueta-nota">Datos ficticios, no es la aplicación real</span>
+      <p class="maqueta-nota">Datos ficticios, no es la aplicación real.</p>
+    </div>
+  </details>
 </nav>
 
 <header class="cabecera">
@@ -43,6 +49,10 @@
       <span class="marca-nombre">Hito</span>
       <span class="marca-lema">Gestión de memorias y tesis</span>
     </p>
+    <nav class="navegacion-principal" aria-label="Navegación principal">
+      <a href="proyectos.html">Proyectos</a>
+      <a href="estudiantes.html" data-solo-profesor>Estudiantes</a>
+    </nav>
     <details class="cuenta">
       <summary class="cuenta-trigger">
         <span class="avatar" aria-hidden="true">CS</span>
@@ -52,17 +62,15 @@
         </svg>
       </summary>
       <div class="cuenta-menu">
-        <p class="cuenta-rol">Profesora guía</p>
+        <p class="cuenta-rol">Profesor guía</p>
         <button class="cuenta-opcion" type="button" data-aviso="En la aplicación real se abriría la configuración de la cuenta.">Configuración</button>
-        <a class="cuenta-opcion" href="index.html">Cerrar sesión</a>
+        <a class="cuenta-opcion" href="ingreso.html">Cerrar sesión</a>
       </div>
     </details>
   </div>
 </header>
 
 <main id="contenido" class="contenedor contenedor--angosto">
-  <p class="volver"><a href="proyectos.html">Volver a tus proyectos</a></p>
-
   <div class="pagina-cabecera">
     <div>
       <h1 class="titulo">Nuevo proyecto</h1>
@@ -102,12 +110,12 @@
     <fieldset class="grupo">
       <legend class="leyenda">Participantes</legend>
       <div class="campo">
-        <p class="etiqueta-campo">Gestoras y gestores</p>
+        <p class="etiqueta-campo">Gestores</p>
         <div class="chips-personas">
-          <span class="chip-persona"><span class="avatar avatar--chico">CS</span>Camila Soto <span class="rol">Tú, gestora</span></span>
+          <span class="chip-persona"><span class="avatar avatar--chico">CS</span>Camila Soto <span class="rol">Tú, gestor</span></span>
         </div>
         <div class="agregar-persona">
-          <input class="entrada" type="email" id="gestor-correo" placeholder="nombre@correo.cl" aria-label="Correo del gestor o gestora que quieres invitar">
+          <input class="entrada" type="email" id="gestor-correo" placeholder="nombre@correo.cl" aria-label="Correo del gestor que quieres invitar">
           <button class="boton boton--linea" type="button" data-aviso="En la aplicación real se enviaría una invitación por correo a la persona indicada.">Agregar</button>
         </div>
         <p class="ayuda">Quien crea el proyecto queda como gestor automáticamente. Puedes sumar co-guías o profesores externos.</p>
@@ -116,7 +124,7 @@
         <p class="etiqueta-campo">Colaboradores</p>
         <div class="chips-personas"></div>
         <div class="agregar-persona">
-          <input class="entrada" type="email" id="colaborador-correo" placeholder="nombre@correo.cl" aria-label="Correo del colaborador o colaboradora que quieres invitar">
+          <input class="entrada" type="email" id="colaborador-correo" placeholder="nombre@correo.cl" aria-label="Correo del colaborador que quieres invitar">
           <button class="boton boton--linea" type="button" data-aviso="En la aplicación real se enviaría una invitación por correo a la persona indicada.">Agregar</button>
         </div>
         <p class="ayuda">Al menos una persona que entregue avances y reciba la retroalimentación.</p>
@@ -164,12 +172,13 @@
 
     <div class="acciones-formulario">
       <a class="boton boton--linea" href="proyectos.html">Cancelar</a>
-      <button class="boton" type="submit" data-aviso="En la aplicación real, el proyecto se crearía con los hitos de la plantilla y quedarías como gestora.">Crear proyecto</button>
+      <button class="boton" type="submit" data-retorno="feedback-proyecto" data-aviso="En la aplicación real, el proyecto se crearía con los hitos de la plantilla y quedarías como gestor.">Crear proyecto</button>
     </div>
+    <p class="feedback" id="feedback-proyecto" role="status"></p>
   </form>
 </main>
 
 <div class="toast-zona" aria-live="polite"></div>
-<script src="js/mockup.js"></script>
+<script src="js/mockup.js?v=20261019-solo-pulsar"></script>
 </body>
 </html>
