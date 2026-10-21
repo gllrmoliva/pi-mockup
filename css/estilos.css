@@ -1753,15 +1753,15 @@ dialog.modal::backdrop {
 .portada-recorrido-cabecera > p { font-family: var(--titulos); font-size: 1.0625rem; }
 .portada-recorrido-cabecera > span { display: block; color: #D3DDED; font-size: .8125rem; margin-top: 5px; }
 .portada-hitos { position: relative; padding-left: 44px; margin-top: 24px; margin-bottom: 16px; }
-.portada-paso { position: relative; padding-bottom: 18px; }
-.portada-paso:last-child { padding-bottom: 0; }
+.portada-paso { position: relative; margin-bottom: 18px; }
+.portada-paso:last-child { margin-bottom: 0; }
 .portada-paso:not(:last-child)::before,
 .portada-paso:not(:last-child)::after {
   content: "";
   position: absolute;
   left: -32px;
-  top: 27px;
-  bottom: -27px;
+  top: 50%;
+  bottom: calc(-50% - 18px);
   width: 2px;
   background: #64799C;
 }
@@ -1771,7 +1771,9 @@ dialog.modal::backdrop {
   animation: portada-tramo-uno 12s ease-in-out infinite;
 }
 .portada-paso:nth-child(2)::after { animation-name: portada-tramo-dos; }
-.portada-nodo { position: absolute; left: -44px; top: 14px; width: 26px; height: 26px; border: 2px solid #A8B9D5; background: var(--azul); border-radius: 50%; display: grid; place-items: center; font-size: .75rem; font-weight: 700; z-index: 1; }
+.portada-paso:nth-child(2)::before,
+.portada-paso:nth-child(2)::after { bottom: -50%; }
+.portada-nodo { position: absolute; left: -44px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border: 2px solid #A8B9D5; background: var(--azul); border-radius: 50%; display: grid; place-items: center; font-size: .75rem; font-weight: 700; z-index: 1; }
 .portada-paso:first-child .portada-nodo { background: var(--amarillo); border-color: var(--amarillo); color: var(--azul-oscuro); }
 .portada-ejemplo { background: var(--blanco); border-radius: 12px; padding: 17px 20px; color: var(--tinta); box-shadow: 0 12px 24px #101F3A40, 0 3px 6px #101F3A26; animation: portada-tarjeta 12s ease-in-out infinite; }
 .portada-paso:nth-child(2) .portada-ejemplo { animation-name: portada-tarjeta-dos; }
@@ -1813,16 +1815,19 @@ dialog.modal::backdrop {
   96% { transform: scaleX(1); opacity: 0; }
 }
 @keyframes portada-tarjeta {
-  0%, 100% { transform: translateY(4px); }
-  10%, 88% { transform: none; }
+  0%, 100% { transform: translateY(4px); opacity: 0; }
+  10%, 88% { transform: none; opacity: 1; }
+  96% { transform: none; opacity: 0; }
 }
 @keyframes portada-tarjeta-dos {
-  0%, 25%, 100% { transform: translateY(4px); }
-  35%, 88% { transform: none; }
+  0%, 25%, 100% { transform: translateY(4px); opacity: 0; }
+  35%, 88% { transform: none; opacity: 1; }
+  96% { transform: none; opacity: 0; }
 }
 @keyframes portada-tarjeta-tres {
-  0%, 50%, 100% { transform: translateY(4px); }
-  60%, 88% { transform: none; }
+  0%, 50%, 100% { transform: translateY(4px); opacity: 0; }
+  60%, 88% { transform: none; opacity: 1; }
+  96% { transform: none; opacity: 0; }
 }
 @media (max-width: 900px) {
   .portada-contenido { gap: 32px; }
