@@ -1,0 +1,85 @@
+name: hito
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hito}
+      POSTGRES_USER: ${POSTGRES_USER:-hito}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      target: production
+    environment:
+      APP_NAME: ${APP_NAME:-Hito}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+      APP_ENV: ${APP_ENV:-development}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-8}
+      UPLOAD_DIR: /app/uploads
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-hito}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-hito}
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  backend-test:
+    profiles: ["test"]
+    build:
+      context: ./backend
+      target: development
+    environment:
+      APP_NAME: Hito
+      APP_VERSION: 0.1.0
+      APP_ENV: test
+      LOG_LEVEL: WARNING
+      UPLOAD_DIR: /tmp/hito-uploads
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-hito}:${POSTGRES_PASSWORD:-change-me}@db:5432/hito_test
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["alembic upgrade head && pytest"]
+
+volumes:
+  postgres_data:
+  uploads_data:
