@@ -5,6 +5,7 @@ ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 cd "$ROOT_DIR"
 
 mkdir -p reports/nfr/coverage
+chmod -R a+rwX reports/nfr/coverage
 
 docker compose --profile test run --rm --build \
     --volume "$ROOT_DIR/reports:/app/reports" \

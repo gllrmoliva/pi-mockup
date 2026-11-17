@@ -67,6 +67,7 @@ print(PERF_PASSWORD)
 ')
 
 mkdir -p reports/nfr
+chmod -R a+rwX reports/nfr
 : > reports/nfr/memory-samples.jsonl
 
 echo "==> Sampling container memory"
