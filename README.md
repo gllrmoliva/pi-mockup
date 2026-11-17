@@ -24,7 +24,7 @@ Servicios disponibles:
 - Estado de la API: <http://localhost:8080/health/live>
 - Estado de la base de datos: <http://localhost:8080/health/ready>
 
-El backend ejecuta `alembic upgrade head` al iniciar. El seed es idempotente y crea 7 usuarios, 4 proyectos y 7 entregables de ejemplo.
+El backend ejecuta `alembic upgrade head` al iniciar. El seed es idempotente y crea 16 usuarios, 20 proyectos, 247 entregables y actividad de demostración: entregas, revisiones, mensajes de foro y adjuntos PDF sintéticos. No elimina datos existentes; si vuelves a ejecutarlo, solo agrega lo que falte.
 
 La configuración local se toma de `.env`; revisa `.env.example` si necesitas cambiar credenciales, sesión, entorno o almacenamiento.
 
@@ -34,13 +34,22 @@ La configuración local se toma de `.env`; revisa `.env.example` si necesitas ca
 |---|---|
 | `camila.soto@udec.cl` | Profesor |
 | `rodrigo.pena@udec.cl` | Profesor |
+| `antonio.skorin@udec.cl` | Profesor |
+| `paula.herrera@udec.cl` | Profesor |
+| `cristian.munoz@udec.cl` | Profesor |
 | `javiera.contreras@udec.cl` | Estudiante |
 | `benjamin.aravena@udec.cl` | Estudiante |
 | `matias.riquelme@udec.cl` | Estudiante |
 | `fernanda.torres@udec.cl` | Estudiante |
-| `antonio.skorin@udec.cl` | Profesor |
+| `valentina.rojas@udec.cl` | Estudiante |
+| `ignacio.fuentes@udec.cl` | Estudiante |
+| `martina.lagos@udec.cl` | Estudiante |
+| `tomas.sepulveda@udec.cl` | Estudiante |
+| `isidora.paredes@udec.cl` | Estudiante |
+| `diego.salazar@udec.cl` | Estudiante |
+| `sebastian.vera@udec.cl` | Estudiante |
 
-La contraseña de demostración se imprime al ejecutar `python -m app.seed` y el smoke test la lee desde `app.seed.DEMO_PASSWORD`. Son cuentas sintéticas y no deben reutilizarse en producción.
+Todas las cuentas usan la contraseña `1234`. La cuenta principal para la demo es `camila.soto@udec.cl`, que gestiona 8 proyectos y tiene una bandeja de revisiones poblada. La contraseña se imprime al ejecutar `python -m app.seed` y el smoke test la lee desde `app.seed.DEMO_PASSWORD`. Son cuentas sintéticas y no deben reutilizarse en producción.
 
 ## Desarrollo del frontend
 

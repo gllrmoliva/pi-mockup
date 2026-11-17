@@ -59,7 +59,7 @@ Nginx :8080 ──/api/*──▶ FastAPI :8000 ──▶ PostgreSQL
 backend/
 ├── app/
 │   ├── main.py                 FastAPI app, docs URLs, error handler, router registration
-│   ├── seed.py                 Idempotent demo users, projects, milestones and deliverables
+│   ├── seed.py                 Idempotent demo data: users, projects, deliverables, submissions, reviews, forum and files
 │   ├── seed_perf.py            Full-scale synthetic dataset for performance tests
 │   ├── api/
 │   │   ├── router.py           Composes /api/v1 routes
@@ -312,6 +312,7 @@ E2E tests live in `frontend/e2e/` and run against the isolated `hito_e2e` stack.
 - `reports/` contains generated coverage and smoke artifacts; it is ignored by Git. Upload it as a CI artifact instead of committing it.
 - The remote runner uses Compose project `hito_ci`; do not set it to `hito`, which is the production project. The smoke and coverage scripts can run `down -v` on their project.
 - The demo deploy uses Compose project `hito` on loopback port `9080`, plus the `hito_proxy` Nginx/Certbot stack on ports `80`/`443`. It preserves `.env.demo` and never runs `down -v`; the demo password is the synthetic seed password, so it is only for demonstrations.
+- `backend/app/seed.py` is non-destructive and idempotent. It enriches existing demo deliverables with submissions, reviews, forum messages and synthetic PDFs in the uploads volume; it does not reset the database.
 - `certs/` contains generated self-signed certificates and is ignored by Git. The public demo uses Nginx/Certbot with Let’s Encrypt in `compose.proxy.yaml`; SSL Labs remains pending. See `docs/operations/tls.md`.
 - `storage_report.py` measures the local uploads volume and `archivo.tamano`; it does not replace S3 lifecycle, CloudWatch alarms or AWS Budgets. See `docs/operations/storage.md`.
 - `backups/` contains database/uploads copies with personal and academic data; it is ignored by Git. Offsite storage and encryption remain pending for production. See `docs/operations/backup-restore.md`.
