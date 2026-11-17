@@ -1,0 +1,26 @@
+name: hito_proxy
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./proxy/conf.d:/etc/nginx/conf.d:ro
+      - ./proxy/certbot/conf:/etc/letsencrypt:ro
+      - ./proxy/certbot/www:/var/www/certbot:ro
+    networks:
+      - default
+      - hito_default
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./proxy/certbot/conf:/etc/letsencrypt
+      - ./proxy/certbot/www:/var/www/certbot
+
+networks:
+  hito_default:
+    external: true

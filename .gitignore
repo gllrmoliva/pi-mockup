@@ -26,6 +26,7 @@ data/
 reports/
 certs/
 backups/
+proxy/
 
 # Editors and OS
 .DS_Store

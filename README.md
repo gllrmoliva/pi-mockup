@@ -109,7 +109,7 @@ Perfil TLS local con certificados autofirmados (RNF-S-3):
 ./scripts/nfr/tls_smoke.sh
 ```
 
-El perfil usa `compose.tls.yaml` en un proyecto Compose separado (`hito_tls`), expone HTTPS en `8443` y HTTP en `8081`, y verifica TLS 1.2/1.3, rechazo de TLS 1.0/1.1, HSTS, redirección y cookie `Secure`. Para limpiar el stack: `TLS_CLEANUP=1 ./scripts/nfr/tls_smoke.sh`. El certificado de producción y la auditoría SSL Labs quedan documentados en `docs/operations/tls.md`.
+El perfil usa `compose.tls.yaml` en un proyecto Compose separado (`hito_tls`), expone HTTPS en `8443` y HTTP en `8081`, y verifica TLS 1.2/1.3, rechazo de TLS 1.0/1.1, HSTS, redirección y cookie `Secure`. Para limpiar el stack: `TLS_CLEANUP=1 ./scripts/nfr/tls_smoke.sh`. El proxy Nginx/Certbot, la renovación y la auditoría SSL Labs quedan documentados en `docs/operations/tls.md`.
 
 Reporte de almacenamiento y crecimiento (RNF-R-3):
 
@@ -192,6 +192,121 @@ Los reportes de cobertura se publican como artefacto `backend-coverage`. Los rep
 
 `.github/workflows/nfr-nightly.yml` ejecuta a diario, o bajo demanda, el respaldo y simulacro de restauración, el reporte de almacenamiento, la matriz E2E de Chromium/Firefox/WebKit y el reporte de rendimiento completo. Publica `restore-drill-report`, `backup-manifest`, `storage-report`, `playwright-all-browsers`, `performance-report` y sus logs como artefactos.
 
+### CI remoto por SSH
+
+El repositorio incluye un runner para ejecutar el CI completo en una máquina Linux externa:
+
+```bash
+./scripts/ci/remote-ci.sh usuario@servidor
+```
+
+El wrapper copia el árbol de trabajo por `rsync`, ejecuta el CI en el servidor y descarga los reportes a `reports/ci/<timestamp>/`.
+
+Perfiles disponibles:
+
+```bash
+# CI de cada PR (por defecto)
+./scripts/ci/remote-ci.sh usuario@servidor
+
+# Respaldo/restauración, almacenamiento, todos los navegadores y rendimiento
+./scripts/ci/remote-ci.sh usuario@servidor --profile nightly
+
+# Ambos perfiles
+./scripts/ci/remote-ci.sh usuario@servidor --profile all
+```
+
+También se puede ejecutar directamente en el servidor:
+
+```bash
+ssh usuario@servidor
+cd hito-ci
+./scripts/ci/run-ci.sh --profile pr
+```
+
+Requisitos del servidor: Docker Engine con Compose v2.24+, Node.js 22 con npm, Python 3.10+, `curl`, `rsync` y acceso al daemon de Docker. El runner usa el proyecto Compose aislado `hito_ci`; nunca usa el proyecto de producción `hito`. Requiere que los puertos `8000`, `8080`, `18080`, `8081`, `8443` y, en modo nightly, `18081` estén libres.
+
+El runner verifica prerequisitos, valida las configuraciones Compose, ejecuta cada etapa, recopila reportes y limpia los contenedores al terminar. Usa `--keep` para conservarlos y `--skip-port-check` solo si controlas manualmente los puertos.
+
+### Despliegue demo por SSH
+
+El workflow `.github/workflows/ci.yml` incluye un job `deploy-demo` que se ejecuta después de que todo el CI pasa, solo en `main` o por ejecución manual. El despliegue usa el proyecto Compose `hito` para la aplicación, un proxy Nginx separado (`hito_proxy`) en los puertos `80`/`443` y datos de demostración creados con `python -m app.seed`.
+
+Requisitos en GitHub:
+
+- Secret `SSH_HOST`: host SSH, por ejemplo `hitoapp.ddns.net`.
+- Secret `SSH_USER`: usuario SSH, por ejemplo `fgonzalez`.
+- Secret `SSH_PRIVATE_KEY`: clave privada SSH.
+- Secret `SSH_KNOWN_HOSTS`: salida de `ssh-keyscan -H <host>` (recomendado).
+- Secret opcional `SSH_PORT`.
+- Secret opcional `CERTBOT_EMAIL`: correo para Let’s Encrypt; si falta, se usa registro sin correo.
+- Variable opcional `DEPLOY_PATH`: directorio remoto, por defecto `hito`.
+- Variable opcional `DEMO_DOMAIN`: dominio público, por defecto `hitoapp.ddns.net`.
+- Variable opcional `DEMO_INTERNAL_PORT`: puerto loopback del contenedor web, por defecto `9080`.
+- Variable opcional `ENABLE_HTTPS`: `1` por defecto; usa `0` para omitir Nginx/TLS.
+
+El despliegue manual se puede ejecutar desde el repositorio:
+
+```bash
+./scripts/cd/remote-deploy.sh fgonzalez@hitoapp.ddns.net
+```
+
+El script:
+
+- sincroniza el árbol de trabajo a `DEPLOY_PATH` por `rsync`;
+- conserva el `.env.demo` remoto y las credenciales de la base;
+- construye y levanta `compose.yaml` con `compose.demo.yaml` en `127.0.0.1:9080`;
+- espera `/health/ready`, ejecuta el seed y verifica el login demo;
+- levanta `compose.proxy.yaml` con Nginx en `80`/`443`;
+- obtiene o reutiliza el certificado Let’s Encrypt del dominio;
+- activa `SESSION_COOKIE_SECURE=true` y `TRUST_PROXY_HEADERS=true`;
+- redirige HTTP a HTTPS;
+- no ejecuta `down -v` ni borra los datos existentes.
+
+El demo queda disponible en `https://hitoapp.ddns.net`. Los puertos `80` y `443` deben estar reenviados desde el router al host: `80` se usa para el desafío ACME y la redirección, y `443` para HTTPS. Es solo para demostración; no debe tratarse como un despliegue de producción con datos reales.
+
+Si `https://hitoapp.ddns.net` presenta un certificado distinto de `CN=hitoapp.ddns.net`, el puerto `443` no está llegando al host. En ese caso revisa el port forwarding del router o desactiva la administración remota del router en el puerto `443`. Para verificar desde fuera:
+
+```bash
+curl -I http://hitoapp.ddns.net/
+curl -I https://hitoapp.ddns.net/
+```
+
+La primera debe devolver `301` hacia HTTPS; la segunda debe validar el certificado y devolver `200`.
+
+### Renovación del certificado
+
+El certificado Let's Encrypt se renueva con:
+
+```bash
+./scripts/cd/renew-certificates.sh
+```
+
+Para validar el flujo sin cambiar el certificado instalado:
+
+```bash
+./scripts/cd/renew-certificates.sh --dry-run
+```
+
+Se recomienda programar una ejecución diaria en el servidor:
+
+```bash
+crontab -e
+```
+
+```cron
+17 3 * * * cd /home/fgonzalez/hito && ./scripts/cd/renew-certificates.sh >> renew.log 2>&1
+```
+
+El script renueva solo si corresponde y recarga Nginx. El puerto `80` sigue disponible para el desafío ACME.
+
+Si el puerto `443` no está accesible, puedes usar un túnel SSH al proxy como alternativa privada:
+
+```bash
+ssh -N -L 8080:127.0.0.1:443 fgonzalez@hitoapp.ddns.net
+```
+
+y abrir `https://localhost:8080` (el certificado será para `hitoapp.ddns.net` y el navegador puede pedir una excepción).
+
 ## Comandos útiles
 
 ```bash
@@ -219,6 +334,11 @@ docker compose exec backend python -m app.seed
 - `compose.tls.yaml` — perfil TLS autofirmado para pruebas locales.
 - `compose.e2e.yaml` — stack E2E aislado en el puerto `18080`.
 - `compose.perf.yaml` — stack de rendimiento aislado en el puerto `18081`.
+- `compose.demo.yaml` — demo interno en `127.0.0.1:9080`, sin exponer el backend.
+- `compose.proxy.yaml` — Nginx y Certbot en los puertos `80`/`443`.
+- `deploy/nginx/` — plantillas HTTP/HTTPS del proxy.
+- `scripts/ci/` — runner de CI local y wrapper para ejecutar el CI completo por SSH.
+- `scripts/cd/` — despliegue demo por SSH, proxy TLS y sincronización del árbol de trabajo.
 - `scripts/nfr/` — verificación de requisitos no funcionales: cobertura, smoke, TLS, almacenamiento, respaldos, E2E y rendimiento.
 - `.github/workflows/` — integración continua y jobs nightly.
 - `docs/operations/` — runbooks de operación, incluidos TLS, almacenamiento, respaldos y rendimiento.

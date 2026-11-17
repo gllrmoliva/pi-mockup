@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -155,3 +156,49 @@ jobs:
       - name: Clean up TLS resources
         if: always()
         run: docker compose -p hito_tls -f compose.yaml -f compose.tls.yaml down -v || true
+
+  deploy-demo:
+    name: Deploy demo over SSH
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - backend-quality
+      - backend-tests-coverage
+      - frontend-quality
+      - docker-smoke
+      - e2e-chromium
+      - tls-handshake
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          if [ -z "$SSH_PRIVATE_KEY" ] || [ -z "$SSH_HOST" ] || [ -z "$SSH_USER" ]; then
+            echo "SSH_PRIVATE_KEY, SSH_HOST and SSH_USER secrets are required." >&2
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -H "$SSH_HOST" > ~/.ssh/known_hosts
+          fi
+          chmod 600 ~/.ssh/known_hosts
+      - name: Deploy demo
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          DEMO_DOMAIN: ${{ vars.DEMO_DOMAIN }}
+          DEMO_INTERNAL_PORT: ${{ vars.DEMO_INTERNAL_PORT }}
+          CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
+          ENABLE_HTTPS: ${{ vars.ENABLE_HTTPS }}
+        run: ./scripts/cd/remote-deploy.sh

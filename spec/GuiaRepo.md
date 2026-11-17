@@ -30,12 +30,18 @@ Nginx :8080 ──/api/*──▶ FastAPI :8000 ──▶ PostgreSQL
 | `compose.tls.yaml` | Self-signed TLS override for local verification. |
 | `compose.e2e.yaml` | Isolated E2E stack on port `18080`. |
 | `compose.perf.yaml` | Isolated performance stack on port `18081`. |
+| `compose.demo.yaml` | Demo stack on loopback port `9080`, with the backend not exposed. |
+| `compose.proxy.yaml` | Nginx/Certbot host proxy on ports `80` and `443`. |
+| `deploy/nginx/` | HTTP/HTTPS Nginx templates for the demo proxy. |
+| `proxy/` | Generated proxy config and Let’s Encrypt certificates; ignored by Git. |
 | `docs/operations/` | Operational runbooks, including TLS, storage, backups, restores and performance. |
 | `docs/nfr/` | Manual NFR evidence: WCAG checklist, usability protocol, SUS and results template. |
 | `.env.example` | Configuration template. Copy it to `.env` for local runs. |
 | `.env` | Local configuration; ignored by Git. |
 | `README.md` | Developer/tester guide: run, test and useful commands. |
 | `.github/workflows/` | GitHub Actions: CI, nightly NFR jobs and manual VPS performance. |
+| `scripts/ci/` | Remote CI runner and local SSH wrapper with PR/nightly/all profiles. |
+| `scripts/cd/` | Demo deployment over SSH, with remote sync and seed-only setup. |
 | `scripts/nfr/` | NFR verification scripts: coverage, smoke, TLS, storage, backups, E2E and performance. |
 | `reports/` | Generated coverage/smoke reports; ignored by Git. |
 | `backups/` | Local database/uploads backups and manifests; ignored by Git. |
@@ -155,6 +161,19 @@ Specific responsibilities:
 | `tests/test_nfr_observability.py` | Audit rows, JSON logs, IP extraction and retention purge. |
 | `tests/test_nfr_storage.py` | Storage thresholds, discrepancy and directory-size checks. |
 | `tests/nfr_helpers.py` | Shared fixtures/helpers for the NFR backend tests. |
+
+### CI automation
+
+| Command or file | Purpose |
+|---|---|
+| `scripts/ci/run-ci.sh` | Runs the PR, nightly or combined CI profile on a Linux host, using isolated Compose projects and writing `reports/ci/<timestamp>/`. |
+| `scripts/ci/remote-ci.sh` | Syncs the working tree over SSH, invokes `run-ci.sh` remotely and fetches reports. |
+| `scripts/cd/deploy-demo.sh` | Builds the demo stack, preserves `.env.demo`, seeds demo data, verifies demo login and enables HTTPS. |
+| `scripts/cd/setup-nginx-tls.sh` | Starts the Nginx proxy, obtains/reuses the Let’s Encrypt certificate, verifies HTTPS locally and redirects HTTP to HTTPS. |
+| `scripts/cd/renew-certificates.sh` | Renews the Let’s Encrypt certificate and reloads Nginx; supports `--dry-run`. |
+| `scripts/cd/remote-deploy.sh` | Syncs the working tree over SSH and runs the demo deployment on the remote host. |
+| `.github/workflows/ci.yml` | GitHub Actions PR CI and demo deploy job after CI on `main`. |
+| `.github/workflows/nfr-nightly.yml` | GitHub Actions nightly NFR jobs. |
 
 ### NFR verification
 
@@ -281,7 +300,9 @@ E2E tests live in `frontend/e2e/` and run against the isolated `hito_e2e` stack.
 | Change or add NFR checks | `backend/tests/test_nfr_*.py`, `scripts/nfr/` |
 | Change coverage configuration or gate | `backend/pyproject.toml`, `scripts/nfr/coverage.sh` |
 | Change audit or structured logging | `backend/app/core/audit/`, `backend/app/core/logging.py`, `backend/app/core/http.py` and the affected routers |
-| Change CI | `.github/workflows/ci.yml` |
+| Change CI | `.github/workflows/ci.yml`, `.github/workflows/nfr-nightly.yml` |
+| Change remote CI behavior | `scripts/ci/run-ci.sh`, `scripts/ci/remote-ci.sh`, `README.md` |
+| Change demo deployment | `compose.demo.yaml`, `compose.proxy.yaml`, `deploy/nginx/`, `scripts/cd/deploy-demo.sh`, `scripts/cd/setup-nginx-tls.sh`, `scripts/cd/renew-certificates.sh`, `scripts/cd/remote-deploy.sh`, `.github/workflows/ci.yml` |
 | Change frontend test helpers/fixtures | `frontend/src/test/helpers.tsx`, `fixtures.ts` |
 | Change requirements/specification | `spec/hito-must-build-spec.md`; `spec/main.tex`; `spec/nfr-test-plan.md`; `spec/main-tex-nfr-changes.md` |
 
@@ -289,7 +310,9 @@ E2E tests live in `frontend/e2e/` and run against the isolated `hito_e2e` stack.
 
 - `backend/app/modules/projects/models.py` contains `Plantilla` and `ItemPlantilla`, and `notifications/` contains a model only. Do not assume their features are implemented. `core/audit/` is wired to critical actions.
 - `reports/` contains generated coverage and smoke artifacts; it is ignored by Git. Upload it as a CI artifact instead of committing it.
-- `certs/` contains generated self-signed certificates and is ignored by Git. Production TLS (domain, Certbot, SSL Labs) remains pending; see `docs/operations/tls.md`.
+- The remote runner uses Compose project `hito_ci`; do not set it to `hito`, which is the production project. The smoke and coverage scripts can run `down -v` on their project.
+- The demo deploy uses Compose project `hito` on loopback port `9080`, plus the `hito_proxy` Nginx/Certbot stack on ports `80`/`443`. It preserves `.env.demo` and never runs `down -v`; the demo password is the synthetic seed password, so it is only for demonstrations.
+- `certs/` contains generated self-signed certificates and is ignored by Git. The public demo uses Nginx/Certbot with Let’s Encrypt in `compose.proxy.yaml`; SSL Labs remains pending. See `docs/operations/tls.md`.
 - `storage_report.py` measures the local uploads volume and `archivo.tamano`; it does not replace S3 lifecycle, CloudWatch alarms or AWS Budgets. See `docs/operations/storage.md`.
 - `backups/` contains database/uploads copies with personal and academic data; it is ignored by Git. Offsite storage and encryption remain pending for production. See `docs/operations/backup-restore.md`.
 - The E2E stack (`compose.e2e.yaml`) is independent (`hito_e2e`, port `18080`) and resets its database. It does not touch development data. Playwright browsers need `npx playwright install --with-deps`; WebKit requires system libraries that CI installs.

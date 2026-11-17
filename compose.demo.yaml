@@ -1,0 +1,7 @@
+services:
+  backend:
+    ports: !override []
+
+  web:
+    ports: !override
+      - "127.0.0.1:${DEMO_INTERNAL_PORT:-9080}:80"

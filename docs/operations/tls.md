@@ -42,23 +42,35 @@ El certificado autofirmado sirve solo para pruebas. No debe usarse en producció
 - cookie `hito_session` con atributo `Secure` cuando se proporciona `DEMO_PASSWORD`;
 - configuración estática de Nginx y `compose.tls.yaml`.
 
-## Producción (pendiente)
+## Producción (demo)
 
-El repositorio no incluye un dominio ni un certificado de producción. Para desplegar:
+El demo público usa un proxy Nginx/Certbot en contenedores, sin `sudo` en el host:
 
-1. Apuntar el dominio al VPS.
-2. Instalar Certbot y emitir el certificado:
+1. El dominio apunta al host.
+2. El router reenvía TCP `80` y TCP `443` al host. El `80` se usa para el desafío ACME y la redirección; el `443` para HTTPS.
+3. `scripts/cd/setup-nginx-tls.sh` levanta `compose.proxy.yaml`, solicita o reutiliza el certificado en `proxy/certbot/conf`, renderiza `deploy/nginx/https.conf.template`, verifica `https://<dominio>/health/ready` de forma local y redirige HTTP a HTTPS.
+4. El proxy comparte la red Docker `hito_default` con el demo y usa `proxy_pass http://web:80`. El contenedor web queda en `127.0.0.1:9080`.
+5. `.env.demo` activa `SESSION_COOKIE_SECURE=true` y `TRUST_PROXY_HEADERS=true`.
+6. La renovación se ejecuta con:
    ```bash
-   sudo certbot certonly --webroot -w /var/www/certbot -d <dominio>
+   ./scripts/cd/renew-certificates.sh
    ```
-3. Montar `/etc/letsencrypt/live/<dominio>/fullchain.pem` y `privkey.pem` en el contenedor web.
-4. Mantener `ssl_protocols TLSv1.2 TLSv1.3`, HSTS y la redirección HTTP → HTTPS.
-5. Configurar `SESSION_COOKIE_SECURE=true` y `TRUST_PROXY_HEADERS=true`.
-6. Renovar con el timer de Certbot y recargar Nginx.
-7. Ejecutar SSL Labs sobre el dominio y guardar el informe como evidencia.
+   Para probar el flujo sin cambiar el certificado:
+   ```bash
+   ./scripts/cd/renew-certificates.sh --dry-run
+   ```
+   Programa una ejecución diaria con `crontab -e` en el servidor:
+   ```cron
+   17 3 * * * cd /home/fgonzalez/hito && ./scripts/cd/renew-certificates.sh >> renew.log 2>&1
+   ```
+7. La auditoría SSL Labs queda pendiente.
+
+El certificado vive en `proxy/certbot/conf`, que es propiedad de root. Por eso los scripts lo comprueban dentro de un contenedor y no desde el usuario del host.
+
+Si `https://<dominio>` muestra un certificado que no corresponde al dominio, el puerto `443` no está llegando al host. Revisa el port forwarding o desactiva la administración remota del router en ese puerto.
 
 ## Limitaciones
 
-- El certificado autofirmado no valida la cadena de confianza ni el dominio.
-- La auditoría SSL Labs de producción queda pendiente hasta contar con el VPS y el dominio.
+- El certificado autofirmado del perfil local no valida la cadena de confianza ni el dominio.
 - El perfil local usa los puertos `8081`/`8443` para no chocar con el stack HTTP de desarrollo.
+- La auditoría SSL Labs de producción queda pendiente.
