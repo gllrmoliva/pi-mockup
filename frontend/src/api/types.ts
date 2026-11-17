@@ -105,11 +105,14 @@ export type Submission = {
     review: Review | null;
 };
 
+export type ForumMessageKind = 'user' | 'system';
+
 export type ForumMessage = {
     id: string;
+    kind: ForumMessageKind;
     body: string;
-    author_id: string;
-    author_name: string;
+    author_id: string | null;
+    author_name: string | null;
     created_at: string;
 };
 

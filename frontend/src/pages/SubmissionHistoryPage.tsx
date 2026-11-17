@@ -104,8 +104,11 @@ function HistoryItem({ submission }: { submission: Submission }) {
             <div className="section-heading">
                 <h2>Versión {submission.version}</h2>
                 <span className="chip chip--neutral">
-                    {submission.files.length} archivo
-                    {submission.files.length === 1 ? '' : 's'}
+                    {submission.files.length === 0
+                        ? 'Enlace'
+                        : `${submission.files.length} archivo${
+                              submission.files.length === 1 ? '' : 's'
+                          }`}
                 </span>
             </div>
 

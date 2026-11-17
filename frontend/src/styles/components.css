@@ -255,7 +255,7 @@
 
 .milestone__marker {
     position: absolute;
-    top: -3px;
+    top: 5px;
     left: -34px;
     z-index: 1;
     display: grid;
@@ -415,6 +415,27 @@
     font-size: 0.91rem;
     color: var(--suave);
     overflow-wrap: anywhere;
+}
+
+.message--system {
+    grid-template-columns: 10px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 12px 0;
+    color: var(--tenue);
+}
+
+.message--system .message__body {
+    margin-top: 0;
+    color: var(--tenue);
+}
+
+.message__system-dot {
+    width: 8px;
+    height: 8px;
+    margin-top: 7px;
+    border-radius: 50%;
+    background: var(--borde-fuerte);
 }
 
 .forum-form {

@@ -22,7 +22,10 @@ import { fileFormatLabels, formatDateTime, initials } from '../utils/format';
 export function DeliverablePage() {
     const { deliverableId } = useParams<{ deliverableId: string }>();
     const deliverable = useDeliverable(deliverableId);
-    const [reviewFeedback, setReviewFeedback] = useState<string | null>(null);
+    const [reviewFeedback, setReviewFeedback] = useState<{
+        message: string;
+        tone: 'success' | 'error';
+    } | null>(null);
 
     if (!deliverableId) {
         return <ErrorState message="No se pudo identificar el entregable." />;
@@ -76,7 +79,9 @@ export function DeliverablePage() {
                 </div>
             </section>
 
-            <Feedback message={reviewFeedback} />
+            {reviewFeedback ? (
+                <Feedback message={reviewFeedback.message} tone={reviewFeedback.tone} />
+            ) : null}
 
             <div className="detail-grid">
                 <div className="detail-main stack">
@@ -84,11 +89,7 @@ export function DeliverablePage() {
                     <ReviewResultPanel deliverable={data} />
                     <ManagerReviewPanel
                         deliverable={data}
-                        onReviewed={() =>
-                            setReviewFeedback(
-                                'Revisión registrada. Puedes dejar un comentario en el foro.',
-                            )
-                        }
+                        onReviewed={(message, tone) => setReviewFeedback({ message, tone })}
                     />
                     <UploadPanel deliverable={data} />
                     <ForumPanel deliverable={data} />
@@ -203,13 +204,16 @@ function ManagerReviewPanel({
     onReviewed,
 }: {
     deliverable: DeliverableDetail;
-    onReviewed: () => void;
+    onReviewed: (message: string, tone: 'success' | 'error') => void;
 }) {
     const reviewDeliverable = useReviewDeliverable();
+    const postMessage = usePostMessage();
     const [decision, setDecision] = useState<ReviewDecision | null>(null);
+    const [forumMessage, setForumMessage] = useState('');
     const [error, setError] = useState<string | null>(null);
 
     const latest = deliverable.latest_submission;
+    const reviewed = reviewDeliverable.isPending || postMessage.isPending;
 
     if (
         deliverable.my_role !== 'manager' ||
@@ -228,12 +232,46 @@ function ManagerReviewPanel({
         }
 
         setError(null);
+        const trimmedMessage = forumMessage.trim();
+
         reviewDeliverable.mutate(
             { deliverableId: deliverable.id, decision },
             {
                 onSuccess: () => {
-                    onReviewed();
                     setDecision(null);
+                    if (!trimmedMessage) {
+                        onReviewed(
+                            'Revisión registrada. Puedes dejar un comentario en el foro.',
+                            'success',
+                        );
+                        return;
+                    }
+
+                    postMessage.mutate(
+                        {
+                            deliverableId: deliverable.id,
+                            body: trimmedMessage,
+                        },
+                        {
+                            onSuccess: () => {
+                                setForumMessage('');
+                                onReviewed(
+                                    'Revisión registrada y mensaje publicado en el foro.',
+                                    'success',
+                                );
+                            },
+                            onError: (mutationError) => {
+                                const detail =
+                                    mutationError instanceof ApiError
+                                        ? ` ${mutationError.message}`
+                                        : '';
+                                onReviewed(
+                                    `La revisión se registró, pero no se pudo publicar el mensaje en el foro.${detail}`,
+                                    'error',
+                                );
+                            },
+                        },
+                    );
                 },
                 onError: (mutationError) => {
                     setError(
@@ -305,13 +343,29 @@ function ManagerReviewPanel({
                     </label>
                 </div>
 
+                <div className="field">
+                    <label htmlFor="review-forum-message">Mensaje para el foro (opcional)</label>
+                    <textarea
+                        id="review-forum-message"
+                        className="textarea"
+                        value={forumMessage}
+                        onChange={(event) => setForumMessage(event.target.value)}
+                        placeholder="Explica tu decisión a los participantes del proyecto"
+                        maxLength={2000}
+                    />
+                    <p className="help">
+                        Se publicará como mensaje en el foro después de registrar la revisión.
+                    </p>
+                    <p className="char-count">{forumMessage.length} / 2000</p>
+                </div>
+
                 <div className="form__actions">
                     <button
                         className="button"
                         type="submit"
-                        disabled={decision === null || reviewDeliverable.isPending}
+                        disabled={decision === null || reviewed}
                     >
-                        {reviewDeliverable.isPending ? 'Registrando…' : 'Registrar revisión'}
+                        {reviewed ? 'Registrando…' : 'Registrar revisión'}
                     </button>
                 </div>
             </form>
@@ -340,34 +394,38 @@ function UploadPanel({ deliverable }: { deliverable: DeliverableDetail }) {
         setError(null);
         setFeedback(null);
 
-        if (files.length === 0) {
-            setError(`Adjunta al menos un archivo válido: ${formatList}.`);
-            return;
-        }
-
-        const allowedFormats = new Set<string>(deliverable.allowed_formats);
-        const invalidFile = files.find((file) => !allowedFormats.has(fileExtension(file.name)));
-        if (invalidFile) {
-            setError(`Adjunta al menos un archivo válido: ${formatList}.`);
-            return;
-        }
-
-        const emptyFile = files.find((file) => file.size === 0);
-        if (emptyFile) {
-            setError(`El archivo ${emptyFile.name} está vacío.`);
-            return;
-        }
-
-        const maxBytes = deliverable.max_file_size_mb * 1024 * 1024;
-        const oversizedFile = files.find((file) => file.size > maxBytes);
-        if (oversizedFile) {
+        const trimmedLink = linkUrl.trim();
+        if (files.length === 0 && !trimmedLink) {
             setError(
-                `El archivo ${oversizedFile.name} supera el tamaño máximo de ${deliverable.max_file_size_mb} MB.`,
+                `Adjunta al menos un archivo válido (${formatList}) o ingresa un enlace HTTPS.`,
             );
             return;
         }
 
-        const trimmedLink = linkUrl.trim();
+        if (files.length > 0) {
+            const allowedFormats = new Set<string>(deliverable.allowed_formats);
+            const invalidFile = files.find((file) => !allowedFormats.has(fileExtension(file.name)));
+            if (invalidFile) {
+                setError(`Adjunta al menos un archivo válido: ${formatList}.`);
+                return;
+            }
+
+            const emptyFile = files.find((file) => file.size === 0);
+            if (emptyFile) {
+                setError(`El archivo ${emptyFile.name} está vacío.`);
+                return;
+            }
+
+            const maxBytes = deliverable.max_file_size_mb * 1024 * 1024;
+            const oversizedFile = files.find((file) => file.size > maxBytes);
+            if (oversizedFile) {
+                setError(
+                    `El archivo ${oversizedFile.name} supera el tamaño máximo de ${deliverable.max_file_size_mb} MB.`,
+                );
+                return;
+            }
+        }
+
         if (trimmedLink && !trimmedLink.startsWith('https://')) {
             setError('Ingrese un enlace HTTPS válido.');
             return;
@@ -411,7 +469,9 @@ function UploadPanel({ deliverable }: { deliverable: DeliverableDetail }) {
             <form className="form" onSubmit={handleSubmit} noValidate>
                 <div className="upload-zone">
                     <p className="upload-zone__text">Selecciona los archivos de tu entrega</p>
-                    <p className="upload-zone__help">Se enviarán juntos como una sola versión.</p>
+                    <p className="upload-zone__help">
+                        Puedes adjuntar archivos, ingresar un enlace HTTPS, o ambos.
+                    </p>
                     <label className="button button--secondary" htmlFor="deliverable-files">
                         Elegir archivos
                     </label>
@@ -433,7 +493,7 @@ function UploadPanel({ deliverable }: { deliverable: DeliverableDetail }) {
                 </div>
 
                 <div className="field">
-                    <label htmlFor="submission-link">Enlace de la entrega (opcional)</label>
+                    <label htmlFor="submission-link">Enlace de la entrega</label>
                     <input
                         id="submission-link"
                         className="input"
@@ -443,7 +503,8 @@ function UploadPanel({ deliverable }: { deliverable: DeliverableDetail }) {
                         placeholder="https://…"
                     />
                     <p className="help">
-                        Debe comenzar con https://. Los archivos siguen siendo obligatorios.
+                        Debe comenzar con https://. Puedes entregar solo el enlace o acompañarlo con
+                        archivos.
                     </p>
                 </div>
 
@@ -519,9 +580,13 @@ function ForumPanel({ deliverable }: { deliverable: DeliverableDetail }) {
                 </p>
             ) : (
                 <ul className="message-list">
-                    {deliverable.messages.map((message) => (
-                        <ForumMessageItem key={message.id} message={message} />
-                    ))}
+                    {deliverable.messages.map((message) =>
+                        message.kind === 'system' ? (
+                            <SystemForumMessageItem key={message.id} message={message} />
+                        ) : (
+                            <ForumMessageItem key={message.id} message={message} />
+                        ),
+                    )}
                 </ul>
             )}
 
@@ -562,17 +627,31 @@ function ForumPanel({ deliverable }: { deliverable: DeliverableDetail }) {
 }
 
 function ForumMessageItem({ message }: { message: ForumMessage }) {
+    const authorName = message.author_name ?? 'Usuario eliminado';
+
     return (
         <li className="message">
             <span className="avatar" aria-hidden="true">
-                {initials(message.author_name)}
+                {initials(authorName)}
             </span>
             <div>
                 <p className="message__header">
-                    <span className="message__author">{message.author_name}</span>
+                    <span className="message__author">{authorName}</span>
                     <span className="message__date">{formatDateTime(message.created_at)}</span>
                 </p>
                 <p className="message__body">{message.body}</p>
+            </div>
+        </li>
+    );
+}
+
+function SystemForumMessageItem({ message }: { message: ForumMessage }) {
+    return (
+        <li className="message message--system">
+            <span className="message__system-dot" aria-hidden="true" />
+            <div>
+                <p className="message__body">{message.body}</p>
+                <p className="message__date">{formatDateTime(message.created_at)}</p>
             </div>
         </li>
     );

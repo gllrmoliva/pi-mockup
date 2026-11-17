@@ -162,7 +162,16 @@ export const sampleManagerDeliverable: DeliverableDetail = {
     review: null,
     messages: [
         {
+            id: 'msg0',
+            kind: 'system',
+            body: 'Camila Soto ha creado el entregable.',
+            author_id: null,
+            author_name: null,
+            created_at: '2026-11-01T12:00:00Z',
+        },
+        {
             id: 'msg1',
+            kind: 'user',
             body: 'Subí la primera versión del informe.',
             author_id: 'u-student',
             author_name: 'Javiera Contreras',
