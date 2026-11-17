@@ -3,7 +3,9 @@ from datetime import UTC, datetime, timedelta
 from httpx import AsyncClient
 from sqlalchemy import select
 
+from app.core.config import settings
 from app.db.session import SessionLocal
+from app.main import app
 from app.modules.auth.enums import UserStatus, UserType
 from app.modules.auth.models import Sesion, Usuario
 from app.modules.auth.security import (
@@ -177,3 +179,119 @@ async def test_expired_session_is_rejected(client: AsyncClient) -> None:
 
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "UNAUTHENTICATED"
+
+
+async def failed_login(client: AsyncClient, email: str) -> None:
+    response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": email, "password": "wrong-password"},
+    )
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "INVALID_CREDENTIALS"
+
+
+async def test_five_failed_logins_lock_account(client: AsyncClient) -> None:
+    user = await create_user("locked@example.com")
+
+    for _ in range(settings.max_failed_login_attempts):
+        await failed_login(client, user.correo)
+
+    async with SessionLocal() as db:
+        stored_user = await db.scalar(select(Usuario).where(Usuario.id == user.id))
+        assert stored_user is not None
+        assert stored_user.intentos_fallidos == settings.max_failed_login_attempts
+        assert stored_user.bloqueado_hasta is not None
+        remaining = stored_user.bloqueado_hasta - datetime.now(UTC)
+        assert timedelta(minutes=settings.login_lockout_minutes - 1) < remaining
+        assert remaining <= timedelta(minutes=settings.login_lockout_minutes)
+
+    locked = await client.post(
+        "/api/v1/auth/login",
+        json={"email": user.correo, "password": PASSWORD},
+    )
+
+    assert locked.status_code == 423
+    assert locked.json()["error"]["code"] == "ACCOUNT_LOCKED"
+    assert locked.json()["error"]["message"] == (
+        "Cuenta bloqueada temporalmente. "
+        f"Intente nuevamente en {settings.login_lockout_minutes} minutos."
+    )
+    assert locked.headers.get("set-cookie") is None
+
+
+async def test_expired_lock_allows_login_and_resets_counter(
+    client: AsyncClient,
+) -> None:
+    user = await create_user("expired-lock@example.com")
+
+    async with SessionLocal() as db:
+        stored_user = await db.scalar(select(Usuario).where(Usuario.id == user.id))
+        assert stored_user is not None
+        stored_user.intentos_fallidos = settings.max_failed_login_attempts
+        stored_user.bloqueado_hasta = datetime.now(UTC) - timedelta(minutes=1)
+        await db.commit()
+
+    response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": user.correo, "password": PASSWORD},
+    )
+
+    assert response.status_code == 200
+    async with SessionLocal() as db:
+        stored_user = await db.scalar(select(Usuario).where(Usuario.id == user.id))
+        assert stored_user is not None
+        assert stored_user.intentos_fallidos == 0
+        assert stored_user.bloqueado_hasta is None
+
+
+async def test_successful_login_resets_failed_attempts(client: AsyncClient) -> None:
+    user = await create_user("reset@example.com")
+
+    await failed_login(client, user.correo)
+    await failed_login(client, user.correo)
+
+    response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": user.correo, "password": PASSWORD},
+    )
+
+    assert response.status_code == 200
+    async with SessionLocal() as db:
+        stored_user = await db.scalar(select(Usuario).where(Usuario.id == user.id))
+        assert stored_user is not None
+        assert stored_user.intentos_fallidos == 0
+        assert stored_user.bloqueado_hasta is None
+
+
+async def test_unknown_email_is_not_locked(client: AsyncClient) -> None:
+    for _ in range(settings.max_failed_login_attempts + 1):
+        await failed_login(client, "ghost@example.com")
+
+    async with SessionLocal() as db:
+        stored_user = await db.scalar(
+            select(Usuario).where(Usuario.correo == "ghost@example.com")
+        )
+        assert stored_user is None
+
+
+async def test_stored_passwords_use_argon2id(client: AsyncClient) -> None:
+    await create_user("hash@example.com")
+
+    async with SessionLocal() as db:
+        stored_user = await db.scalar(
+            select(Usuario).where(Usuario.correo == "hash@example.com")
+        )
+        assert stored_user is not None
+        assert stored_user.credencial.startswith("$argon2id$")
+
+
+async def test_auth_routes_do_not_include_registration() -> None:
+    auth_paths = {
+        path for path in app.openapi()["paths"] if path.startswith("/api/v1/auth")
+    }
+
+    assert auth_paths == {
+        "/api/v1/auth/login",
+        "/api/v1/auth/logout",
+        "/api/v1/auth/me",
+    }

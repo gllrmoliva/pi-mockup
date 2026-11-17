@@ -48,14 +48,6 @@ class DeliverableUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class ReviewCreate(BaseModel):
-    """Decisión de revisión sobre la última entrega."""
-
-    decision: ReviewDecisionApi
-
-    model_config = ConfigDict(extra="forbid")
-
-
 class MessageCreate(BaseModel):
     """Mensaje del foro de un entregable."""
 
@@ -65,7 +57,7 @@ class MessageCreate(BaseModel):
 
 
 class SubmissionFileResponse(BaseModel):
-    """Archivo asociado a una entrega."""
+    """Archivo adjunto a una entrega o a una revisión."""
 
     id: UUID
     original_name: str
@@ -75,12 +67,13 @@ class SubmissionFileResponse(BaseModel):
 
 
 class ReviewResponse(BaseModel):
-    """Revisión de una entrega."""
+    """Revisión de una entrega y sus archivos adjuntos."""
 
     id: UUID
     decision: ReviewDecisionApi
     reviewer_name: str
     reviewed_at: datetime
+    files: list[SubmissionFileResponse]
 
 
 class SubmissionResponse(BaseModel):

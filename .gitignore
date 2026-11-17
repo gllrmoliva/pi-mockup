@@ -13,16 +13,19 @@ htmlcov/
 node_modules/
 frontend/node_modules/
 frontend/dist/
+frontend/test-results/
 
 # Environment
 .env
 .env.*
 !.env.example
-spec/
 
 # Runtime data
 uploads/
 data/
+reports/
+certs/
+backups/
 
 # Editors and OS
 .DS_Store

@@ -10,7 +10,7 @@ from app.api.deps import get_current_user
 from app.core.errors import AppError
 from app.db.session import get_db
 from app.modules.auth.models import Usuario
-from app.modules.deliverables.models import Entrega, Entregable
+from app.modules.deliverables.models import Entrega, Entregable, Revision
 from app.modules.projects.enums import ParticipantRole
 from app.modules.projects.models import Hito, Participacion, Proyecto
 from app.modules.storage.models import Archivo
@@ -47,10 +47,11 @@ class DeliverableContext:
 
 @dataclass(frozen=True)
 class FileContext:
-    """Archivo, entrega, entregable y participación del usuario."""
+    """Archivo, entrega o revisión, entregable y participación del usuario."""
 
     file: Archivo
     submission: Entrega
+    review: Revision | None
     deliverable: Entregable
     milestone: Hito
     project: Proyecto
@@ -156,7 +157,19 @@ async def get_file_context(
     if file is None:
         raise AppError("FILE_NOT_FOUND", FILE_NOT_FOUND_MESSAGE, 404)
 
-    submission = await db.get(Entrega, file.entrega_id)
+    review: Revision | None = None
+    if file.revision_id is not None:
+        review = await db.get(Revision, file.revision_id)
+        if review is None:
+            raise AppError("FILE_NOT_FOUND", FILE_NOT_FOUND_MESSAGE, 404)
+        submission = await db.get(Entrega, review.entrega_id)
+    else:
+        submission = (
+            await db.get(Entrega, file.entrega_id)
+            if file.entrega_id is not None
+            else None
+        )
+
     if submission is None:
         raise AppError("FILE_NOT_FOUND", FILE_NOT_FOUND_MESSAGE, 404)
 
@@ -184,6 +197,7 @@ async def get_file_context(
     return FileContext(
         file=file,
         submission=submission,
+        review=review,
         deliverable=deliverable,
         milestone=milestone,
         project=project,

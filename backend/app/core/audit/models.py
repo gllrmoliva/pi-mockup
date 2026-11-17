@@ -27,7 +27,7 @@ class RegistroAuditoria(TimestampMixin, Base):
     fecha: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    ip: Mapped[str] = mapped_column(String(45), nullable=False)
+    ip: Mapped[str | None] = mapped_column(String(45), nullable=True)
 
     __table_args__ = (
         Index("ix_registro_auditoria_usuario_id_fecha", "usuario_id", "fecha"),

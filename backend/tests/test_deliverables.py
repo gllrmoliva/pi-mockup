@@ -115,11 +115,15 @@ async def upload(
 
 
 async def review(
-    client: AsyncClient, deliverable_id: str, decision: str
+    client: AsyncClient,
+    deliverable_id: str,
+    decision: str,
+    files: list[tuple[str, tuple[str, bytes, str]]] | None = None,
 ) -> dict[str, Any]:
     response = await client.post(
         f"/api/v1/deliverables/{deliverable_id}/reviews",
-        json={"decision": decision},
+        data={"decision": decision},
+        files=files,
     )
     assert response.status_code == 201, response.text
     return response.json()
@@ -531,9 +535,109 @@ async def test_review_state_machine(client: AsyncClient) -> None:
     await login(client, "professor@example.com")
     review_after_approval = await client.post(
         f"/api/v1/deliverables/{deliverable['id']}/reviews",
-        json={"decision": "approved"},
+        data={"decision": "approved"},
     )
     assert review_after_approval.status_code == 409
+
+
+async def test_review_files_are_stored_and_downloadable(
+    client: AsyncClient,
+) -> None:
+    _, student, _, _, deliverable = await setup_project(client)
+    await login(client, student.correo)
+    await upload(
+        client,
+        str(deliverable["id"]),
+        [("files", ("v1.pdf", PDF_BYTES, "application/pdf"))],
+    )
+
+    await login(client, "professor@example.com")
+    review_response = await review(
+        client,
+        str(deliverable["id"]),
+        "approved",
+        files=[
+            (
+                "files",
+                ("informe-corregido.pdf", PDF_BYTES + b"corregido", "application/pdf"),
+            ),
+            (
+                "files",
+                ("anexo.pdf", PDF_BYTES + b"anexo", "application/pdf"),
+            ),
+        ],
+    )
+    assert len(review_response["files"]) == 2
+    review_file_ids = {file["id"] for file in review_response["files"]}
+
+    detail = await client.get(f"/api/v1/deliverables/{deliverable['id']}")
+    assert detail.status_code == 200
+    detail_files = detail.json()["review"]["files"]
+    assert {file["id"] for file in detail_files} == review_file_ids
+    assert detail.json()["messages"][-1]["body"].endswith(
+        "ha marcado la versión 1 como Aprobada y adjuntó 2 archivos."
+    )
+
+    history = await client.get(f"/api/v1/deliverables/{deliverable['id']}/submissions")
+    assert history.status_code == 200
+    history_files = history.json()[0]["review"]["files"]
+    assert {file["id"] for file in history_files} == review_file_ids
+
+    manager_download = await client.get(
+        f"/api/v1/files/{detail_files[0]['id']}/download"
+    )
+    assert manager_download.status_code == 200
+    assert manager_download.content in {
+        PDF_BYTES + b"corregido",
+        PDF_BYTES + b"anexo",
+    }
+
+    await login(client, student.correo)
+    collaborator_download = await client.get(
+        f"/api/v1/files/{detail_files[0]['id']}/download"
+    )
+    assert collaborator_download.status_code == 200
+
+    outsider = await create_user("outsider@example.com")
+    await login(client, outsider.correo)
+    outsider_download = await client.get(
+        f"/api/v1/files/{detail_files[0]['id']}/download"
+    )
+    assert outsider_download.status_code == 404
+
+
+async def test_review_file_validation_rejects_review(
+    client: AsyncClient,
+) -> None:
+    _, student, _, _, deliverable = await setup_project(client)
+    await login(client, student.correo)
+    await upload(
+        client,
+        str(deliverable["id"]),
+        [("files", ("v1.pdf", PDF_BYTES, "application/pdf"))],
+    )
+
+    await login(client, "professor@example.com")
+    invalid_format = await client.post(
+        f"/api/v1/deliverables/{deliverable['id']}/reviews",
+        data={"decision": "changes_requested"},
+        files=[("files", ("correccion.exe", b"x", "application/x-msdownload"))],
+    )
+    assert invalid_format.status_code == 422
+    assert "no está permitido" in invalid_format.json()["error"]["message"]
+
+    empty_file = await client.post(
+        f"/api/v1/deliverables/{deliverable['id']}/reviews",
+        data={"decision": "changes_requested"},
+        files=[("files", ("correccion.pdf", b"", "application/pdf"))],
+    )
+    assert empty_file.status_code == 422
+    assert "está vacío" in empty_file.json()["error"]["message"]
+
+    detail = await client.get(f"/api/v1/deliverables/{deliverable['id']}")
+    assert detail.status_code == 200
+    assert detail.json()["status"] == "submitted"
+    assert detail.json()["review"] is None
 
 
 async def test_deliverable_lifecycle_forum_events(client: AsyncClient) -> None:
@@ -580,14 +684,14 @@ async def test_review_requires_submission_and_manager(
 
     before_submission = await client.post(
         f"/api/v1/deliverables/{deliverable['id']}/reviews",
-        json={"decision": "approved"},
+        data={"decision": "approved"},
     )
     assert before_submission.status_code == 409
 
     await login(client, student.correo)
     collaborator_review = await client.post(
         f"/api/v1/deliverables/{deliverable['id']}/reviews",
-        json={"decision": "approved"},
+        data={"decision": "approved"},
     )
     assert collaborator_review.status_code == 403
 

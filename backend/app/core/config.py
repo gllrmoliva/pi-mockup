@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://hito:change-me@localhost:5432/hito"
     session_cookie_secure: bool = False
     session_ttl_hours: int = 8
+    max_failed_login_attempts: int = 5
+    login_lockout_minutes: int = 15
+    trust_proxy_headers: bool = False
     upload_dir: str = "uploads"
 
     model_config = SettingsConfigDict(

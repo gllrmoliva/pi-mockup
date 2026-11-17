@@ -9,6 +9,7 @@ type ModalProps = {
 
 export function Modal({ title, children, onClose }: ModalProps) {
     const dialogRef = useRef<HTMLDialogElement>(null);
+    const previouslyFocused = useRef<HTMLElement | null>(null);
     const titleId = useId();
 
     useEffect(() => {
@@ -16,12 +17,16 @@ export function Modal({ title, children, onClose }: ModalProps) {
         if (dialog === null) {
             return;
         }
+        previouslyFocused.current = document.activeElement as HTMLElement | null;
         if (!dialog.open) {
             dialog.showModal();
         }
         return () => {
             if (dialog.open) {
                 dialog.close();
+            }
+            if (previouslyFocused.current?.isConnected) {
+                previouslyFocused.current.focus({ preventScroll: true });
             }
         };
     }, []);

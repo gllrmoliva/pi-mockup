@@ -17,6 +17,13 @@ from app.modules.auth.security import (
 logger = logging.getLogger(__name__)
 
 INVALID_CREDENTIALS_MESSAGE = "Correo o contraseña incorrectos."
+LOCKED_ACCOUNT_MESSAGE = "Cuenta bloqueada temporalmente."
+
+
+def locked_account_message() -> str:
+    """Construye el mensaje de bloqueo con la duración configurada."""
+    minutes = settings.login_lockout_minutes
+    return f"{LOCKED_ACCOUNT_MESSAGE} Intente nuevamente en {minutes} minutos."
 
 
 def normalize_email(email: str) -> str:
@@ -34,10 +41,19 @@ async def authenticate_user(db: AsyncSession, email: str, password: str) -> Usua
         )
 
     user = await db.scalar(
-        select(Usuario).where(Usuario.correo == normalize_email(email))
+        select(Usuario)
+        .where(Usuario.correo == normalize_email(email))
+        .with_for_update()
     )
     if user is None:
         raise AppError("INVALID_CREDENTIALS", INVALID_CREDENTIALS_MESSAGE, 401)
+
+    now = datetime.now(UTC)
+    if user.bloqueado_hasta is not None:
+        if user.bloqueado_hasta > now:
+            raise AppError("ACCOUNT_LOCKED", locked_account_message(), 423)
+        user.bloqueado_hasta = None
+        user.intentos_fallidos = 0
 
     try:
         password_matches = verify_password(password, user.credencial)
@@ -45,26 +61,38 @@ async def authenticate_user(db: AsyncSession, email: str, password: str) -> Usua
         logger.exception("Stored credential could not be verified")
         password_matches = False
 
-    if not password_matches or user.estado != UserStatus.ACTIVE:
+    if not password_matches:
+        user.intentos_fallidos += 1
+        if user.intentos_fallidos >= settings.max_failed_login_attempts:
+            user.bloqueado_hasta = now + timedelta(
+                minutes=settings.login_lockout_minutes
+            )
+        await db.commit()
         raise AppError("INVALID_CREDENTIALS", INVALID_CREDENTIALS_MESSAGE, 401)
 
+    if user.estado != UserStatus.ACTIVE:
+        await db.commit()
+        raise AppError("INVALID_CREDENTIALS", INVALID_CREDENTIALS_MESSAGE, 401)
+
+    user.intentos_fallidos = 0
+    user.bloqueado_hasta = None
+    await db.commit()
     return user
 
 
-async def create_session(db: AsyncSession, user: Usuario) -> str:
-    """Crea una sesión opaca y devuelve el token que va a la cookie."""
+async def create_session(db: AsyncSession, user: Usuario) -> tuple[str, Sesion]:
+    """Crea una sesión opaca y devuelve el token y la sesión persistida."""
     now = datetime.now(UTC)
     token = generate_session_token()
-    db.add(
-        Sesion(
-            usuario_id=user.id,
-            token_hash=hash_session_token(token),
-            fecha_expiracion=now + timedelta(hours=settings.session_ttl_hours),
-        )
+    session = Sesion(
+        usuario_id=user.id,
+        token_hash=hash_session_token(token),
+        fecha_expiracion=now + timedelta(hours=settings.session_ttl_hours),
     )
+    db.add(session)
     await db.execute(delete(Sesion).where(Sesion.fecha_expiracion <= now))
     await db.commit()
-    return token
+    return token, session
 
 
 async def get_user_for_session(db: AsyncSession, token: str) -> Usuario | None:
@@ -81,9 +109,12 @@ async def get_user_for_session(db: AsyncSession, token: str) -> Usuario | None:
     return await db.scalar(statement)
 
 
-async def delete_session(db: AsyncSession, token: str) -> None:
-    """Elimina la sesión asociada al token, si existe."""
-    await db.execute(
-        delete(Sesion).where(Sesion.token_hash == hash_session_token(token))
+async def delete_session(db: AsyncSession, token: str) -> Sesion | None:
+    """Elimina la sesión asociada al token y la devuelve para auditarla."""
+    session = await db.scalar(
+        select(Sesion).where(Sesion.token_hash == hash_session_token(token))
     )
-    await db.commit()
+    if session is None:
+        return None
+    await db.delete(session)
+    return session

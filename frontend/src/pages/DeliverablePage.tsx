@@ -17,7 +17,7 @@ import { LoadingState } from '../components/LoadingState';
 import { ReviewBlock } from '../components/ReviewBlock';
 import { StatusChip } from '../components/StatusChip';
 import { SubmissionFiles } from '../components/SubmissionFiles';
-import { fileFormatLabels, formatDateTime, initials } from '../utils/format';
+import { fileFormatLabels, formatDateTime, formatFileSize, initials } from '../utils/format';
 
 export function DeliverablePage() {
     const { deliverableId } = useParams<{ deliverableId: string }>();
@@ -210,10 +210,14 @@ function ManagerReviewPanel({
     const postMessage = usePostMessage();
     const [decision, setDecision] = useState<ReviewDecision | null>(null);
     const [forumMessage, setForumMessage] = useState('');
+    const [files, setFiles] = useState<File[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     const latest = deliverable.latest_submission;
     const reviewed = reviewDeliverable.isPending || postMessage.isPending;
+    const formatList = deliverable.allowed_formats
+        .map((format) => fileFormatLabels[format])
+        .join(', ');
 
     if (
         deliverable.my_role !== 'manager' ||
@@ -224,6 +228,17 @@ function ManagerReviewPanel({
         return null;
     }
 
+    function addFiles(selectedFiles: File[]) {
+        setFiles((current) => {
+            const existing = new Set(current.map(fileKey));
+            return [...current, ...selectedFiles.filter((file) => !existing.has(fileKey(file)))];
+        });
+    }
+
+    function removeFile(key: string) {
+        setFiles((current) => current.filter((file) => fileKey(file) !== key));
+    }
+
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if (decision === null) {
@@ -232,10 +247,20 @@ function ManagerReviewPanel({
         }
 
         setError(null);
+        const fileError = validateSelectedFiles(
+            files,
+            deliverable.allowed_formats,
+            deliverable.max_file_size_mb,
+        );
+        if (fileError) {
+            setError(fileError);
+            return;
+        }
+
         const trimmedMessage = forumMessage.trim();
 
         reviewDeliverable.mutate(
-            { deliverableId: deliverable.id, decision },
+            { deliverableId: deliverable.id, decision, files },
             {
                 onSuccess: () => {
                     setDecision(null);
@@ -359,6 +384,53 @@ function ManagerReviewPanel({
                     <p className="char-count">{forumMessage.length} / 2000</p>
                 </div>
 
+                <div className="field">
+                    <p className="field__label" id="review-files-label">
+                        Archivos de la revisión (opcional)
+                    </p>
+                    <label className="button button--secondary" htmlFor="review-files">
+                        Elegir archivos
+                    </label>
+                    <input
+                        id="review-files"
+                        className="file-input"
+                        type="file"
+                        multiple
+                        aria-labelledby="review-files-label"
+                        accept={deliverable.allowed_formats.map((format) => `.${format}`).join(',')}
+                        onChange={(event) => {
+                            addFiles(Array.from(event.target.files ?? []));
+                            event.target.value = '';
+                        }}
+                    />
+                    {files.length > 0 ? (
+                        <ul className="file-list review-file-selection" role="status">
+                            {files.map((file) => (
+                                <li className="file-row" key={fileKey(file)}>
+                                    <div className="file-row__main">
+                                        <p className="file-row__name">{file.name}</p>
+                                        <p className="file-row__meta">
+                                            {formatFileSize(file.size)}
+                                        </p>
+                                    </div>
+                                    <button
+                                        className="button button--ghost button--small"
+                                        type="button"
+                                        aria-label={`Quitar ${file.name}`}
+                                        onClick={() => removeFile(fileKey(file))}
+                                    >
+                                        Quitar
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : null}
+                    <p className="help">
+                        Puedes seleccionar varios archivos; se acumulan antes de enviar. Formatos:{' '}
+                        {formatList}; máximo {deliverable.max_file_size_mb} MB por archivo.
+                    </p>
+                </div>
+
                 <div className="form__actions">
                     <button
                         className="button"
@@ -402,28 +474,14 @@ function UploadPanel({ deliverable }: { deliverable: DeliverableDetail }) {
             return;
         }
 
-        if (files.length > 0) {
-            const allowedFormats = new Set<string>(deliverable.allowed_formats);
-            const invalidFile = files.find((file) => !allowedFormats.has(fileExtension(file.name)));
-            if (invalidFile) {
-                setError(`Adjunta al menos un archivo válido: ${formatList}.`);
-                return;
-            }
-
-            const emptyFile = files.find((file) => file.size === 0);
-            if (emptyFile) {
-                setError(`El archivo ${emptyFile.name} está vacío.`);
-                return;
-            }
-
-            const maxBytes = deliverable.max_file_size_mb * 1024 * 1024;
-            const oversizedFile = files.find((file) => file.size > maxBytes);
-            if (oversizedFile) {
-                setError(
-                    `El archivo ${oversizedFile.name} supera el tamaño máximo de ${deliverable.max_file_size_mb} MB.`,
-                );
-                return;
-            }
+        const fileError = validateSelectedFiles(
+            files,
+            deliverable.allowed_formats,
+            deliverable.max_file_size_mb,
+        );
+        if (fileError) {
+            setError(fileError);
+            return;
         }
 
         if (trimmedLink && !trimmedLink.startsWith('https://')) {
@@ -695,4 +753,33 @@ function DeliverableFicha({ deliverable }: { deliverable: DeliverableDetail }) {
 
 function fileExtension(name: string): string {
     return name.split('.').pop()?.toLowerCase() ?? '';
+}
+
+function fileKey(file: File): string {
+    return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+function validateSelectedFiles(
+    files: File[],
+    allowedFormats: string[],
+    maxFileSizeMb: number,
+): string | null {
+    const allowed = new Set<string>(allowedFormats);
+    const invalidFile = files.find((file) => !allowed.has(fileExtension(file.name)));
+    if (invalidFile) {
+        return `El formato del archivo no está permitido: ${invalidFile.name}.`;
+    }
+
+    const emptyFile = files.find((file) => file.size === 0);
+    if (emptyFile) {
+        return `El archivo ${emptyFile.name} está vacío.`;
+    }
+
+    const maxBytes = maxFileSizeMb * 1024 * 1024;
+    const oversizedFile = files.find((file) => file.size > maxBytes);
+    if (oversizedFile) {
+        return `El archivo ${oversizedFile.name} supera el tamaño máximo de ${maxFileSizeMb} MB.`;
+    }
+
+    return null;
 }

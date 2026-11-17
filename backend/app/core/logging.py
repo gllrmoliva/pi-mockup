@@ -1,10 +1,29 @@
+import json
 import logging
+from datetime import UTC, datetime
+from typing import Any
+
+
+class JsonFormatter(logging.Formatter):
+    """Formatea registros de log como una línea JSON."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        payload: dict[str, Any] = {
+            "timestamp": datetime.fromtimestamp(record.created, UTC).isoformat(),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        if record.exc_info:
+            payload["exception"] = self.formatException(record.exc_info)
+        return json.dumps(payload, ensure_ascii=False)
 
 
 def configure_logging(level: str) -> None:
-    """Configura el logging estándar de la aplicación."""
-    logging.basicConfig(
-        level=level.upper(),
-        format="%(asctime)s %(levelname)s %(name)s %(message)s",
-        force=True,
-    )
+    """Configura el logging estándar de la aplicación en JSON."""
+    handler = logging.StreamHandler()
+    handler.setFormatter(JsonFormatter())
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.addHandler(handler)
+    root.setLevel(level.upper())

@@ -1,0 +1,157 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-quality:
+    name: Backend lint, format and types
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Ruff and Pyright
+        run: |
+          docker compose --profile test run --rm --build --entrypoint /bin/sh \
+            backend-test -c "ruff check app tests alembic && ruff format --check app tests alembic && pyright"
+
+  backend-tests-coverage:
+    name: Backend tests and coverage gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests and the 80% business-logic gate
+        run: ./scripts/nfr/coverage.sh
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: reports/nfr/coverage/
+          if-no-files-found: warn
+
+  frontend-quality:
+    name: Frontend lint, types, tests and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run typecheck
+      - name: Unit and component tests
+        run: npm run test:run
+      - name: Production build
+        run: npm run build
+
+  docker-smoke:
+    name: Docker Compose smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build, seed and verify the full stack
+        env:
+          SMOKE_CLEANUP: "1"
+        run: ./scripts/nfr/compose_smoke.sh
+      - name: Collect Docker logs
+        if: failure()
+        run: |
+          mkdir -p reports/nfr
+          docker compose ps > reports/nfr/docker-smoke.log 2>&1 || true
+          docker compose logs --no-color >> reports/nfr/docker-smoke.log 2>&1 || true
+      - name: Upload Docker logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-smoke-logs
+          path: reports/nfr/docker-smoke.log
+          if-no-files-found: warn
+      - name: Clean up Docker resources
+        if: always()
+        run: docker compose down -v || true
+
+  e2e-chromium:
+    name: E2E Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Install Playwright Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Run Chromium E2E, accessibility and 360 px checks
+        run: ./scripts/nfr/e2e.sh --project=chromium
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-chromium
+          path: reports/nfr/playwright
+          if-no-files-found: warn
+      - name: Upload Playwright failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-chromium-failures
+          path: frontend/test-results
+          if-no-files-found: warn
+      - name: Clean up E2E resources
+        if: always()
+        run: docker compose -p hito_e2e -f compose.yaml -f compose.e2e.yaml down -v || true
+
+  tls-handshake:
+    name: TLS 1.2/1.3 handshake
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the self-signed TLS profile
+        env:
+          TLS_CLEANUP: "1"
+        run: ./scripts/nfr/tls_smoke.sh
+      - name: Collect TLS logs
+        if: failure()
+        run: |
+          mkdir -p reports/nfr
+          docker compose -p hito_tls -f compose.yaml -f compose.tls.yaml ps > reports/nfr/tls-smoke.log 2>&1 || true
+          docker compose -p hito_tls -f compose.yaml -f compose.tls.yaml logs --no-color >> reports/nfr/tls-smoke.log 2>&1 || true
+      - name: Upload TLS logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tls-smoke-logs
+          path: reports/nfr/tls-smoke.log
+          if-no-files-found: warn
+      - name: Clean up TLS resources
+        if: always()
+        run: docker compose -p hito_tls -f compose.yaml -f compose.tls.yaml down -v || true

@@ -1,0 +1,198 @@
+name: NFR nightly
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup-restore:
+    name: Backup and restore drill
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start database and backend
+        run: docker compose up -d --build db backend
+      - name: Wait for the API
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://localhost:8000/health/ready >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: Seed demo data
+        run: docker compose exec -T backend python -m app.seed
+      - name: Create backup
+        run: ./scripts/nfr/backup.sh
+      - name: Run restore drill
+        run: ./scripts/nfr/restore_drill.sh
+      - name: Upload restore report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restore-drill-report
+          path: reports/nfr/restore-drill.json
+          if-no-files-found: warn
+      - name: Upload backup manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-manifest
+          path: backups/manifest-*.json
+          if-no-files-found: warn
+      - name: Collect logs
+        if: failure()
+        run: |
+          mkdir -p reports/nfr
+          docker compose logs --no-color > reports/nfr/nightly-backup.log 2>&1 || true
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-drill-logs
+          path: reports/nfr/nightly-backup.log
+          if-no-files-found: warn
+      - name: Clean up
+        if: always()
+        run: docker compose down -v || true
+
+  storage-report:
+    name: Storage report
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start database and backend
+        run: docker compose up -d --build db backend
+      - name: Wait for the API
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://localhost:8000/health/ready >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: Seed demo data
+        run: docker compose exec -T backend python -m app.seed
+      - name: Run storage report
+        run: ./scripts/nfr/storage_report.sh
+      - name: Upload storage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storage-report
+          path: reports/nfr/storage.json
+          if-no-files-found: warn
+      - name: Collect logs
+        if: failure()
+        run: |
+          mkdir -p reports/nfr
+          docker compose logs --no-color > reports/nfr/nightly-storage.log 2>&1 || true
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storage-report-logs
+          path: reports/nfr/nightly-storage.log
+          if-no-files-found: warn
+      - name: Clean up
+        if: always()
+        run: docker compose down -v || true
+
+  e2e-all-browsers:
+    name: E2E all browsers
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Install Playwright browsers and dependencies
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Run the full browser matrix
+        run: ./scripts/nfr/e2e.sh
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-all-browsers
+          path: reports/nfr/playwright
+          if-no-files-found: warn
+      - name: Upload Playwright failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-all-browsers-failures
+          path: frontend/test-results
+          if-no-files-found: warn
+      - name: Clean up E2E resources
+        if: always()
+        run: docker compose -p hito_e2e -f compose.yaml -f compose.e2e.yaml down -v || true
+
+  perf-local-report:
+    name: Performance local report
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Install Playwright Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Run the full performance report
+        env:
+          PERF_USERS: "100"
+          PERF_DURATION: "900"
+          PERF_RAMP_UP: "30"
+          PERF_PROFESSORS: "30"
+          PERF_ENFORCE: "0"
+          PERF_CLEANUP: "1"
+        run: ./scripts/nfr/perf.sh
+      - name: Upload performance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report
+          path: |
+            reports/nfr/load.json
+            reports/nfr/load.md
+            reports/nfr/navigation.json
+            reports/nfr/memory.json
+          if-no-files-found: warn
+      - name: Collect performance logs
+        if: failure()
+        run: |
+          mkdir -p reports/nfr
+          docker compose -p hito_perf -f compose.yaml -f compose.perf.yaml logs --no-color \
+            > reports/nfr/performance.log 2>&1 || true
+      - name: Upload performance logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-logs
+          path: reports/nfr/performance.log
+          if-no-files-found: warn
+      - name: Clean up performance resources
+        if: always()
+        run: docker compose -p hito_perf -f compose.yaml -f compose.perf.yaml down -v || true

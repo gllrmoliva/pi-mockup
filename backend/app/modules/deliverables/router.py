@@ -1,11 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.core.audit.service import record_audit
 from app.core.errors import AppError
+from app.core.http import get_client_ip
 from app.db.session import get_db
 from app.modules.auth.models import Usuario
 from app.modules.deliverables.dependencies import (
@@ -25,7 +27,6 @@ from app.modules.deliverables.schemas import (
     ForumMessageResponse,
     MessageCreate,
     PendingReviewResponse,
-    ReviewCreate,
     ReviewResponse,
     SubmissionResponse,
 )
@@ -44,6 +45,7 @@ from app.modules.deliverables.service import (
     update_deliverable,
 )
 from app.modules.projects.enums import ParticipantRole
+from app.modules.projects.schemas import ReviewDecisionApi
 from app.modules.storage.service import get_storage
 
 router = APIRouter(tags=["deliverables"])
@@ -56,6 +58,7 @@ router = APIRouter(tags=["deliverables"])
 )
 async def create_deliverable_endpoint(
     payload: DeliverableCreate,
+    request: Request,
     context: Annotated[MilestoneContext, Depends(get_milestone_manager_context)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> DeliverableDetail:
@@ -67,6 +70,15 @@ async def create_deliverable_endpoint(
         payload,
         context.user,
     )
+    await record_audit(
+        db,
+        user_id=context.user.id,
+        action="entregable.crear",
+        entity="entregable",
+        entity_id=deliverable.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
     detail_context = DeliverableContext(
         deliverable=deliverable,
         milestone=context.milestone,
@@ -83,11 +95,21 @@ async def create_deliverable_endpoint(
 )
 async def update_deliverable_endpoint(
     payload: DeliverableUpdate,
+    request: Request,
     context: Annotated[DeliverableContext, Depends(get_deliverable_manager_context)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> DeliverableDetail:
     """Edita un entregable existente."""
     await update_deliverable(db, context, payload)
+    await record_audit(
+        db,
+        user_id=context.user.id,
+        action="entregable.editar",
+        entity="entregable",
+        entity_id=context.deliverable.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
     return await build_deliverable_detail(db, context)
 
 
@@ -124,12 +146,22 @@ async def submit_deliverable_endpoint(
     context: Annotated[
         DeliverableContext, Depends(get_deliverable_collaborator_context)
     ],
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
     files: Annotated[list[UploadFile] | None, File()] = None,
     link_url: Annotated[str | None, Form()] = None,
 ) -> SubmissionResponse:
     """Registra una nueva versión de un entregable."""
     submission = await submit_deliverable(db, context, files or [], link_url)
+    await record_audit(
+        db,
+        user_id=context.user.id,
+        action="entrega.crear",
+        entity="entrega",
+        entity_id=submission.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
     return await serialize_submission(db, submission)
 
 
@@ -139,12 +171,23 @@ async def submit_deliverable_endpoint(
     status_code=status.HTTP_201_CREATED,
 )
 async def review_deliverable_endpoint(
-    payload: ReviewCreate,
+    request: Request,
     context: Annotated[DeliverableContext, Depends(get_deliverable_manager_context)],
     db: Annotated[AsyncSession, Depends(get_db)],
+    decision: Annotated[ReviewDecisionApi, Form()],
+    files: Annotated[list[UploadFile] | None, File()] = None,
 ) -> ReviewResponse:
-    """Registra la decisión de un gestor sobre la última entrega."""
-    review = await review_deliverable(db, context, payload)
+    """Registra la decisión de un gestor y sus archivos adjuntos."""
+    review = await review_deliverable(db, context, decision, files or [])
+    await record_audit(
+        db,
+        user_id=context.user.id,
+        action="revision.crear",
+        entity="revision",
+        entity_id=review.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
     return await serialize_review(db, review)
 
 
@@ -155,11 +198,21 @@ async def review_deliverable_endpoint(
 )
 async def post_message_endpoint(
     payload: MessageCreate,
+    request: Request,
     context: Annotated[DeliverableContext, Depends(get_deliverable_context)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ForumMessageResponse:
     """Publica un mensaje en el foro del entregable."""
     comment = await post_message(db, context, payload)
+    await record_audit(
+        db,
+        user_id=context.user.id,
+        action="comentario.crear",
+        entity="comentario",
+        entity_id=comment.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
     return await serialize_message(db, comment)
 
 
@@ -178,6 +231,7 @@ async def list_pending_reviews_endpoint(
 @router.get("/files/{file_id}/download")
 async def download_file_endpoint(
     context: Annotated[FileContext, Depends(get_file_context)],
+    request: Request,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> FileResponse:
     """Descarga un archivo respetando el acceso por rol y versión."""
@@ -200,6 +254,16 @@ async def download_file_endpoint(
             "El archivo no está disponible.",
             404,
         )
+
+    await record_audit(
+        db,
+        user_id=context.user.id,
+        action="archivo.descargar",
+        entity="archivo",
+        entity_id=context.file.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
 
     return FileResponse(
         path,

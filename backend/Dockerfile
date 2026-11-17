@@ -14,6 +14,7 @@ COPY app ./app
 COPY alembic.ini .
 COPY alembic ./alembic
 COPY entrypoint.sh .
+COPY logging.json .
 
 RUN mkdir -p /app/uploads \
     && chmod +x entrypoint.sh \

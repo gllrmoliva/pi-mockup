@@ -1,9 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.core.audit.service import record_audit
+from app.core.http import get_client_ip
 from app.db.session import get_db
 from app.modules.auth.models import Usuario
 from app.modules.projects.dependencies import (
@@ -48,11 +50,21 @@ async def list_projects(
 )
 async def create_project_endpoint(
     payload: ProjectCreate,
+    request: Request,
     current_user: Annotated[Usuario, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ProjectDetail:
     """Crea un proyecto; el profesor creador queda como gestor."""
     project = await create_project(db, current_user, payload)
+    await record_audit(
+        db,
+        user_id=current_user.id,
+        action="proyecto.crear",
+        entity="proyecto",
+        entity_id=project.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
     return await build_project_detail(db, project, "manager")
 
 
@@ -72,11 +84,21 @@ async def get_project_endpoint(
 @router.patch("/projects/{project_id}", response_model=ProjectDetail)
 async def update_project_endpoint(
     payload: ProjectUpdate,
+    request: Request,
     context: Annotated[ProjectContext, Depends(get_manager_context)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ProjectDetail:
     """Edita la información y los participantes de un proyecto."""
     project = await update_project(db, context.project, payload)
+    await record_audit(
+        db,
+        user_id=context.user.id,
+        action="proyecto.editar",
+        entity="proyecto",
+        entity_id=project.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
     my_role = await get_participation_role(db, project.id, context.user.id)
     return await build_project_detail(db, project, my_role)
 
@@ -88,11 +110,21 @@ async def update_project_endpoint(
 )
 async def create_milestone_endpoint(
     payload: MilestoneCreate,
+    request: Request,
     context: Annotated[ProjectContext, Depends(get_manager_context)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> MilestoneResponse:
     """Crea un hito en la posición indicada dentro del proyecto."""
     milestone = await create_milestone(db, context.project, payload)
+    await record_audit(
+        db,
+        user_id=context.user.id,
+        action="hito.crear",
+        entity="hito",
+        entity_id=milestone.id,
+        ip=get_client_ip(request),
+    )
+    await db.commit()
     return MilestoneResponse(
         id=milestone.id,
         name=milestone.nombre,

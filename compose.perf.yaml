@@ -1,0 +1,16 @@
+name: hito_perf
+
+services:
+  backend:
+    ports: !override []
+    environment:
+      APP_ENV: perf
+      LOG_LEVEL: WARNING
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-hito}:${POSTGRES_PASSWORD:-change-me}@db:5432/hito_perf
+      UPLOAD_DIR: /app/uploads
+      SESSION_COOKIE_SECURE: "false"
+      TRUST_PROXY_HEADERS: "true"
+
+  web:
+    ports: !override
+      - "18081:80"

@@ -1,0 +1,15 @@
+name: hito_e2e
+
+services:
+  backend:
+    ports: !override []
+    environment:
+      APP_ENV: e2e
+      LOG_LEVEL: WARNING
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-hito}:${POSTGRES_PASSWORD:-change-me}@db:5432/hito_e2e
+      SESSION_COOKIE_SECURE: "false"
+      TRUST_PROXY_HEADERS: "true"
+
+  web:
+    ports: !override
+      - "18080:80"

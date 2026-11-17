@@ -190,10 +190,12 @@ export function useReviewDeliverable() {
         mutationFn: ({
             deliverableId,
             decision,
+            files,
         }: {
             deliverableId: string;
             decision: ReviewDecision;
-        }) => api.reviewDeliverable(deliverableId, decision),
+            files: File[];
+        }) => api.reviewDeliverable(deliverableId, decision, files),
         onSuccess: (_data, variables) => {
             void queryClient.invalidateQueries({
                 queryKey: queryKeys.deliverable(variables.deliverableId),

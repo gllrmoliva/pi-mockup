@@ -158,9 +158,17 @@ export function submitDeliverable(
 export function reviewDeliverable(
     deliverableId: string,
     decision: ReviewDecision,
+    files: File[],
 ): Promise<Review> {
-    return jsonRequest<Review>(`/api/v1/deliverables/${deliverableId}/reviews`, 'POST', {
-        decision,
+    const data = new FormData();
+    data.append('decision', decision);
+    for (const file of files) {
+        data.append('files', file);
+    }
+
+    return request<Review>(`/api/v1/deliverables/${deliverableId}/reviews`, {
+        method: 'POST',
+        body: data,
     });
 }
 

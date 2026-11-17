@@ -50,9 +50,11 @@ function ProjectRow({ project }: { project: ProjectListItem }) {
                     <div
                         className="progress__bar"
                         role="progressbar"
+                        aria-label={`Progreso de ${project.topic}`}
                         aria-valuemin={0}
                         aria-valuemax={project.total_deliverables}
                         aria-valuenow={project.approved_deliverables}
+                        aria-valuetext={`${project.approved_deliverables} de ${project.total_deliverables} entregables aprobados`}
                     >
                         <span style={{ width: `${progress}%` }} />
                     </div>

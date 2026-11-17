@@ -29,6 +29,7 @@ describe('DeliverablePage', () => {
                                   decision: 'approved',
                                   reviewer_name: 'Camila Soto',
                                   reviewed_at: '2026-11-16T12:30:00Z',
+                                  files: [],
                               },
                               latest_submission: {
                                   ...sampleSubmission,
@@ -37,6 +38,7 @@ describe('DeliverablePage', () => {
                                       decision: 'approved',
                                       reviewer_name: 'Camila Soto',
                                       reviewed_at: '2026-11-16T12:30:00Z',
+                                      files: [],
                                   },
                               },
                           }
@@ -51,6 +53,7 @@ describe('DeliverablePage', () => {
                         decision: 'approved',
                         reviewer_name: 'Camila Soto',
                         reviewed_at: '2026-11-16T12:30:00Z',
+                        files: [],
                     },
                     201,
                 );
@@ -95,6 +98,7 @@ describe('DeliverablePage', () => {
             decision: 'changes_requested',
             reviewer_name: 'Camila Soto',
             reviewed_at: '2026-11-16T12:30:00Z',
+            files: [],
         };
 
         stubFetch((url, init) => {
@@ -118,7 +122,8 @@ describe('DeliverablePage', () => {
             }
             if (url === '/api/v1/deliverables/d3/reviews' && init?.method === 'POST') {
                 reviewed = true;
-                reviewPayload = JSON.parse(String(init.body));
+                const data = init.body as FormData;
+                reviewPayload = data.get('decision');
                 return jsonResponse(decision, 201);
             }
             if (url === '/api/v1/deliverables/d3/messages' && init?.method === 'POST') {
@@ -153,8 +158,104 @@ describe('DeliverablePage', () => {
         expect(
             await screen.findByText('Revisión registrada y mensaje publicado en el foro.'),
         ).toBeInTheDocument();
-        expect(reviewPayload).toEqual({ decision: 'changes_requested' });
+        expect(reviewPayload).toBe('changes_requested');
         expect(messagePayload).toEqual({ body: 'Corrige la sección 2.' });
+    });
+
+    it('adjunta archivos a la revisión y los muestra en el resultado', async () => {
+        let reviewed = false;
+        const reviewFile = {
+            id: 'rf1',
+            original_name: 'informe-corregido.pdf',
+            mime_type: 'application/pdf',
+            size_bytes: 1200,
+            sha256: 'b'.repeat(64),
+        };
+        const secondReviewFile = {
+            id: 'rf2',
+            original_name: 'anexo.pdf',
+            mime_type: 'application/pdf',
+            size_bytes: 800,
+            sha256: 'c'.repeat(64),
+        };
+        const decision = {
+            id: 'r3',
+            decision: 'approved',
+            reviewer_name: 'Camila Soto',
+            reviewed_at: '2026-11-16T12:30:00Z',
+            files: [reviewFile, secondReviewFile],
+        };
+
+        stubFetch((url, init) => {
+            if (url === '/api/v1/auth/me') {
+                return jsonResponse(professorUser);
+            }
+            if (url === '/api/v1/deliverables/d3' && init?.method !== 'POST') {
+                return jsonResponse(
+                    reviewed
+                        ? {
+                              ...sampleManagerDeliverable,
+                              status: 'approved',
+                              review: decision,
+                              latest_submission: {
+                                  ...sampleSubmission,
+                                  review: decision,
+                              },
+                          }
+                        : sampleManagerDeliverable,
+                );
+            }
+            if (url === '/api/v1/deliverables/d3/reviews' && init?.method === 'POST') {
+                reviewed = true;
+                const data = init.body as FormData;
+                expect(data.get('decision')).toBe('approved');
+                expect(data.getAll('files').map((file) => (file as File).name)).toEqual([
+                    'informe-corregido.pdf',
+                    'anexo.pdf',
+                ]);
+                return jsonResponse(decision, 201);
+            }
+            return jsonResponse({}, 404);
+        });
+
+        renderApp('/deliverables/d3');
+
+        await screen.findByRole('heading', { name: 'Informe de avance 1' });
+        await userEvent.click(screen.getByRole('radio', { name: /Aprobar la entrega/ }));
+        const reviewInput = screen.getByLabelText('Archivos de la revisión (opcional)');
+        await userEvent.upload(
+            reviewInput,
+            new File(['corrección'], 'informe-corregido.pdf', {
+                type: 'application/pdf',
+            }),
+        );
+        await userEvent.upload(
+            reviewInput,
+            new File(['anexo'], 'anexo.pdf', {
+                type: 'application/pdf',
+            }),
+        );
+        expect(screen.getByText('informe-corregido.pdf')).toBeInTheDocument();
+        expect(screen.getByText('anexo.pdf')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', { name: 'Registrar revisión' }));
+
+        expect(
+            await screen.findByText('Revisión registrada. Puedes dejar un comentario en el foro.'),
+        ).toBeInTheDocument();
+        expect(screen.getByText('Archivos de la revisión')).toBeInTheDocument();
+        expect(screen.getByText('informe-corregido.pdf')).toBeInTheDocument();
+        expect(screen.getByText('anexo.pdf')).toBeInTheDocument();
+        expect(
+            screen
+                .getAllByRole('link', { name: 'Descargar' })
+                .some((link) => link.getAttribute('href') === '/api/v1/files/rf1/download'),
+        ).toBe(true);
+        expect(
+            screen
+                .getAllByRole('link', { name: 'Descargar' })
+                .some((link) => link.getAttribute('href') === '/api/v1/files/rf2/download'),
+        ).toBe(true);
     });
 
     it('valida archivos y mensajes vacíos del colaborador', async () => {

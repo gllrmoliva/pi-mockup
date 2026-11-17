@@ -1,0 +1,1260 @@
+% =====================================================================
+%  Plantilla SRS IEEE 830 (versión simplificada del curso)
+%  Proyecto Informático · Ingeniería Civil Informática · DIICC · UdeC
+%  Compilar con pdfLaTeX (Overleaf: compilador por defecto).
+% =====================================================================
+\documentclass[10pt,a4paper]{article}
+
+% --------- Paquetes ------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
+\usepackage[sfdefault,lf]{carlito}   % Métrica equivalente a Calibri
+\usepackage[a4paper,top=1.7cm,bottom=1.5cm,left=2cm,right=2cm,
+            headsep=0.5cm,footskip=0.8cm,includehead,includefoot]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{array,xltabular,hhline}
+\usepackage{fancyhdr,lastpage}
+\usepackage{titlesec}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+
+% --------- Colores -----------
+\definecolor{azuloscuro}{HTML}{1F3864}
+\definecolor{azul}{HTML}{2E5C8A}
+\definecolor{nota}{HTML}{595959}
+\definecolor{borde}{HTML}{A6B4C8}
+\definecolor{encabezado}{HTML}{D6E0EF}
+\definecolor{etiqueta}{HTML}{F7F9FC}
+\definecolor{cajaazul}{HTML}{EDF1F7}
+\definecolor{cajaambar}{HTML}{FFF7E6}
+\definecolor{bordeambar}{HTML}{E0A030}
+\definecolor{texto}{HTML}{1A1A1A}
+
+\color{texto}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+% --------- Encabezado / pie --------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\scriptsize\color{nota}Proyecto Informático · Plantilla SRS IEEE 830\quad Ingeniería Civil Informática · DIICC · UdeC}
+\fancyfoot[C]{\scriptsize\color{nota}Página \thepage\ de \pageref*{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{{\color{borde}\hrule width\headwidth height\headrulewidth}}
+\renewcommand{\footrulewidth}{0pt}
+
+% --------- Títulos -----------
+\titleformat{\section}
+  {\color{azuloscuro}\fontsize{15}{18}\selectfont\bfseries}
+  {\thesection.}{0.4em}{}[{\color{azuloscuro}\titlerule[0.8pt]}]
+\titlespacing*{\section}{0pt}{6pt}{10pt}
+\titleformat{\subsection}
+  {\color{azul}\fontsize{12}{14}\selectfont\bfseries}
+  {\thesubsection}{0.4em}{}
+\titlespacing*{\subsection}{0pt}{12pt}{4pt}
+\titleformat{\subsubsection}
+  {\color{azuloscuro}\normalsize\bfseries}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{8pt}{2pt}
+
+% --------- Tablas ------------
+\arrayrulecolor{borde}
+\setlength{\arrayrulewidth}{0.4pt}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\LTpre}{6pt}
+\setlength{\LTpost}{8pt}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{E}[1]{>{\raggedright\arraybackslash}p{#1}} % columna etiqueta
+\AtBeginEnvironment{xltabular}{\footnotesize\setlength{\extrarowheight}{3pt}}
+\keepXColumns
+
+% Fila de encabezado de tabla (fondo azul claro, negrita)
+\newcommand{\hrow}{\rowcolor{encabezado}}
+\newcommand{\h}[1]{\textbf{#1}}
+
+% Texto de ayuda dentro de celdas (gris)
+\newcommand{\ph}[1]{{\color{nota}#1}}
+
+% Nota de instrucción (gris cursiva): bórrela en la versión entregada
+\newcommand{\nota}[1]{{\small\itshape\color{nota}#1\par}}
+
+% Tabla etiqueta–valor (dos columnas). Uso:
+%   \begin{kv}[4.6cm] \kvrow{Etiqueta}{Valor} ... \end{kv}
+\newenvironment{kv}[1][4.6cm]
+  {\footnotesize\setlength{\extrarowheight}{3pt}\xltabular{\linewidth}{|E{#1}|L|}\hline}
+  {\endxltabular}
+\newcommand{\kvrow}[2]{#1 & #2 \\ \hline}
+
+% Caja "Cómo usar esta plantilla"
+\newtcolorbox{cajainfo}{enhanced,breakable,colback=cajaazul,colframe=azul,
+  boxrule=0pt,leftrule=3pt,arc=0pt,outer arc=0pt,
+  left=10pt,right=10pt,top=8pt,bottom=8pt,fontupper=\small}
+
+% Caja de verificación final
+\newtcolorbox{cajaverif}{enhanced,breakable,colback=cajaambar,colframe=bordeambar,
+  boxrule=0pt,leftrule=3pt,arc=0pt,outer arc=0pt,
+  left=10pt,right=10pt,top=8pt,bottom=8pt,fontupper=\small}
+
+% Espacio reservado para diagramas
+\newcommand{\diagrama}[1]{%
+  \begin{tcolorbox}[enhanced,colback=etiqueta,colframe=borde,boxrule=0pt,
+    leftrule=3pt,arc=0pt,outer arc=0pt,height=1.5cm,valign=center,halign=center]
+    {\color{nota}#1}
+  \end{tcolorbox}}
+
+% =====================================================================
+\begin{document}
+
+% --------- Portada -----------
+{\color{azuloscuro}\fontsize{22}{26}\selectfont\bfseries Plantilla de Especificación de Requisitos de Software\par}
+\vspace{2pt}
+{\color{azul}\fontsize{11.5}{14}\selectfont\itshape Basado en IEEE 830\par}
+\vspace{4pt}
+{\color{azuloscuro}\rule{\linewidth}{1.2pt}}
+\vspace{6pt}
+
+\vspace{6pt}
+\begin{kv}[4.2cm]
+\kvrow{Proyecto}{\textbf{Hito: gestión de memorias y tesis.} Sistema web para que profesores guía gestionen las memorias de título y tesis que supervisan: hitos, entregables, entregas versionadas y revisiones.}
+\kvrow{Equipo}{\textbullet~Guillermo Oliva Orellana (Jefe de proyecto)\par\textbullet~Fabián González Uribe (Arquitecto / Líder técnico)\par\textbullet~Matías Olivas Henríquez (Líder de calidad)\par\textbullet~Antonio Skorin García (Líder de datos y seguridad)\par\textbullet~Martín Llanos Fariña (Líder de operación y despliegue)}
+\kvrow{Escenario de aplicación}{Educación superior chilena: supervisión de memorias y tesis por profesores guía. Escenario de aplicación: Facultad de Ingeniería de la Universidad de Concepción. La validación con usuarios se realiza en el DIICC (§2.3).}
+\kvrow{Perfiles de usuario objetivo}{Profesor guía, estudiante memorista o tesista, co-guía o profesor externo, y jefe de carrera como usuario indirecto (§2.4).}
+\kvrow{Versión del documento}{1}
+\kvrow{Fecha}{8 de octubre de 2026}
+\kvrow{Autores y secciones a cargo}{Antonio Skorin: §1, §2. Fabián González: §3, §4, §7. Guillermo Oliva: §5. Matías Olivas: §6. Martín Llanos: §7, §8 y §9.}
+\kvrow{Audiencia y uso previsto}{El equipo de desarrollo, evaluadores de proyecto (META: Docentes/evaluadores del curso). En segundo lugar, los profesores guía y estudiantes que participen en la validación del sistema, quienes pueden leer §1 y §2 para confirmar que el problema y el alcance están bien descritos.}
+\end{kv}
+
+\vspace{10pt}
+\subsection*{Resumen ejecutivo}
+\textbf{Problema.} Los profesores guía supervisan varias memorias de título y tesis a la vez, y hoy siguen su avance con correo, mensajería, carpetas compartidas y planillas. Para saber en qué etapa está cada estudiante, qué entregas esperan revisión y qué se comentó sobre cada versión, deben revisar varias fuentes (§2.3). Los sistemas especializados que existen requieren que toda la institución los adopte, y las herramientas generales como Notion o Trello no conocen el proceso de titulación.
+
+\textbf{Solución propuesta.} \emph{Hito} es un sistema web en que cada profesor organiza sus proyectos en hitos y entregables con fecha límite, los estudiantes suben entregas versionadas, y cada revisión queda asociada a la versión que evaluó. El sistema calcula los atrasos y avisa de los plazos por correo. Cada profesor lo adopta por su cuenta, sin convenio con la universidad.
+
+\textbf{Escenario de aplicación.} Facultad de Ingeniería de la Universidad de Concepción: 146 académicos que pueden guiar memorias y 529 memorias por año, lo que da hasta 675 cuentas y un crecimiento de 33 a 66~GB de archivos al año (§2.3). La validación con usuarios se hará con 3 a 5 profesores guía del DIICC y sus estudiantes (§2.4, §10).
+
+\textbf{Requisitos.} El documento define 21 requisitos funcionales (12 Must, 6 Should y 3 Could, §3 y §9.1), requisitos no funcionales con métricas verificables (§4) y 20 reglas de negocio (§6). El tratamiento de datos personales se basa en el consentimiento del titular (§5.3).
+
+\textbf{Restricciones principales.} Operación por un máximo de USD~10 mensuales, MVP demostrable en la semana~13 con 5 horas semanales por integrante, y cumplimiento de la Ley~19.628 y la Ley~21.719 (§2.6).
+
+\textbf{Solución técnica y plan.} De las tres alternativas evaluadas se continúa con ALT-1: frontend en React, API REST en FastAPI, PostgreSQL y despliegue con Docker en un servidor virtual administrado por el equipo, sujeta a su prueba de concepto (§8). El MVP de la semana~13 demuestra los 12 requisitos Must con las pruebas de aceptación PA-1 a PA-4 (§9.1). Los riesgos principales son la disponibilidad de los profesores para la validación (R-4), la carga desigual del equipo (R-7) y el costo de la nube (R-8), descritos en §12.
+\newpage
+\subsection*{Índice de secciones}
+\begin{xltabular}{\linewidth}{|P{1.6cm}|L|P{1.4cm}|P{4.6cm}|}
+\hline\hrow \h{§} & \h{Sección} & \h{Estado} & \h{KPI que evidencia} \\ \hline
+\endhead
+1   & Introducción & & 3.1 \\ \hline
+2   & Descripción general & & 1.1 · 2.1 · 2.3 \\ \hline
+2.2 & Contexto del sistema (C4 nivel 1) & & 1.1 \\ \hline
+2.3 & Problema u oportunidad, su evidencia y el escenario de aplicación & & 1.1 \\ \hline
+2.4 & Perfiles de usuario y validación prevista & & 1.1 · 2.3 \\ \hline
+2.6 & Registro de restricciones de diseño & & 2.1 \\ \hline
+2.7 & Aplicación de matemática, ciencias y ciencias de la ingeniería & & 1.2 \\ \hline
+3   & Requisitos funcionales & & 2.1 \\ \hline
+4   & Requisitos no funcionales & & 1.3 · 2.1 \\ \hline
+5   & Requisitos de datos & & 2.1 \\ \hline
+5.3 & Protección de datos personales y consideraciones legales & & 4.1 · 4.2 \\ \hline
+6   & Reglas de negocio & & 2.1 \\ \hline
+7   & Consideraciones éticas, sociales, ambientales y del contexto & & 2.3 · 4.1 \\ \hline
+8   & Espacio de soluciones preliminar & & 2.1 \\ \hline
+9   & Priorización, plan, presupuesto y equipo & & 5.2 · 5.3 · 2.2 \\ \hline
+10  & Criterios de aceptación y validación & & 6.1 \\ \hline
+11  & Trazabilidad & & 3.1 \\ \hline
+12  & Riesgos y supuestos & & 2.1 \\ \hline
+13  & Aprobaciones & & 5.3 \\ \hline
+14  & Anexos & & 3.1 \\ \hline
+\end{xltabular}
+
+% =====================================================================
+\clearpage
+
+
+\newpage
+\section{Introducción}
+% Nombre de trabajo del sistema: cámbielo aquí y se actualiza en todo el documento.
+\providecommand{\sistema}{\textbf{Hito: gestión de memorias y tesis}}
+
+\subsection{Propósito}
+%\nota{Qué documenta este SRS, para quién y con qué uso previsto. Dos o tres frases.}
+\begin{kv}
+\kvrow{Propósito del documento}{Definir el proyecto \sistema, un sistema web de gestión de memorias de título y tesis para profesores guía de universidades chilenas. El documento establece el alcance, el problema que se aborda y la evidencia que lo respalda, los usuarios a quienes está dirigido, las restricciones de diseño y los requisitos que guiarán su desarrollo.}
+\kvrow{Audiencia}{El equipo de desarrollo, evaluadores de proyecto (META: Docentes/evaluadores del curso). En segundo lugar, los profesores guía y estudiantes que participen en la validación del sistema, quienes pueden leer §1 y §2 para confirmar que el problema y el alcance están bien descritos.}
+\kvrow{Estado}{En revisión}
+\end{kv}
+
+\subsection{Alcance}
+%\nota{Delimite el sistema: qué construye y qué NO construye. Enuncie el problema en una frase y los objetivos de alto nivel. La evidencia del problema va en §2.3.}
+\begin{kv}
+\kvrow{Nombre del sistema}{\sistema{}}
+\kvrow{Problema u oportunidad}{Los profesores guía de universidades chilenas supervisan simultáneamente varias memorias y tesis, cada una con etapas, entregas y plazos, pero no cuentan con una herramienta personalizada que les muestre en un solo lugar en qué etapa está cada trabajo de cada alumno, qué entregas esperan su revisión y qué retroalimentación se dio sobre cada versión. Hoy ese seguimiento se reparte entre correo, mensajería, carpetas compartidas, planillas u otros métodos particulares a cada profesor.}
+\kvrow{Objetivos de alto nivel (3 a 5)}{%
+\textbf{O1.} Dar al profesor guía una vista única de todos los proyectos que gestiona y de los estudiantes que participan en ellos.\par
+\textbf{O2.} Permitir definir entregables con fecha límite, recibir entregas versionadas y registrar la revisión de cada versión, conservando el historial completo.\par
+\textbf{O3.} Organizar cada proyecto en hitos (etapas) a partir de plantillas editables, de modo que el sistema se adapte a los reglamentos de distintas carreras o requerimientos personales de cada profesor.\par
+\textbf{O4.} Reducir el seguimiento manual mediante el cálculo automático de atrasos y avisos por correo de plazos próximos y de entregas pendientes de revisión.}
+\kvrow{Queda dentro del alcance}{%
+\textbullet~Memorias de título.\par
+\textbullet~Tesis de pregrado y postgrado (se exige un tema definido, la propuesta formal no es obligatoria).\par
+\textbullet~Proyectos de investigación, solo cuando pueden modelarse de forma estructurada: tienen un tema, al menos un gestor que no es el autor principal del trabajo, uno o más colaboradores que suben entregables y un término previsto (defensa, informe final, envío, etc.).\par
+\textbullet~Gestión de participantes por proyecto con dos roles: gestor y colaborador. Un proyecto puede tener más de un gestor (p.~ej., profesor guía y co-guía).\par
+\textbullet~Hitos, entregables, entregas versionadas (archivo o enlace), revisiones con decisión (aprobado o cambios solicitados), comunicación entre colaboradores y gestores por entrega.\par
+\textbullet~Plantillas de hitos por tipo de proyecto y carrera.\par
+\textbullet~Vista tipo tablero (kanban) de entregables por estado, como visualización, los cambios de estado ocurren por acciones (entregar, revisar), no por arrastre libre como en plataformas de kanban estándar.\par
+\textbullet~Notificaciones por correo y exportación de plazos a calendario.}
+\kvrow{Queda fuera del alcance}{%
+\textbullet~Trabajos propios del profesor (investigación donde él es autor principal).\par
+\textbullet~Procesos institucionales oficiales: inscripción formal del tema, actas, calificaciones, emisión de títulos o grados.\par
+\textbullet~Integración con sistemas académicos institucionales.\par
+\textbullet~Edición de los documentos de trabajos.\par
+\textbullet~Seguimiento de tareas diarias del estudiante (gestión del trabajo del autor).\par
+\textbullet~Detección de plagio, revisión automática de contenido y repositorio público de tesis.\par
+\textbullet~Gestión de comisiones examinadoras y calendario de defensas.}
+\kvrow{Resultados esperados}{Se considerará que el sistema cumplió su objetivo si, en la validación de uso con 3 a 5 profesores guía y sus estudiantes sobre el prototipo: (a) cada profesor puede responder sin ayuda y en pocos segundos ``qué entregas esperan mi revisión'' y ``en qué etapa está cada uno de mis estudiantes''; (b) el ciclo completo entregable-entrega-revisión-nueva versión se completa sin pérdida del historial; y (c) los profesores declaran que reemplazarían al menos parte de su método actual (correo, planillas, Trello) por el sistema. Las métricas exactas se fijan en §4 y §10.}
+\end{kv}
+
+\newpage
+\subsection{Definiciones, siglas y abreviaturas}
+\begin{xltabular}{\linewidth}{|P{4.6cm}|L|}
+\hline\hrow \h{Término} & \h{Definición} \\ \hline
+\endhead
+Memoria de título & Trabajo final exigido por muchas carreras profesionales en Chile (p.~ej., Ingeniería Civil) para obtener el título, desarrollado por el estudiante bajo la supervisión de un profesor guía. \\ \hline
+Tesis & Trabajo final para obtener un grado académico (licenciatura, magíster o doctorado). En este sistema se trata igual que una memoria; se distingue solo por el campo \emph{tipo}. \\ \hline
+Proyecto & Unidad central del sistema: una memoria, tesis o proyecto de investigación modelable como tal. Tiene un tipo, un tema, participantes, hitos y entregables. \\ \hline
+Profesor guía & Académico responsable de supervisar una memoria o tesis. En el sistema, normalmente es el gestor del proyecto. \\ \hline
+Co-guía & Segundo supervisor de un trabajo, interno o externo a la universidad. En el sistema puede tener rol de gestor o de colaborador, según se defina en el proyecto. \\ \hline
+Memorista / tesista & Estudiante que desarrolla la memoria o tesis. En el sistema es un colaborador del proyecto. \\ \hline
+Gestor & Rol dentro de un proyecto: quien administra el proyecto en la plataforma (define hitos y entregables, revisa entregas) sin ser necesariamente su autor. Un usuario puede ser gestor en un proyecto y colaborador en otro, aunque resultaría improbable en términos de reglas de negocio. \\ \hline
+Colaborador & Rol dentro de un proyecto: quien realiza entregas. Incluye al autor principal del trabajo: el sistema no modela la autoría, registra la supervisión y no el trabajo en sí. \\ \hline
+Tipo de usuario & Clasificación de la cuenta (profesor o estudiante). Es independiente del rol que la persona tenga en cada proyecto. \\ \hline
+Hito & Etapa o punto de control de un proyecto (p.~ej., Propuesta de Memoria, Informe de avance, Informe final, Defensa). Agrupa entregables y se completa automáticamente al aprobarse todos ellos o manualmente por un gestor. \\ \hline
+Plantilla de hitos & Lista predefinida de hitos para un tipo de proyecto y carrera (p.~ej., ``Memoria Ing. Civil Informática UdeC''), que se copia al crear un proyecto y luego puede editarse. \\ \hline
+Entregable & Algo que debe entregarse, con título, descripción y fecha límite (p.~ej., ``Informe de avance 1, 15 de noviembre''). Se trata del requisito como tal, no el archivo. \\ \hline
+Entrega & Una versión concreta enviada para un entregable (archivo o enlace), con número de versión y fecha. Un entregable puede tener varias entregas. \\ \hline
+Revisión & Retroalimentación de un gestor sobre una entrega específica, con comentario y decisión: \emph{aprobado} o \emph{cambios solicitados}. \\ \hline
+Atrasado & Condición calculada (no almacenada) de un entregable que no está aprobado, cuya fecha límite ya pasó y que no tiene ninguna entrega anterior a esa fecha (RB-10). No es un estado: se muestra como una marca junto al estado del entregable. \\ \hline
+Tablero (kanban) & Vista que agrupa entregables en columnas según su estado. \\ \hline
+SIES & Servicio de Información de Educación Superior, Subsecretaría de Educación Superior, Mineduc. \\ \hline
+FI & Facultad de Ingeniería, Universidad de Concepción \\ \hline
+DIICC & Departamento de Ingeniería Informática y Ciencias de la Computación, Universidad de Concepción. \\ \hline
+SRS & \emph{Software Requirements Specification}, especificación de requisitos de software (IEEE 830). \\ \hline
+C4 & Modelo de diagramas de arquitectura de software en cuatro niveles; el nivel 1 es el diagrama de contexto. \\ \hline
+MVP & \emph{Minimum Viable Product}, producto mínimo viable. \\ \hline
+RF / RNF / RB & Requisito funcional / requisito no funcional / regla de negocio. \\ \hline
+\end{xltabular}
+
+\newpage
+\subsection{Referencias}
+%\nota{Normas, estadísticas y fuentes públicas que fundamentan el problema y el escenario, APIs, estándares y literatura técnica. Con identificador y fecha.}
+\begin{xltabular}{\linewidth}{|P{1.6cm}|L|P{5.5cm}|}
+\hline\hrow \h{ID} & \h{Referencia} & \h{Uso en este proyecto} \\ \hline
+\endhead
+REF-1 & IEEE Std 830-1998, \emph{IEEE Recommended Practice for Software Requirements Specifications}. IEEE, 1998. & Estructura de este documento. \\ \hline
+REF-2 & SIES, Subsecretaría de Educación Superior. \emph{Informe Titulación 2025 en Educación Superior en Chile}. Mineduc, publicado el 26 de mayo de 2026. \url{https://www.mineduc.cl/?p=43042} & Magnitud del universo de trabajos de titulación en Chile (EV-1). \\ \hline
+REF-3 & R. Zarzuri, ``Cuatro años y punto: lo que nadie dice del debate sobre la duración de las carreras universitarias'', El Desconcierto, 26 de mayo de 2026, citando el informe SIES 2024 de duración real. \href{https://eldesconcierto.cl/opinion/cuatro-anos-y-punto-lo-que-nadie-dice-del-debate-la-duracion-las-carreras-universitarias-n5459014}{\texttt{eldesconcierto.cl}} & Sobreduración de las carreras de pregrado (EV-2). Debe contrastarse con el informe SIES original. \\ \hline
+REF-4 & J. Simmonds Wagemann, \emph{Plataforma web de monitoreo de memoristas del Departamento de Ciencias de la Computación}. Memoria de título, Universidad de Chile, 2024. \url{https://repositorio.uchile.cl/handle/2250/204040} & Antecedente chileno, evidencia de seguimiento manual (EV-3). \\ \hline
+REF-5 & Departamento de Informática UTFSM, \emph{Reglamento Interno de Titulación, Ingeniería Civil Informática} (con Anexo 1, marzo 2024). \href{https://sgm.inf.utfsm.cl/uploads/documentacion/51_Reglamento_Titulacion_INF_(+Anexo_1marzo24).pdf}{\texttt{sgm.inf.utfsm.cl}} & Ejemplo de proceso con hitos y plazos formales para el profesor guía (EV-4). \\ \hline
+REF-6 & Escuela de Postgrado UTEM, \emph{Instructivo para la asignación de profesores(as) guía de tesis}, julio 2026. \href{https://postgrado.utem.cl/wp-content/uploads/2026/07/INSTRUCTIVO-PARA-LA-ASIGNACION-DE-PROFESORESAS-GUIA-DE-TESIS.pdf}{\texttt{postgrado.utem.cl}} & Rol y obligaciones del profesor guía; límite de tesistas por guía (EV-5). \\ \hline
+REF-7 & Universidad de Concepción, Decreto U.~de~C. N.° 1995-105, \emph{Reglamento de Memoria de Título} de las carreras de Ingeniería Civil. \url{https://documentos.udec.cl/sites/default/files/Decreto-1995-105.pdf} & Base para la plantilla de hitos del escenario de aplicación (por revisar en detalle). \\ \hline
+REF-8 & Technical University of Munich, \emph{Thesis Management} (documentación del sistema). \url{https://docs.thesis.aet.cit.tum.de/about} & Solución existente de referencia, de código abierto (EV-6). \\ \hline
+REF-9 & OpenEduCat, \emph{Thesis Management System}. \url{https://openeducat.org/feature-thesis-management-system/} & Solución comercial existente, orientada a la administración (EV-6). \\ \hline
+REF-10 & Ley N.° 19.628 sobre Protección de la Vida Privada, y Ley N.° 21.719 que regula la protección y el tratamiento de los datos personales y crea la Agencia de Protección de Datos Personales (publicada el 13 de diciembre de 2024; vigente desde el 1 de diciembre de 2026). Biblioteca del Congreso Nacional. & Restricción legal (§2.6) y §5.3. \\ \hline
+REF-11 & S. Brown, \emph{The C4 model for visualising software architecture}. \url{https://c4model.com} & Notación del diagrama de contexto (§2.2). \\ \hline
+REF-12 & IETF RFC 5545, \emph{Internet Calendaring and Scheduling Core Object Specification (iCalendar)}, 2009. & Formato de exportación de plazos a calendarios externos. \\ \hline
+REF-13 & Google web.dev, \emph{User-centric performance metrics}, 2023. & Estándares y métricas de rendimiento de UI/UX en páginas web. \\ \hline
+REF-14 & Facultad de Ingeniería, Universidad de Concepción, \emph{Académicos de Ingeniería Civil Informática}. \url{https://fi.udec.cl/pregrado/ingenieria-civil-informatica/academicos/} & Respalda el recuento de 17 académicos en el directorio del DIICC (EV-8, \S~2.3). \\ \hline
+REF-15 & Facultad de Ingeniería, Universidad de Concepción, \emph{Egresados 2021--2024}. \url{https://fi.udec.cl/wp-content/uploads/2025/12/Egresados-Graduates-2021-2024.pdf} & Respalda el número de egresados de todas las carreras de la Facultad de Ingeniería: 453 (2021), 484 (2022), 528 (2023) y 529 (2024). Es la base del dimensionamiento (EV-8, \S~2.3). \\ \hline
+REF-16 & Ministerio de Educación de Chile, Servicio de Información de Educación Superior (SIES), \emph{Titulados en educación superior}, bases 2021--2025. \url{https://datosabiertos.mineduc.cl/titulados-en-educacion-superior/} & Respalda el promedio de 31,2 titulados al año de Ingeniería Civil Informática de la UdeC, sede Casa Central, código de carrera 49. Se usa como referencia para el DIICC, donde se hace la validación (EV-8, \S~2.3). \\ \hline
+REF-17 & Facultad de Ingeniería, Universidad de Concepción, \emph{Reglamento Interno de Docencia de Pregrado de la Facultad de Ingeniería}, art.~29. \url{https://fi.udec.cl/wp-content/uploads/2024/02/REGLAMENTO-INTERNO-DE-DOCENCIA-DE-PREGRADO-DE-LA-FACULTAD-DE-INGENIERIA.pdf} & Establece la duración formal de un semestre para la Memoria de Título, usada como base para estimar las memorias activas por semestre (\S~2.3). \\ \hline
+REF-18 & Facultad de Ingeniería, Universidad de Concepción, páginas de académicos de cada departamento. \url{https://fi.udec.cl}, consultadas en noviembre de 2026. & Respalda el recuento de 146 académicos de las categorías Asistente, Asociado y Titular en los ocho departamentos de la facultad (EV-8, \S~2.3). \\ \hline
+REF-19 & StatCounter Global Stats, \emph{Browser Market Share Chile}. \url{https://gs.statcounter.com/browser-market-share/all/chile}, consultado en noviembre de 2026. & Participación de uso de los navegadores en Chile; justifica RNF-C-1. \\ \hline
+REF-20 & Amazon Web Services, \emph{Amazon S3 pricing}. \url{https://aws.amazon.com/s3/pricing/}, consultado en noviembre de 2026. & Tarifa de referencia del almacenamiento de objetos usada en \S~9.3. \\ \hline
+\end{xltabular}
+
+\subsection{Visión general del documento}
+%\nota{Mapa breve de las secciones y cómo leerlo según el rol del lector.}
+La sección~1 presenta el propósito del documento, el alcance del sistema (qué incluye y qué no), los términos que se usan con un significado específico y las fuentes citadas. La sección~2 describe el sistema en su contexto: su perspectiva como producto (§2.1), el diagrama de contexto C4 (§2.2), el problema y la evidencia que lo respalda junto con el escenario de aplicación (§2.3), los perfiles de usuario y cómo se validará con ellos (§2.4), las suposiciones y dependencias (§2.5), las restricciones de diseño con las alternativas que descartaron (§2.6) y las aplicaciones de matemática y ciencias de la ingeniería previstas (§2.7). La sección~3 presenta los requisitos funcionales y especifica con mayor detalle elementos individuales del producto, la sección~4 define requisitos no funcionales relevantes para el proyecto, la sección~5 resume el modelo de datos junto con reglas sobre la manera de almacenar los datos utilizados por el sistema. La sección~6 define reglas de negocio. La sección~7 aborda consideraciones éticas, sociales, ambientales y legales, aunque con distintos niveles de profundidad, acorde a qué tan relevante es cada una para el sistema. La sección~8 explora alternativas de solución. La sección~9 abarca los aspectos organizacionales fundamentales para el equipo de trabajo: niveles de prioridad de objetivos, planificación, presupuesto y roles.
+
+% =====================================================================
+\clearpage
+\section{Descripción general}
+\subsection{Perspectiva del producto}
+\begin{kv}
+\kvrow{Tipo de sistema}{Aplicación web responsiva (escritorio y móvil desde el navegador), con una API REST propia entre la interfaz y el servidor. No requiere instalar aplicaciones.}
+\kvrow{Contexto de operación}{Externo: lo usan profesores y estudiantes desde cualquier red (campus, casa, teléfono). Desplegado en la nube con un proveedor externo. Integraciones mínimas y estándar: envío de correo (SMTP o API de un proveedor) y exportación de plazos en formato iCalendar (RFC 5545). El inicio de sesión usa cuentas propias del sistema, asociadas al correo institucional de cada usuario (RF-1, RNF-S-1). No se integra con proveedores de identidad externos como Google o Microsoft.}
+\kvrow{Sistemas con los que convive}{%
+\textbullet~Herramientas donde vive el trabajo en sí: Overleaf, Google Drive, OneDrive, GitHub. El sistema enlaza a ellas o recibe el archivo.\par
+\textbullet~Correo institucional y calendarios personales (Google Calendar, Outlook), que reciben avisos y plazos.\par
+\textbullet~Sistemas académicos institucionales (plataforma de gestión curricular, LMS), donde se realizan la inscripción oficial y las calificaciones. El sistema no se integra con ellos.\par
+\textbullet~Herramientas generales que algunos profesores usan hoy (Trello, Notion, planillas), que el sistema busca reemplazar para este uso específico.}
+\kvrow{Situación actual}{Cada profesor improvisa su propio método. Lo habitual es combinar correo electrónico (para recibir versiones y enviar comentarios), mensajería (WhatsApp, Telegram, Discord), carpetas compartidas, planillas personales y, en algunos casos, tableros genéricos como Trello o Notion. A nivel de departamento, el control de plazos puede hacerse incluso en papel: en el DCC de la Universidad de Chile, el monitoreo de memoristas se realizaba con una plantilla que se rellenaba a lápiz (EV-3). Con este método, el historial de versiones y comentarios queda disperso entre hilos de correo, y saber en qué etapa está cada estudiante exige revisar varias fuentes. La forma concreta en que trabajan los profesores del DIICC se confirmará con las entrevistas descritas en §2.3 (EV-7).}
+\end{kv}
+
+\subsection{Contexto del sistema (diagrama C4 nivel 1)}
+%\nota{Inserte aquí el diagrama de contexto: el sistema como una caja, con los actores humanos y los sistemas externos con los que intercambia información. Con leyenda. Evidencia KPI 1.1 y sustenta el criterio C2 de la rúbrica R1.}
+La Figura~\ref{fig:c4} muestra el sistema como una caja, junto con los actores y los sistemas externos con los que intercambia información. La tabla que sigue detalla cada elemento de la figura.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\linewidth]{graficos/C4-1.pdf}
+\caption{Diagrama de contexto del sistema (C4 nivel 1).}
+\label{fig:c4}
+\end{figure}
+
+\begin{xltabular}{\linewidth}{|P{3.4cm}|P{3.4cm}|L|P{3.6cm}|}
+\hline\hrow \h{Elemento externo} & \h{Tipo} & \h{Qué intercambia con el sistema} & \h{Dirección y protocolo} \\ \hline
+\endhead
+Profesor guía (gestor) & Actor & Crea proyectos, invita participantes, define hitos y entregables, revisa entregas (comentario y decisión). Recibe la vista de su portafolio y el tablero de entregas por revisar. & In / Out · HTTPS (navegador) \\ \hline
+Estudiante memorista o tesista (colaborador) & Actor & Acepta invitaciones, sube entregas (archivo PDF o enlace), lee revisiones. Recibe plazos y estado de sus entregables. & In / Out · HTTPS (navegador) \\ \hline
+Co-guía o profesor externo & Actor & Según su rol en el proyecto: revisa (como gestor) o entrega (como colaborador). & In / Out · HTTPS (navegador) \\ \hline
+Servicio de envío de correo & Sistema & Correos de invitación, aviso de plazos próximos, nuevas entregas y nuevas revisiones. & Out · SMTP o API REST del proveedor \\ \hline
+Calendario del usuario (Google Calendar, Outlook) & Sistema & Fechas límite de entregables e hitos. & Out · iCalendar (RFC 5545), suscripción por URL \\ \hline
+Overleaf, Google Drive, GitHub & Sistema (solo referencia) & Ninguno: el sistema guarda la URL que entrega el estudiante y el navegador del usuario la abre. & - (enlace) \\ \hline
+Sistemas académicos institucionales & Sistema (fuera del alcance) & Ninguno. Se muestra para dejar explícito que no hay integración (§1.2). & - \\ \hline
+\end{xltabular}
+
+\subsection{Problema u oportunidad, su evidencia y el escenario de aplicación}
+%\nota{El corazón de identifying opportunities. No basta con describir el problema: debe acreditarse que existe y con qué magnitud, mediante fuentes públicas verificables. Toda cifra debe indicar su origen. Aquí se declara además el escenario de aplicación, que el equipo define y que debe permanecer consistente todo el semestre. Evidencia KPI 1.1 y sustenta los criterios C1 y C2 de R1.}
+\begin{kv}[4.2cm]
+\kvrow{Enunciado del problema}{Los profesores guía no tienen una forma centralizada de saber, para cada memoria o tesis que supervisan, en qué etapa está, qué se ha entregado, qué espera su revisión y qué retroalimentación se dio sobre cada versión. Como resultado, el seguimiento depende de la memoria del profesor y de información dispersa en correos, mensajes y archivos.}
+\kvrow{Causa}{El síntoma es la información dispersa y las revisiones olvidadas o tardías. La causa es que las herramientas disponibles no se ajustan a la situación del profesor: (1) los sistemas especializados existentes están diseñados para la administración de la institución y requieren que toda la universidad los adopte (EV-6), por lo que un profesor no puede usarlos por su cuenta; y (2) las herramientas generales (Trello, Notion, planillas) no conocen el proceso de titulación: no asignan permisos según el rol de cada persona en un proyecto, no relacionan una revisión con una versión específica de un documento y no representan etapas definidas por reglamento. A esto se suma que cada carrera tiene un proceso distinto (EV-4), lo que dificulta una solución única.}
+\kvrow{Componentes del problema}{%
+\textbf{P1. Visibilidad del portafolio:} saber qué proyectos y estudiantes tiene a cargo el profesor y en qué etapa está cada uno.\par
+\textbf{P2. Control de entregables y plazos:} saber qué debe entregarse, cuándo y qué está atrasado.\par
+\textbf{P3. Retroalimentación trazable:} asociar cada comentario a la versión del documento que se revisó y conservar el historial.\par
+\textbf{P4. Procesos heterogéneos:} representar las etapas propias de cada carrera o programa.\par
+\textbf{P5. Avisos:} recordar plazos y entregas pendientes sin depender del seguimiento manual.}
+\kvrow{A quién afecta y cómo}{%
+\textbf{Profesores guía:} tiempo dedicado a reconstruir el estado de cada trabajo, riesgo de pasar por alto entregas o plazos de revisión que el reglamento les impone (EV-4).\par
+\textbf{Estudiantes:} expectativas poco claras sobre qué entregar y cuándo, retroalimentación tardía o difícil de encontrar.\par
+\textbf{Jefaturas de carrera y coordinaciones de titulación:} poca visibilidad sobre el avance de los trabajos, que hoy obtienen preguntando a cada profesor o con planillas propias (EV-3). Son afectados indirectos: no son usuarios del MVP.}
+\kvrow{Magnitud}{%
+\textbullet~En 2025 hubo 329.011 titulaciones en la educación superior chilena, 238.716 de ellas de pregrado, la cifra más alta registrada por el SIES; las de postgrado crecieron 5,2\,\% respecto de 2024 (EV-1). Una parte de estas titulaciones (carreras con memoria y programas con tesis) pasó por un proceso de supervisión como el descrito.\par
+\textbullet~Quienes se titularon de pregrado demoraron en promedio 2,09 semestres más de lo previsto (SIES 2024, EV-2). La sobreduración tiene muchas causas, este proyecto no pretende resolverla, pero la etapa de titulación es una de las que la prolongan.\par
+\textbullet~Los reglamentos imponen hitos y plazos formales al profesor guía, por ejemplo un máximo de un mes para evaluar el informe final (EV-4).\par
+\textbullet~Al menos un departamento chileno hacía el monitoreo de memoristas a mano y desarrolló su propia herramienta por no encontrar una adecuada (EV-3).\par
+\textbullet~En el escenario de aplicación, la Facultad de Ingeniería de la UdeC registra 529 egresados por año y 146 académicos que pueden guiar memorias, es decir, unas 3,6 memorias por académico al año (EV-8).\par
+\textbf{Pendiente:} no existe una cifra pública del tiempo que consume el seguimiento disperso. Se medirá en las entrevistas de las semanas 9 a 10 (horas semanales de coordinación por profesor y número de trabajos supervisados a la vez, preguntas 1 y 5 del Anexo A.1) y se incorporará en E2 (EV-7).}
+\kvrow{Método de levantamiento}{%
+\textbullet~Revisión documental de reglamentos de titulación de distintas universidades chilenas (REF-5, REF-6, REF-7) para identificar etapas, roles y plazos comunes.\par
+\textbullet~Revisión de soluciones existentes, nacionales e internacionales (REF-4, REF-8, REF-9).\par
+\textbullet~Entrevistas semiestructuradas a 3 a 5 profesores guía del DIICC, sobre cuántos trabajos supervisan, cómo los siguen hoy, cuánto tiempo les toma y qué problemas han tenido.\par
+\textbullet~Encuesta breve a memoristas y tesistas sobre claridad de plazos y tiempos de retroalimentación.\par
+Los instrumentos se adjuntan en el Anexo A (§14).}
+\kvrow{Consecuencias de no resolverlo}{Se mantiene el seguimiento informal: revisiones que se pierden en hilos de correo, comentarios que no se sabe a qué versión corresponden, plazos de revisión que se pasan sin aviso y estudiantes que avanzan sin claridad sobre lo que se espera. Cada departamento seguiría construyendo herramientas propias aisladas (EV-3).}
+\kvrow{Soluciones existentes y por qué no bastan}{%
+\textbf{TUM Thesis Management} (REF-8): de código abierto y completo (postulación a temas, documentos, revisión, carta Gantt, roles). Está diseñado para el proceso de una universidad alemana y requiere un despliegue institucional, es decir, un profesor no puede usarlo por su cuenta.\par
+\textbf{OpenEduCat, Digii} (REF-9): módulos de tesis dentro de sistemas comerciales de gestión universitaria, orientados a decanos y administración, requieren compra y adopción institucional.\par
+\textbf{Aplicaciones institucionales de seguimiento de hitos} (p.~ej., en universidades de EE.~UU.): específicas de su institución y enfocadas en aprobaciones administrativas.\par
+\textbf{Plataforma de monitoreo de memoristas del DCC, U.~de Chile} (REF-4): resuelve el control de plazos de informes finales para la jefatura de estudios de un departamento; no está pensada para el trabajo diario del profesor con cada estudiante ni para otros procesos.\par
+\textbf{Trello, Notion, planillas}: flexibles y de bajo costo. Notion es la más cercana: permite armar bases de datos, plantillas y permisos por página, pero cada profesor debe construir y mantener ese espacio por su cuenta. El sistema se distingue de estas herramientas en cuatro puntos: (1) los permisos dependen del rol de cada persona en cada proyecto (gestor o colaborador) y no se configuran a mano; (2) cada entrega es una versión que no se puede modificar, y cada revisión queda asociada a la versión que evaluó, mientras que en Notion o Trello una página o tarjeta se puede editar o sobrescribir; (3) el estado de un entregable solo cambia por acciones válidas (entregar, revisar) y no por edición libre, por lo que refleja lo que realmente ocurrió; y (4) los atrasos y los avisos de plazos se calculan automáticamente a partir de las fechas límite, y las etapas se crean desde plantillas de hitos por carrera.\par
+\textbf{Sistemas académicos chilenos (p.~ej., Ucampus)}: gestionan la vida académica en general, no se verificó la existencia de un módulo de supervisión de memorias en ellos.}
+\kvrow{\textbf{Escenario: dominio y actividad}}{Educación superior. Actividad: supervisión de memorias de título y tesis por parte de profesores guía, desde la definición del tema hasta la defensa.}
+\kvrow{\textbf{Escenario: organización usuaria}}{Una facultad de una universidad chilena con carreras que exigen memoria de título. Escenario de aplicación: Facultad de Ingeniería de la Universidad de Concepción, con ocho departamentos. La validación con usuarios se realiza en el DIICC (Ingeniería Civil Informática, Magíster y Doctorado en Ciencias de la Computación), porque el equipo tiene acceso directo a sus profesores y estudiantes. Se supone una madurez tecnológica alta en el DIICC, pero el diseño no debería asumirla: los profesores de otras disciplinas deben poder usar el sistema sin capacitación. El sistema se adopta profesor por profesor, sin requerir una decisión institucional. Dimensionar con toda la facultad representa el caso de mayor carga, en que todos sus profesores guía lo adoptan, y no supone un convenio con la universidad. No se supone presupuesto institucional.}
+\kvrow{\textbf{Escenario: volúmenes esperados}}{%
+\textbullet~\textbf{Académicos:} los ocho departamentos de la Facultad de Ingeniería suman 146 académicos de las categorías Asistente, Asociado y Titular, que según el reglamento de la UdeC son quienes pueden guiar una Memoria de Título: Civil 17, Eléctrica 29, Industrial 18, Materiales 9, Mecánica 18, Metalúrgica 17, Química 21 e Informática 17 (REF-18, REF-14).\par
+\textbullet~\textbf{Memorias:} la facultad registró 453, 484, 528 y 529 egresados entre 2021 y 2024 (REF-15). Se adopta la cifra más reciente y más alta: 529 memorias por año. Se supone que cada egresado realiza una memoria individual y que su duración efectiva coincide con el semestre que fija el reglamento (REF-17, art.~29), lo que da unas 265 memorias activas por semestre. En promedio son 3,6 memorias por académico al año, es decir, cerca de 2 a la vez. Estas cifras se contrastarán con las inscripciones por semestre (R-3).\par
+\textbullet~\textbf{Cuentas:} hasta 675 cuentas el primer año (529 estudiantes y 146 académicos).\par
+\textbullet~\textbf{Entregas:} con 5 hitos por memoria, 2 entregables por hito y 2,5 versiones por entregable en promedio, cada memoria genera 10 entregables y 25 entregas. El escenario genera 5.290 entregables y cerca de 13.200 entregas al año.\par
+\textbullet~\textbf{Almacenamiento:} si la mitad de las entregas contiene un archivo PDF de 5 a 10~MB y el resto usa enlaces, cada memoria ocupa entre 62,5 y 125~MB durante todo su desarrollo. Con 529 memorias, el almacenamiento crece entre 33 y 66~GB al año. Como los archivos se eliminan 12 meses después del cierre del proyecto (§5.1), el total almacenado se estabiliza en un máximo de 1,5 veces el flujo anual: entre 50 y 100~GB.\par
+\textbullet~\textbf{Carga máxima:} 100 usuarios concurrentes en la noche de un plazo común (RNF-R-2).\par
+Las tesis de postgrado están dentro del alcance funcional (§1.2), pero no se incluyen en este dimensionamiento: su volumen se estimará con las entrevistas (EV-7).}
+\kvrow{\textbf{Escenario: condiciones de operación}}{Uso desde oficina, casa o teléfono, con conexión a internet de banda ancha o móvil. Sin uso en terreno ni operación sin conexión. Horario libre, con más actividad en días hábiles y picos al final de cada semestre y en las semanas previas a entregas y defensas. Dispositivos: computadores personales (uso principal del profesor al revisar) y teléfonos (consulta de plazos y avisos).}
+\kvrow{\textbf{Escenario: recursos supuestos}}{Sin presupuesto institucional. Infraestructura en capas gratuitas o de bajo costo de proveedores de nube (orden de USD 0 a 10 mensuales, se precisa en §9.3). Mantención posterior al semestre: a cargo del equipo o de quien adopte el proyecto en el departamento, por eso se privilegian tecnologías conocidas y un despliegue simple de mantener.}
+\end{kv}
+
+\begin{xltabular}{\linewidth}{|P{3.4cm}|L|P{3.6cm}|P{3.3cm}|}
+\hline\hrow \h{Evidencia} & \h{Dato o hallazgo} & \h{Fuente y fecha} & \h{Cómo se obtuvo} \\ \hline
+\endhead
+EV-1 · Universo de titulaciones & 329.011 titulaciones en 2025 (238.716 de pregrado), la cifra más alta registrada; postgrado +5,2\,\% respecto de 2024. & SIES, Informe Titulación 2025, publicado el 26-05-2026 (REF-2). & Revisión documental de fuente pública oficial. \\ \hline
+EV-2 · Sobreduración & Los titulados de pregrado demoraron en promedio 2,09 semestres más de la duración formal. & Informe SIES 2024, citado en El Desconcierto, 26-05-2026 (REF-3). & Revisión documental; pendiente contrastar con el informe SIES original. \\ \hline
+EV-3 · Seguimiento manual & En el DCC de la U.~de Chile, el monitoreo de plazos de memoristas se hacía con una plantilla rellenada a lápiz; la herramienta existente, diseñada para postgrado, no se ajustaba a las necesidades de la jefatura de estudios, lo que motivó una memoria para construir una plataforma propia. & Repositorio U.~de Chile, 2024 (REF-4). & Revisión documental de antecedente nacional. \\ \hline
+EV-4 · Hitos y plazos reglamentarios & La asignatura de trabajo de título se evalúa por el profesor guía en base a hitos, y el profesor guía tiene un plazo máximo de un mes para evaluar el informe final. & Reglamento Interno de Titulación, Ing. Civil Informática UTFSM, marzo 2024 (REF-5). & Revisión documental de reglamento. \\ \hline
+EV-5 · Rol y carga del profesor guía & Se definen obligaciones del profesor guía, entre ellas el seguimiento sistemático, y un máximo de tres estudiantes de postgrado por guía o co-guía. & Instructivo Escuela de Postgrado UTEM, julio 2026 (REF-6). & Revisión documental de reglamento. \\ \hline
+EV-6 · Soluciones existentes orientadas a la institución & Los sistemas especializados encontrados (TUM, OpenEduCat, Digii) se despliegan a nivel de institución y están orientados a la administración. & Documentación pública de cada producto, consultada en octubre de 2026 (REF-8, REF-9). & Revisión de mercado. \\ \hline
+
+EV-7 · Práctica actual de los profesores del DIICC & Pendiente: n.° de trabajos supervisados a la vez, horas semanales dedicadas al seguimiento, herramientas usadas y problemas reportados. & Entrevistas y encuesta, semanas 9 a 10 (§10). & Entrevistas semiestructuradas a 3 a 5 profesores guía; encuesta a estudiantes (Anexo A).\\ \hline
+
+EV-8 \textperiodcentered{} Dimensionamiento del escenario & La Facultad de Ingeniería tiene 146 académicos que pueden guiar memorias (17 de ellos en el DIICC) y registró 529 egresados en 2024 (453 en 2021, 484 en 2022 y 528 en 2023). Ingeniería Civil Informática registra 31,2 titulados por año en promedio. La duración formal de la Memoria de Título es de un semestre. & Páginas de académicos por departamento (REF-18, REF-14), egresados FI 2021--2024 (REF-15), titulados SIES 2021--2025 (REF-16) y reglamento de pregrado (REF-17, art.~29). & Recuento de académicos por departamento y categoría, lectura de las cifras oficiales de egresados y revisión del reglamento. \\ \hline
+
+\end{xltabular}
+
+\subsection{Perfiles de usuario y validación prevista}
+\begin{xltabular}{\linewidth}{|P{2.2cm}|P{2.0cm}|P{1.8cm}|L|P{1.6cm}|P{1.5cm}|P{1.8cm}|}
+\hline\hrow \h{Perfil de usuario} & \h{Rol / actor} & \h{Tipo} & \h{Tareas y contexto de uso} & \h{Influencia} & \h{Nivel de acceso} & \h{Alfabetización digital} \\ \hline
+\endhead
+Profesor guía & Gestor & Usuario directo & Crea proyectos desde plantillas, invita estudiantes, define hitos y entregables, revisa entregas y marca hitos. Supervisa varios trabajos a la vez y tiene poco tiempo: necesita ver de inmediato qué espera su revisión. Uso principal desde computador, en la oficina o en casa. & Alta (decide si adopta el sistema) & Total sobre los proyectos que gestiona & Media a alta (variable fuera de informática) \\ \hline
+Estudiante memorista o tesista & Colaborador & Usuario directo y afectado & Consulta plazos, sube entregas (PDF o enlace), lee revisiones y vuelve a entregar. Uso desde computador y teléfono, a menudo cerca de las fechas límite. Es afectado por la calidad y rapidez de la retroalimentación que recibe. & Media (su adopción condiciona la utilidad) & Sus proyectos; no ve otros proyectos del profesor & Alta \\ \hline
+Co-guía o profesor externo & Gestor o colaborador, según el proyecto & Usuario directo & Participa en uno o pocos proyectos: revisa entregas como segundo supervisor o realiza entregas en proyectos de investigación. Uso ocasional; no debe necesitar capacitación. & Baja a media & Según su rol en cada proyecto & Media a alta \\ \hline
+Jefe de carrera o coordinador de titulación & Ninguno en el MVP & Indirecto y decisor & No usa el sistema en esta versión, pero define el reglamento que las plantillas de hitos deben reflejar y puede promover o frenar su uso en el departamento. Un posible uso futuro es una vista agregada del avance de todos los trabajos. & Media & Ninguno en el MVP & Media \\ \hline
+\end{xltabular}
+
+\begin{kv}[4.6cm]
+\kvrow{Usuarios representativos disponibles para validación}{%
+\textbullet~\textbf{Profesor guía:} 3 a 5 académicos del DIICC que supervisan memorias o tesis; contacto directo por correo institucional o en persona, a partir de los profesores guía del equipo.\par
+\textbullet~\textbf{Estudiante:} memoristas de Ingeniería Civil Informática y tesistas de Magíster del DIICC; contacto a través de sus profesores guía y de compañeros.\par
+\textbullet~\textbf{Co-guía o externo:} al menos un co-guía o profesor de otra disciplina, para comprobar que el sistema sirve fuera de informática.\par
+\textbullet~\textbf{Jefe de carrera o coordinación:} una conversación para validar las plantillas de hitos frente al reglamento vigente (REF-7).}
+\kvrow{Instancias de validación previstas}{Validación del concepto y de los requisitos; validación de uso sobre el prototipo, con 3 a 5 participantes.\par
+\textbf{1. Concepto y requisitos (antes de E2):} entrevistas con profesores guía usando este documento y bocetos del tablero; se busca confirmar el problema (EV-7), el vocabulario de §1.3 y la plantilla de hitos.\par
+\textbf{2. Uso sobre el prototipo (antes de E4):} 3 a 5 profesores y sus estudiantes realizan tareas guiadas (crear un proyecto, entregar, revisar, volver a entregar) sobre datos sintéticos; se mide si completan las tareas sin ayuda y se recogen comentarios. Consentimiento informado según Anexo H.}
+\end{kv}
+
+\subsection{Suposiciones, dependencias y restricciones de contexto}
+\begin{kv}
+\kvrow{Suposiciones}{%
+\textbullet~Los profesores guía están dispuestos a usar una herramienta adicional si les ahorra tiempo frente a su método actual (se verifica en EV-7).\par
+\textbullet~Los estudiantes aceptarán la invitación y usarán el sistema si su profesor lo exige; la adopción depende del profesor.\par
+\textbullet~El trabajo en sí (texto, código, datos) sigue viviendo en otras herramientas, al sistema le basta un PDF o un enlace por entrega.\par
+\textbullet~Las etapas de los reglamentos de distintas carreras pueden representarse como una lista ordenada de hitos con entregables; si algún proceso requiere ramificaciones complejas, el modelo de hitos debe revisarse.\par
+\textbullet~Todos los usuarios tienen un correo institucional válido, que sirve como identificador de su cuenta.}
+\kvrow{Dependencias}{%
+\textbullet~Proveedor de nube para el servidor, la base de datos y el almacenamiento de archivos.\par
+\textbullet~Servicio de envío de correo con capa gratuita o de bajo costo.\par
+\textbullet~Librerías y frameworks de código abierto (se definen en E2), con licencias compatibles (§5.3).\par
+\textbullet~Disponibilidad de profesores y estudiantes del DIICC para entrevistas y pruebas.}
+\kvrow{Restricciones de plataforma}{Acceso solo mediante navegador web moderno (escritorio y móvil), sin instalar aplicaciones. Interfaz en español. Las tecnologías específicas se eligen en E2 entre las alternativas de §8; no hay tecnologías impuestas por el escenario, salvo las que fije el curso.}
+\end{kv}
+
+\subsection{Registro de restricciones de diseño}
+\begin{xltabular}{\linewidth}{|P{2.4cm}|L|P{2.2cm}|P{3.0cm}|P{3.6cm}|}
+\hline\hrow \h{Restricción (ABET)} & \h{Enunciado concreto en este proyecto} & \h{Origen} & \h{Métrica o criterio de verificación} & \h{Alternativa de diseño descartada por su causa} \\ \hline
+\endhead
+% TODO: puede que esto no debería estar, el costo mensual está un poco de más xd.
+\textbf{cost} & La operación debe costar como máximo USD 10 mensuales para el escenario descrito en §2.3 (Facultad de Ingeniería), con un crecimiento estimado de 33 a 66 GB de archivos al año y hasta 100 GB almacenados. & Escenario & Facturación mensual de servicios de nube en el entorno de producción ($\le$~USD~10/mes). & Adquirir una solución comercial cerrada (ej. OpenEduCat) o desplegar sobre un clúster de contenedores administrado de forma interna, cuyo costo base mensual excede el límite. \\ \hline
+\textbf{schedule} & El MVP, formado por los 12 requisitos funcionales ``Must'' (§9.1), debe estar implementado y demostrable en la semana~13 del semestre. Cada integrante dedica 5~horas semanales fuera de clases, según el syllabus: 25~horas de equipo por semana y 225~horas en las 9 semanas que van de la 10 a la 18 (§9.3). & Curso & En la semana~13 pasan el 100\,\% de los criterios de aceptación de los 12 RF ``Must''. En el informe final (E4, semana~17) pasan también los de los RF ``Should''. & Construir un motor de flujos configurable y dinámico (tipo editor BPMN), se descarta por alta complejidad y se reemplaza por plantillas de hitos lineales predefinidas. \\ \hline
+
+\textbf{legal considerations} & El sistema trata datos identificatorios y académicos de estudiantes y profesores (nombre, correo, entregas y retroalimentaciones), debiendo cumplir la Ley~19.628 y la Ley~21.719 chilena, resguardando la minimización de datos y los derechos de autor de las obras. & Normativo & Ausencia total de RUT y notas oficiales en la base de datos, mecanismos probados de eliminación y descarga de datos personales (RF-21) y cifrado TLS/AES. & Identificar usuarios por RUT y registrar calificaciones cuantitativas oficiales (datos innecesarios para el objetivo) o crear un motor de indexación pública de documentos entre proyectos, vulnerando la privacidad de las obras. \\ \hline
+\textbf{extensibility} & Las etapas de titulación de cada carrera deben poder modelarse sin alterar ni redesplegar el código, adaptándose a distintos reglamentos universitarios. & Escenario & Creación o modificación de una plantilla de hitos completa (ej. ``Tesis Magíster'') y su asignación a un proyecto únicamente desde la interfaz gráfica web. & Codificar de manera fija (\emph{hardcoded}) en el backend las etapas específicas del reglamento de Ingeniería Civil Informática UdeC, impidiendo extender el software a otros programas académicos. \\ \hline
+\textbf{usability} & Los profesores no disponen de tiempo ni recibirán capacitación: la tarea principal (revisar qué entregas esperan revisión y retroalimentar una) debe completarse de forma intuitiva y autónoma. & Escenario & $\ge$~85\,\% de los usuarios de prueba completan las tareas clave de revisión sin asistencia externa en el primer intento durante las pruebas de uso. & Implementar un tablero Kanban genérico de arrastre bidireccional libre, ya que traslada al usuario la carga cognitiva de configurar estados y permite movimientos incoherentes. Se mantiene el tablero solo como vista calculada. \\ \hline
+\textbf{interoperability} & Los plazos deben sincronizarse con los calendarios personales de los usuarios y admitir entregas referenciadas a las herramientas donde residen los trabajos. & Escenario & Enlaces de suscripción generados bajo el estandar iCalendar (RFC~5545) importables en Google Calendar y Outlook. Además de soporte de entregas vía enlace HTTPS. & Desarrollar integraciones propietarias directas con los sistemas académicos institucionales (por falta de APIs públicas) y con cada herramienta de redacción, por su alto costo de mantenimiento. \\ \hline
+\end{xltabular}
+
+\subsection{Aplicación de matemática, ciencias y ciencias de la ingeniería}
+\begin{xltabular}{\linewidth}{|P{1.4cm}|L|P{3.2cm}|P{3.0cm}|P{3.0cm}|}
+\hline\hrow \h{ID} & \h{Qué se aplicará} & \h{En qué parte del sistema} & \h{Para qué decisión o cálculo} & \h{Cómo se validará el resultado} \\ \hline
+\endhead
+CI-1 & \textbf{Teoría de autómatas:} el ciclo de vida de un entregable (pendiente, entregado, cambios solicitados, aprobado) y de un hito se modela como una máquina de estados finitos, donde cada transición está etiquetada con la acción y el rol que la puede ejecutar. & Lógica de dominio de entregables, entregas, revisiones e hitos. & Definir qué acciones están permitidas para cada rol en cada estado y garantizar que el tablero solo muestre estados alcanzables por acciones válidas. & Recorrido exhaustivo de todas las combinaciones estado $\times$ rol $\times$ acción en pruebas automatizadas, y pruebas basadas en propiedades que generan secuencias aleatorias de acciones y verifican que nunca se llega a un estado inválido. \\ \hline
+CI-2 & \textbf{Normalización formal de datos:} análisis de dependencias funcionales del modelo (Proyecto, Participación, Hito, Entregable, Entrega, Revisión) hasta forma normal de Boyce-Codd. & Modelo de datos (§5.1). & Separar el entregable (requisito) de sus entregas (versiones) y de sus revisiones sin redundancia, y decidir qué valores se calculan en vez de almacenarse (p.~ej., ``atrasado''). & Demostración de que cada relación cumple BCNF a partir de sus dependencias funcionales, revisada por un segundo integrante; pruebas de integridad sobre datos sintéticos. \\ \hline
+CI-3 & \textbf{Modelo estadístico de carga:} las llegadas de entregas y de usuarios se modelan como un proceso de Poisson con tasa variable, concentrada cerca de las fechas límite (§2.3), para estimar el pico de carga y el almacenamiento anual. & Dimensionamiento de infraestructura (§4.1, §9.3). & Elegir el plan de infraestructura más barato que cumpla los RNF de rendimiento dentro del límite de costo de §2.6. & Prueba de carga con datos sintéticos que reproduzca el pico estimado, comparación de la estimación con los datos de uso reales de la validación, si los hay. \\ \hline
+\end{xltabular}
+
+% =====================================================================
+\clearpage
+\section{Requisitos funcionales}
+\subsection{Lista resumida}
+\begin{xltabular}{\linewidth}{|P{0.8cm}|P{2cm}|P{3.2cm}|P{1.4cm}|L|}
+\hline\hrow \h{ID} & \h{Título} & \h{Descripción breve} & \h{Prioridad (MoSCoW)} & \h{Criterios de aceptación} \\ \hline
+\endhead
+RF-1 & Inicio de Sesión & El sistema debe permitir a un usuario con cuenta activa, profesor o estudiante, iniciar sesión con su correo institucional y su contraseña. No hay registro abierto ni inicio de sesión con cuentas de terceros (Google, Microsoft); las cuentas se crean según RF-19. & Must & 1. Dado un correo institucional y una contraseña correctos, cuando el usuario confirme la acción entonces el sistema debe llevarlo a la pantalla principal del programa. \par 2. Dado un correo inválido o una contraseña incorrecta, cuando el usuario inicie sesión entonces el sistema debe mostrar un error en pantalla que indique un mensaje similar a: "Correo o contraseña incorrectos".\par 3. Dado un campo correo y/o contraseña vacíos, cuando el usuario inicie sesión entonces se debe mostrar un mensaje similar a: "Correo y/o contraseña vacíos".\par 4. Dado un visitante sin cuenta, cuando abra la pantalla de inicio de sesión entonces no encontrará una opción para registrarse por su cuenta. \\ \hline
+RF-2 & Visualización de Proyectos & El sistema debe mostrar todos los proyectos que un usuario tenga asociados. & Must & 1. Dado un proyecto correctamente asociado a un usuario, cuando este accede a la pantalla principal, entonces se muestra en una lista.\par 2. Dado un proyecto correctamente asociado a un usuario, cuando el usuario entra a él entonces se pasa a una nueva pantalla de visualización del proyecto, ordenados por fecha de última modificación.  \\ \hline
+RF-3 & Detalle de un Proyecto & El sistema debe desplegar todos los datos de un proyecto, incluyendo hitos y entregables. & Must & 1. Dado un proyecto sin ningún hito, cuando el usuario entre a la pantalla de visualización del proyecto entonces se muestra un mensaje similar a: "No existen hitos para este proyecto". \par2. Dado un proyecto con al menos un hito, cuando el usuario entre a la pantalla de visualización del proyecto entonces se muestran todos los hitos creados en una lista con orden temporal ascendente.\par 3. Dado un proyecto con al menos un hito y un entregable, cuando el usuario entre a la pantalla de visualización del proyecto entonces se muestran los entregables asociados a un hito en orden temporal ascendente dentro del mismo, junto con su información y estado. \\ \hline
+RF-4 & Creación de Proyectos & El sistema debe permitir a un profesor crear un nuevo proyecto asignando tema, tipo, gestores y colaboradores. & Must & 1. Dado un inicio de sesión correcto como profesor, cuando el usuario entre a la interfaz de creación de proyecto entonces se despliega un menú que permite ingresar información básica, gestores y colaboradores.\par 2. Dado un ingreso correcto de los datos, cuando el usuario confirme la acción entonces ese proyecto se creará en el sistema y el usuario que lo creó automáticamente será gestor del mismo.\par 3. Dado el campo "colaboradores" vacío, cuando el usuario confirme la acción entonces el sistema desplegará un error similar a: "El proyecto requiere tener al menos un colaborador". \\ \hline
+RF-5 & Edición de la Información del Proyecto & El sistema debe permitir a un gestor asignado editar la información básica de sus proyectos asociados, como tipo, tema, gestores y colaboradores. & Must & 1. Dado un proyecto asociado a un profesor, cuando entre a la pantalla de edición de proyecto entonces se despliega una un formulario con los datos actuales del proyecto.\par 2. Dado el ingreso correcto de los nuevos datos de proyecto, cuando el usuario confirme la acción entonces se guardarán los cambios en el sistema.\par 3. Dado el campo "colaboradores" vacío, cuando el usuario confirme la acción entonces se mostrará un error similar a: "El proyecto requiere tener al menos un colaborador".  \\ \hline
+RF-6 & Creación de Hitos & El sistema debe permitir a un gestor de un proyecto crear un hito dentro de él durante su edición. & Must & 1. Dado un proyecto asociado a un usuario como gestor que esté siendo editado, cuando entre a la ventana de creación de hitos, se muestre un formulario que permita ingresar el nombre del hito y su ubicación dentro de la lista.\par 2. Dado el ingreso correcto de un nombre y ubicación del hito, cuando el usuario confirme la acción entonces se crea en el sistema y se muestra en la ubicación dada.\par 3. Dado un campo "nombre" vacío, cuando el usuario confirme la acción entonces el sistema muestra un error similar a: "El Hito debe tener un nombre". \\ \hline
+
+RF-7 & Edición de Hitos & El sistema debe permitir a un gestor editar el nombre de un hito de un proyecto asociado a él. & Should & 1. Dado un proyecto asociado a un usuario como gestor con al menos un hito, cuando el usuario entre a la pantalla de edición de nombre entonces se muestre un formulario solamente con el nombre del hito.\par 2. Dado un proyecto asociado a un usuario como gestor con al menos un hito que esté siendo editado, cuando el usuario confirme la acción entonces el nombre se actualizará en el sistema. \\ \hline
+
+RF-8 & Creación de Entregables & El sistema debe permitir a un gestor crear un entregable dentro de un hito de un proyecto asociado a él durante su edición. & Must & 1. Dado un proyecto asociado a un usuario como gestor con al menos un hito, cuando el usuario entre a la ventana de creación de entregable entonces muestre un formulario que permita ingresar ubicación del mismo con respecto al hito, nombre, descripción, fecha de entrega y archivos admitidos.\par 2. Dado el ingreso correcto de los datos del entregable a crear, cuando el usuario confirme la acción entonces este se guarda en el sistema y se despliega dentro del hito asociado en la posición asignada.\par 3. Dado algún campo vacío, cuando el usuario confirme la acción entonces el sistema muestra un error similar a: "Los campos no pueden estar vacíos".\par 3. Dado una fecha de entrega inválida (por ejemplo, pasada), cuando el usuario confirme la acción entonces el sistema desplegará un error similar a: "Ingrese una fecha de entrega válida". \\ \hline
+RF-9 & Edición de Entregables & El sistema debe permitir a un gestor editar un entregable dentro de un hito de un proyecto asociado a él. & Must & 1. Dado un proyecto asociado a un gestor con al menos un hito que contenga un entregable, cuando el usuario entre a la ventana de edición entonces se muestre un formulario con todos los campos de este.\par 2. Dado el ingreso correcto de las modificaciones del entregable, cuando el usuario confirme la acción entonces este se guarda en el sistema.\par 3. Dado algún campo vacío, cuando el usuario confirme la acción entonces el sistema muestra un error similar a: "Los campos no pueden estar vacíos".\par 3. Dado una fecha de entrega inválida (por ejemplo, pasada), cuando el usuario confirme la acción entonces el sistema desplegará un error similar a: "Ingrese una fecha de entrega válida".\\ \hline
+RF-10 & Subida de Archivos & El sistema debe permitir a un colaborador subir y resubir archivos dentro de los entregables. & Must & 1. Dado un entregable en estado "Pendiente" con fecha de entrega vigente, cuando el colaborador suba uno o más archivos y confirme la acción, entonces se guardarán en el sistema y el estado del entregable cambiará automáticamente a "Entregado".\par 2. Dado un entregable "Pendiente" cuya fecha límite ya haya expirado, cuando el colaborador suba uno o más archivos y confirme la acción, entonces los archivos se guardarán con su fecha real, el estado del entregable cambiará a "Entregado" y el entregable conservará la marca "Atrasado" hasta ser aprobado (RB-9, RB-10).\par 3. Dado un entregable que ya tiene archivos previamente subidos, cuando el colaborador vuelva a subir archivos y confirme la acción, entonces la nueva entrega reemplazará a la anterior en la vista principal y se generará una nueva versión en el historial interno.\par 4. Dado el intento de subir archivos, cuando el colaborador adjunte un formato no admitido o no adjunte nada y confirme la acción, entonces el sistema mostrará un error indicando que debe subir archivos válidos. \\ \hline
+RF-11 & Comentarios de una Entrega & El sistema debe permitir a todos los involucrados de un proyecto (incluyendo gestores y colaboradores) publicar mensajes en un foro dentro de una entrega. & Should & 1. Dado un entregable perteneciente a un proyecto, cuando cualquier usuario involucrado envíe un mensaje válido en la sección del foro, entonces el comentario se publicará de inmediato mostrando el nombre del autor, fecha y hora.\par 2. Dado el foro de un entregable, cuando un usuario intente enviar un comentario con el campo de texto vacío, entonces el sistema bloqueará la acción y mostrará un mensaje de error similar a: "El comentario no puede estar vacío". \\ \hline
+RF-12 & Registro de Entregas Previas & El sistema debe permitir a un gestor acceder a un historial de entregas en un entregable dentro de uno de sus proyectos asignados. & Must & 1. Dado un entregable con más de una entrega realizada por un colaborador, cuando un gestor acceda a la sección de historial del entregable, entonces se desplegará una lista ordenada cronológicamente con todas las versiones de los archivos subidos.\par 2. Dado un entregable con múltiples entregas, cuando un colaborador acceda a él, entonces solo podrá ver y descargar la última versión de los archivos enviados, sin tener acceso al botón o sección del historial de versiones. \\ \hline
+RF-13 & Estado de un Entregable & El sistema debe mostrar el estado de los entregables de un proyecto a todas las personas involucradas en él. & Must & 1. Dado un proyecto con entregables, cuando cualquier usuario involucrado ingrese a la vista del proyecto o al detalle de un entregable, entonces el sistema mostrará claramente su estado actual (Pendiente, Entregado, Cambios Solicitados o Aprobado), según las transiciones de RB-9.\par 2. Dado un entregable no aprobado, cuando la fecha actual del sistema supere la fecha límite y no exista ninguna entrega anterior a esa fecha, entonces el sistema mostrará junto al estado la marca "Atrasado". La marca se calcula en cada consulta y no se almacena (RB-10). \\ \hline
+RF-14 & Modificación de Estado de Entregable & El sistema debe permitir a un gestor modificar el estado de los entregables de sus proyectos asignados. & Must & 1. Dado un entregable evaluado por un gestor, cuando este seleccione un nuevo estado ("Aprobado" o "Cambios Solicitados") y confirme la acción, entonces el estado se actualizará en el sistema y será visible para todos los participantes del proyecto.\par 2. Dado un usuario con rol de colaborador, cuando interactúe con sus entregables, entonces la interfaz no le permitirá editar ni modificar el estado asignado a estos. \\ \hline
+RF-15 & Plantillas de Hitos & El sistema debe proveer de plantillas preestablecidas que un profesor pueda utilizar para crear un proyecto. & Could & 1. Dado el inicio de sesión como gestor (profesor), cuando el usuario entre a la interfaz de creación de un nuevo proyecto, entonces el sistema desplegará la opción de seleccionar una plantilla de hitos preestablecida.\par 2. Dado un gestor que selecciona una plantilla preestablecida durante la creación, cuando confirme la acción, entonces el nuevo proyecto se creará conteniendo automáticamente la estructura de hitos definida por dicha plantilla.\par 3. Dado un proyecto ya existente, cuando el gestor acceda a su pantalla de edición, entonces la opción de aplicar una plantilla no estará disponible. \\ \hline
+RF-16 & Tablero Kanban para Entregables & El sistema debe mostrar una vista de los entregables como un tablero kanban de entregables ordenados por estado. & Could & 1. Dado un proyecto con entregables, cuando cualquier involucrado (gestor o colaborador) acceda a la vista Kanban, entonces visualizará los entregables organizados en columnas fijas que representan cada estado (Pendiente, Entregado, Cambios Solicitados, Aprobado). Las tarjetas de los entregables atrasados llevan la marca "Atrasado" (RB-10).\par 2. Dado un entregable visible en el tablero Kanban, cuando su estado cambie (ya sea automática o manualmente), entonces la tarjeta correspondiente se moverá automáticamente a la columna del nuevo estado al actualizar la vista.\par 3. Dado cualquier usuario en la vista Kanban, cuando intente arrastrar una tarjeta de entregable de una columna a otra, entonces la interfaz no permitirá la acción, siendo una vista de solo lectura. \\ \hline
+RF-17 & Notificaciones de Sistema por Correo & El sistema debe enviar notificaciones por correo a un colaborador cuando ocurren cambios en alguno de sus proyectos, y a un gestor cuando un colaborador realice una entrega o publique un mensaje. & Should & 1. Dado un proyecto activo, cuando un gestor cree un hito, cree un entregable, modifique una fecha de plazo o actualice el estado de una evaluación, entonces el sistema enviará automáticamente un correo electrónico notificando del cambio a los colaboradores del proyecto.\par 2. Dado un entregable pendiente o atrasado, cuando un colaborador suba archivos y complete una entrega, entonces el sistema enviará automáticamente un correo electrónico notificando a los gestores del proyecto.\par 3. Dado el foro de un entregable, cuando se publique el primer mensaje del día por parte de un usuario, entonces el sistema enviará un único correo electrónico de notificación a las contrapartes (gestores o colaboradores, según corresponda).\par 4. Dado un foro que ya generó una notificación de correo en el día en curso, cuando se publiquen nuevos mensajes dentro de ese mismo día, entonces el sistema no enviará correos adicionales para evitar la saturación.\\ \hline
+RF-18 & Exportación de Plazos a Calendario & El sistema debe permitir exportar las fechas de entrega para que sean compatibles con las aplicaciones de calendario. & Could & 1. Dado un proyecto con fechas de entrega asignadas, cuando un usuario presione la opción de exportar plazos, entonces el sistema generará y descargará automáticamente un archivo de calendario estático (como un archivo .ics) que contenga los eventos de ese proyecto específico.\par 2. Dado un proyecto que no posea entregables con fechas límite definidas, cuando el usuario intente exportar los plazos al calendario, entonces el sistema desplegará un mensaje similar a: "No hay fechas de entrega disponibles para exportar en este proyecto".\\ \hline
+RF-19 & Alta e Invitación de Cuentas & El sistema debe crear las cuentas solo por invitación: el equipo operador da de alta las cuentas de profesor a solicitud, y un gestor invita a los demás participantes al agregarlos a un proyecto con su correo institucional. & Should & 1. Dado un gestor que agrega a un proyecto un correo que no tiene cuenta, cuando confirme la acción entonces el sistema enviará a ese correo una invitación con un enlace de activación de un solo uso, válido por 7 días.\par 2. Dado un invitado que abre un enlace vigente, cuando defina su contraseña y acepte el texto de consentimiento (§5.3), entonces su cuenta quedará activa y verá el proyecto al que fue invitado.\par 3. Dado un enlace vencido o ya utilizado, cuando alguien lo abra entonces el sistema rechazará la activación y ofrecerá solicitar una nueva invitación al gestor.\par 4. Dado un correo que ya tiene cuenta, cuando un gestor lo agregue a un proyecto entonces el sistema lo asociará al proyecto sin crear una cuenta nueva. \\ \hline
+RF-20 & Completado de Hitos & El sistema debe marcar un hito como completado cuando todos sus entregables están aprobados, y permitir a un gestor marcarlo como completado manualmente (RB-12). & Should & 1. Dado un hito con al menos un entregable, cuando un gestor apruebe el último entregable que faltaba, entonces el hito pasará automáticamente a "Completado" y se registrará la fecha.\par 2. Dado un hito no completado, cuando un gestor lo marque manualmente como completado y confirme la acción, entonces el hito quedará "Completado" aunque no tenga entregables.\par 3. Dado un usuario con rol de colaborador, cuando vea un hito entonces la interfaz no le ofrecerá la acción de completarlo. \\ \hline
+RF-21 & Derechos del Titular de Datos & El sistema debe permitir a cada usuario ejercer desde su perfil sus derechos sobre sus datos personales: acceso y portabilidad, rectificación y supresión (§5.3, RB-19). & Should & 1. Dado un usuario con sesión iniciada, cuando solicite la descarga de sus datos desde su perfil, entonces el sistema generará un archivo con sus datos (JSON) y los archivos que subió (ZIP).\par 2. Dado un usuario con sesión iniciada, cuando edite su nombre o su correo en su perfil y confirme la acción, entonces los cambios se guardarán.\par 3. Dado un usuario que solicita eliminar su cuenta y lo confirma, entonces el sistema borrará sus datos de identificación y los archivos que subió, atribuirá sus comentarios y revisiones a "Usuario eliminado" y avisará a los gestores de sus proyectos. \\ \hline
+\end{xltabular}
+
+\subsection{Detalle por requisito funcional}
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-1 · Inicio de Sesión}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un usuario con cuenta activa, profesor o estudiante, iniciar sesión con su correo institucional y su contraseña. No hay registro abierto ni inicio de sesión con cuentas de terceros.}
+\kvrow{Actores}{Usuario (Profesor o Estudiante)}
+\kvrow{Precondiciones}{El usuario debe tener una cuenta activa, creada por invitación (RF-19).}
+\kvrow{Flujo principal}{1. El usuario ingresa su correo institucional y la contraseña que definió al activar su cuenta.\par 2. El sistema valida las credenciales.\par 3. El sistema otorga acceso y redirige a la pantalla principal.}
+\kvrow{Flujos alternos y excepciones}{Si las credenciales son incorrectas o los campos están vacíos, se deniega el acceso y se muestra un mensaje de error.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un correo y contraseña correctos, cuando el usuario confirme la acción entonces el sistema debe llevarlo a la pantalla principal del programa.\par 2. Dado un correo inválido o una contraseña incorrecta, cuando el usuario inicie sesión entonces el sistema debe mostrar un error en pantalla.\par 3. Dado un campo correo y/o contraseña vacíos, cuando el usuario inicie sesión entonces se debe mostrar un mensaje de campos vacíos.\par 4. Dado un visitante sin cuenta, la pantalla de inicio de sesión no ofrece una opción para registrarse.}
+\kvrow{RNF asociados}{RNF-S-1 (Autenticación), RNF-S-2 (Autorización y Privacidad)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-2 · Visualización de Proyectos}} \\ \hline
+\kvrow{Descripción}{El sistema debe mostrar todos los proyectos que un usuario tenga asociados.}
+\kvrow{Actores}{Usuario (Cualquier rol)}
+\kvrow{Precondiciones}{El usuario debe haber iniciado sesión y tener al menos un proyecto asociado.}
+\kvrow{Flujo principal}{1. El usuario accede a la pantalla principal.\par 2. El sistema recupera los proyectos donde el usuario es gestor o colaborador.\par 3. El sistema muestra la lista de proyectos.}
+\kvrow{Flujos alternos y excepciones}{Si el usuario no tiene proyectos, se muestra un mensaje indicando que no hay proyectos asociados.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un proyecto correctamente asociado a un usuario, cuando este accede a la pantalla principal, entonces se muestra en una lista.\par 2. Dado un proyecto correctamente asociado a un usuario, cuando el usuario entra a él entonces se pasa a una nueva pantalla de visualización del proyecto, ordenados por fecha de última modificación.}
+\kvrow{RNF asociados}{RNF-R-1 (Tiempo de respuesta p95)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-3 · Detalle de un Proyecto}} \\ \hline
+\kvrow{Descripción}{El sistema debe desplegar todos los datos de un proyecto, incluyendo hitos y entregables.}
+\kvrow{Actores}{Usuario (Gestor o Colaborador del proyecto)}
+\kvrow{Precondiciones}{El usuario debe haber seleccionado un proyecto de su lista.}
+\kvrow{Flujo principal}{1. El usuario ingresa a un proyecto.\par 2. El sistema recupera la estructura del proyecto.\par 3. Se despliega información del mismo, junto con hitos y entregables asociados.}
+\kvrow{Flujos alternos y excepciones}{Si el proyecto no tiene hitos, se muestra un mensaje informativo.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un proyecto sin ningún hito, cuando el usuario entre a la pantalla entonces se muestra un mensaje: "No existen hitos para este proyecto".\par 2. Dado un proyecto con al menos un hito, cuando el usuario entre a la pantalla entonces se muestran todos los hitos en orden temporal ascendente.\par 3. Dado un proyecto con hitos y entregables, cuando el usuario entre a la pantalla entonces se muestran los entregables en orden temporal ascendente, junto con su información y estado.}
+\kvrow{RNF asociados}{RNF-R-1 (Tiempo de respuesta p95), RNF-U-1 (Accesibilidad), RNF-U-2 (Diseño responsivo)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-4 · Creación de Proyectos}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un profesor crear un nuevo proyecto asignando tema, tipo, gestores y colaboradores.}
+\kvrow{Actores}{Profesor (Rol global)}
+\kvrow{Precondiciones}{El usuario debe tener rol global de Profesor.}
+\kvrow{Flujo principal}{1. El profesor accede a la creación de proyectos.\par 2. Ingresa los datos solicitados.\par 3. Confirma la creación.\par 4. El sistema crea el proyecto y asigna al profesor como gestor.}
+\kvrow{Flujos alternos y excepciones}{Si no se agrega un colaborador, el sistema bloquea la creación.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un inicio de sesión correcto como profesor, cuando el usuario entre a la interfaz entonces se despliega un menú para ingresar información.\par 2. Dado un ingreso correcto de los datos, cuando el usuario confirme la acción entonces el proyecto se creará y el creador será gestor del mismo.\par 3. Dado el campo "colaboradores" vacío, cuando el usuario confirme la acción entonces el sistema desplegará un error indicando que requiere al menos un colaborador.}
+\kvrow{RNF asociados}{RNF-R-3 (Volumen de datos y crecimiento), RNF-D-2 (RPO/RTO), RNF-S-2 (Autorización y Privacidad), RNF-S-3 (Protección de datos)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-5 · Edición de la Información del Proyecto}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un gestor asignado editar la información básica de sus proyectos asociados.}
+\kvrow{Actores}{Gestor del proyecto (Profesor o Estudiante)}
+\kvrow{Precondiciones}{El usuario debe tener el rol de Gestor en el proyecto a editar.}
+\kvrow{Flujo principal}{1. El gestor accede a la edición.\par 2. Modifica los campos necesarios.\par 3. Confirma y el sistema guarda los cambios.}
+\kvrow{Flujos alternos y excepciones}{Si se eliminan todos los colaboradores, se bloquea el guardado.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un proyecto asociado a un gestor, cuando entre a la pantalla de edición entonces se despliega un formulario con los datos actuales.\par 2. Dado el ingreso correcto de nuevos datos, cuando el usuario confirme la acción entonces se guardarán los cambios.\par 3. Dado el campo "colaboradores" vacío, cuando el usuario confirme la acción entonces se mostrará un error.}
+\kvrow{RNF asociados}{RNF-D-2 (RPO/RTO), RNF-S-2 (Autorización y Privacidad), RNF-S-3 (Protección de datos)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-6 · Creación de Hitos}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un gestor de un proyecto crear un hito dentro de él durante su edición.}
+\kvrow{Actores}{Gestor del proyecto}
+\kvrow{Precondiciones}{El usuario debe estar editando un proyecto donde tiene rol de gestor.}
+\kvrow{Flujo principal}{1. El gestor accede a la creación de hitos.\par 2. Ingresa el nombre y ubicación.\par 3. El sistema guarda el hito.}
+\kvrow{Flujos alternos y excepciones}{Si el nombre está vacío, se rechaza la creación.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un proyecto en edición, cuando entre a la ventana de creación de hitos, se muestre un formulario para ingresar nombre y ubicación.\par 2. Dado el ingreso correcto, cuando el usuario confirme entonces se crea en el sistema y se muestra en la ubicación.\par 3. Dado un campo "nombre" vacío, cuando el usuario confirme entonces se muestra un error.}
+\kvrow{RNF asociados}{RNF-D-2 (RPO/RTO), RNF-S-2 (Autorización y Privacidad), RNF-S-3 (Protección de datos)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-8 · Creación de Entregables}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un gestor crear un entregable dentro de un hito.}
+\kvrow{Actores}{Gestor del proyecto}
+\kvrow{Precondiciones}{Debe existir al menos un hito en el proyecto.}
+\kvrow{Flujo principal}{1. El gestor accede a la creación de entregable en un hito.\par 2. Ingresa los datos y plazos.\par 3. El sistema guarda el entregable y lo asocia al hito.}
+\kvrow{Flujos alternos y excepciones}{Si hay campos vacíos o la fecha es inválida (pasada), se rechaza la operación.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un proyecto con un hito, cuando entre a la creación de entregable se muestra un formulario.\par 2. Dado el ingreso correcto, cuando se confirme la acción este se guarda y despliega en la posición.\par 3. Dado algún campo vacío, cuando se confirme entonces se muestra un error.\par 4. Dado una fecha de entrega pasada, cuando se confirme entonces se despliega un error.}
+\kvrow{RNF asociados}{RNF-D-2 (RPO/RTO), RNF-S-2 (Autorización y Privacidad), RNF-S-3 (Protección de datos)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-9 · Edición de Entregables}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un gestor editar un entregable dentro de un hito.}
+\kvrow{Actores}{Gestor del proyecto}
+\kvrow{Precondiciones}{Debe existir un entregable asociado al proyecto.}
+\kvrow{Flujo principal}{1. El gestor accede a la edición de un entregable.\par 2. Modifica la descripción o los plazos.\par 3. Confirma la acción.}
+\kvrow{Flujos alternos y excepciones}{Errores al ingresar campos vacíos o fechas expiradas al reasignar.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un proyecto con un entregable, cuando entre a la ventana de edición se muestre el formulario poblado.\par 2. Dado el ingreso correcto de modificaciones, cuando confirme la acción este se guarda.\par 3. Dado algún campo vacío, se muestra un error.\par 4. Dado una fecha inválida, se despliega un error.}
+\kvrow{RNF asociados}{RNF-D-2 (RPO/RTO), RNF-S-2 (Autorización y Privacidad), RNF-S-3 (Protección de datos)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-10 · Subida de Archivos}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un colaborador subir y resubir archivos dentro de los entregables.}
+\kvrow{Actores}{Colaborador del proyecto}
+\kvrow{Precondiciones}{Entregable habilitado para la subida de archivos.}
+\kvrow{Flujo principal}{1. Colaborador sube archivos.\par 2. El sistema valida el formato.\par 3. Se guarda el archivo y se actualiza el estado de la entrega general.}
+\kvrow{Flujos alternos y excepciones}{Subida de formato inválido o intentos sin adjuntos resultan en error.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un entregable Pendiente a tiempo, cuando el colaborador suba archivos, el estado cambia a "Entregado".\par 2. Dado un entregable Pendiente con fecha límite expirada, cuando suba archivos, el estado cambia a "Entregado" y el entregable conserva la marca "Atrasado" hasta ser aprobado (RB-10).\par 3. Dado un entregable con entregas previas, cuando resuba, la nueva entrega reemplaza la vista principal generando historial para el gestor.\par 4. Dado el intento de subir formato inválido, el sistema muestra error.}
+\kvrow{RNF asociados}{RNF-R-1 (Tiempo de respuesta p95), RNF-R-3 (Volumen de datos y crecimiento), RNF-D-2 (RPO/RTO), RNF-S-2 (Autorización y Privacidad), RNF-S-3 (Protección de datos)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-12 · Registro de Entregas Previas}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un gestor acceder al historial de entregas de un entregable dentro de uno de sus proyectos asignados.}
+\kvrow{Actores}{Gestor del proyecto (consulta el historial); Colaborador (ve solo la última versión)}
+\kvrow{Precondiciones}{El entregable debe tener al menos una entrega.}
+\kvrow{Flujo principal}{1. El gestor abre un entregable.\par 2. Accede a la sección de historial.\par 3. El sistema lista todas las versiones en orden cronológico, cada una con su fecha, sus archivos o enlace y la revisión asociada, si existe.\par 4. El gestor abre o descarga la versión que necesita.}
+\kvrow{Flujos alternos y excepciones}{Si quien accede es un colaborador, solo se muestra la última versión y no se ofrece el historial (RB-17).}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un entregable con más de una entrega, cuando un gestor acceda al historial, entonces se desplegará una lista cronológica con todas las versiones de los archivos subidos.\par 2. Dado un entregable con múltiples entregas, cuando un colaborador acceda a él, entonces solo podrá ver y descargar la última versión, sin acceso al historial.}
+\kvrow{RNF asociados}{RNF-D-2 (RPO/RTO), RNF-S-2 (Autorización y Privacidad), RNF-R-3 (Volumen de datos y crecimiento)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-13 · Estado de un Entregable}} \\ \hline
+\kvrow{Descripción}{El sistema debe mostrar el estado de los entregables de un proyecto a todas las personas involucradas.}
+\kvrow{Actores}{Usuario (Gestor o Colaborador)}
+\kvrow{Precondiciones}{El usuario accede a un proyecto con entregables.}
+\kvrow{Flujo principal}{1. El usuario visualiza la lista de entregables.\par 2. El sistema calcula y expone el estado actual.}
+\kvrow{Flujos alternos y excepciones}{Si la fecha actual supera la fecha límite sin entregas anteriores a ella y el entregable no está aprobado, se muestra además la marca "Atrasado" (RB-10).}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un proyecto con entregables, cuando el usuario ingrese a la vista, el sistema mostrará claramente su estado actual (Pendiente, Entregado, Cambios Solicitados o Aprobado).\par 2. Dado un entregable no aprobado, cuando la fecha actual supere el límite sin entregas anteriores a esa fecha, el sistema mostrará junto al estado la marca calculada "Atrasado".}
+\kvrow{RNF asociados}{RNF-D-1 (Disponibilidad), RNF-M-1 (Cobertura de pruebas)}
+\end{xltabular}
+
+\vspace{1em}
+
+\noindent
+\begin{xltabular}{\linewidth}{|E{4.6cm}|L|}
+\hline\hrow \multicolumn{2}{|l|}{\h{RF-14 · Modificación de Estado de Entregable}} \\ \hline
+\kvrow{Descripción}{El sistema debe permitir a un gestor modificar el estado de los entregables de sus proyectos asignados.}
+\kvrow{Actores}{Gestor del proyecto}
+\kvrow{Precondiciones}{El entregable debe contar con al menos una entrega realizada por un colaborador.}
+\kvrow{Flujo principal}{1. El gestor revisa el entregable.\par 2. Selecciona un nuevo estado evaluativo.\par 3. El sistema actualiza el estado general.}
+\kvrow{Flujos alternos y excepciones}{Un colaborador intenta evaluar y el sistema bloquea la interfaz.}
+\kvrow{Criterios de aceptación (Gherkin)}{1. Dado un entregable evaluado por un gestor, cuando seleccione "Aprobado" o "Cambios Solicitados" y confirme, se actualizará el estado y será visible.\par 2. Dado un usuario con rol de colaborador, la interfaz no le permitirá editar ni modificar el estado.}
+\kvrow{RNF asociados}{RNF-D-2 (RPO/RTO), RNF-S-2 (Autorización y Privacidad), RNF-S-3 (Protección de datos)}
+\end{xltabular}
+
+
+% =====================================================================
+\clearpage
+\section{Requisitos no funcionales}
+% Encabezado común para las tablas RNF
+\newcommand{\rnfhead}{\hline\hrow \h{ID} & \h{Métrica o control} & \h{Objetivo} & \h{Justificación del valor} & \h{Método de verificación} \\ \hline}
+
+\subsection{Rendimiento y capacidad}
+\begin{xltabular}{\linewidth}{|P{1.0cm}|P{3.0cm}|P{4.0cm}|L|P{2.6cm}|}
+\rnfhead\endhead
+RNF-R-1 & Tiempo de respuesta p95 & $\le$ 500 ms en navegación y $\le$ 3 s para subida de archivos & Estándar de usabilidad web de Google web.dev (REF-13). Se amplía a 3s para entregables, considerando que los anexos y memorias pueden pesar decenas de megabytes. & Pruebas de navegación con Google Lighthouse y de carga usando JMeter \\ \hline
+RNF-R-2 & Concurrencia de usuarios & Con 100 usuarios concurrentes durante 15 minutos, el sistema cumple los tiempos de RNF-R-1 y mantiene una tasa de error menor que 1\,\%. Se entiende por degradación el incumplimiento de cualquiera de estas dos condiciones. & El escenario de \S~2.3 tiene unas 265 memorias activas por semestre. Los plazos comunes concentran la actividad en las últimas horas: 100 usuarios concurrentes equivalen a que cerca del 40\,\% de los memoristas activos esté conectado a la vez, que se toma como caso pesimista. & Prueba de estrés con JMeter sobre datos sintéticos \\ \hline
+RNF-R-3 & Volumen de datos y crecimiento & Soportar un crecimiento de 33 a 66~GB de archivos al año y hasta 100~GB almacenados, sin superar el límite de costo de \S~2.6. & Son las mismas cifras de \S~2.3: 529 memorias al año, 25 entregas por memoria, la mitad con un archivo de 5 a 10~MB (62,5 a 125~MB por memoria). Los archivos se eliminan 12 meses después del cierre del proyecto, por lo que el total se estabiliza en 50 a 100~GB. & Monitoreo del uso del almacenamiento de objetos, con alerta al 80\,\% de lo previsto \\ \hline
+\end{xltabular}
+
+\subsection{Disponibilidad y continuidad}
+\begin{xltabular}{\linewidth}{|P{1.0cm}|P{3.0cm}|P{4.0cm}|L|P{2.6cm}|}
+\rnfhead\endhead
+RNF-D-1 & Disponibilidad & $\ge$ 99,5\,\% mensual (a lo más 3,6 horas de indisponibilidad al mes) & El límite de costo de \S~2.6 obliga a operar con un solo servidor, sin redundancia, lo que no permite comprometer un valor mayor. El valor es suficiente para el escenario porque una caída no hace perder un plazo: las entregas fuera de plazo se aceptan con su fecha real (RB-10). Además, 3,6 horas al mes son coherentes con el RTO de 4 horas de RNF-D-2. & Monitoreo de uptime con Pingdom \\ \hline
+RNF-D-2 & RPO / RTO & RPO 24 horas / RTO 4 horas & En caso de fallo crítico, perder 1 día de datos es mitigable porque los estudiantes conservan las memorias locales. 4 horas es razonable para restablecer el servicio fuera de plazos críticos. & Simulacros semestrales de recuperación \\ \hline
+\end{xltabular}
+
+\subsection{Seguridad}
+\begin{xltabular}{\linewidth}{|P{1.0cm}|P{3.0cm}|P{4.0cm}|L|P{2.6cm}|}
+\rnfhead\endhead
+RNF-S-1 & Autenticación & Autenticación propia con correo institucional y contraseña: 100\,\% de las contraseñas almacenadas como hash (bcrypt o Argon2), bloqueo temporal de la cuenta tras 5 intentos fallidos consecutivos y ninguna vía de registro abierto. & El sistema se adopta sin convenio con la universidad (\S~2.3), por lo que no puede depender del inicio de sesión único institucional. Tampoco se usan cuentas de Google o Microsoft, para no sumar una dependencia externa ni un tercero que reciba datos (\S~2.1, \S~5.3). El bloqueo limita los ataques por fuerza bruta. & Pruebas de integración del inicio de sesión e inspección del esquema de la base de datos \\ \hline
+RNF-S-2 & Autorización y Privacidad & RBAC estricto según rol de proyecto & Los estudiantes de un proyecto no deben tener acceso a documentos ni notas de proyectos ajenos para proteger la privacidad académica. & Test unitarios, de integración y de uso por un usuario final del sistema \\ \hline
+RNF-S-3 & Protección de datos & TLS 1.2+ en tránsito & Prevenir la intercepción de archivos académicos y credenciales en redes públicas de la universidad. & Auditoría de certificados SSL \\ \hline
+\end{xltabular}
+
+\subsection{Usabilidad y accesibilidad}
+\begin{xltabular}{\linewidth}{|P{1.0cm}|P{3.0cm}|P{4.0cm}|L|P{2.6cm}|}
+\rnfhead\endhead
+RNF-U-1 & Accesibilidad & WCAG 2.1 AA & Las plataformas institucionales universitarias deben cumplir con estándares de inclusión para estudiantes con discapacidades visuales o motoras. & Auditoría con Google Lighthouse \\ \hline
+RNF-U-2 & Diseño responsivo & El 100\,\% de las tareas de PA-1, PA-2 y PA-5 (\S~10) se completa en una pantalla de 360~px de ancho, sin desplazamiento horizontal. & Alta proporción de estudiantes revisa notificaciones de evaluación, estados de entregas y foro de comentarios desde sus teléfonos (\S~2.3, condiciones de operación). & Pruebas en navegadores móviles (iOS/Android) \\ \hline
+RNF-U-3 & Facilidad de uso sin capacitación & $\ge$ 85\,\% de las tareas clave (PA-1, PA-2 y PA-5) completadas sin ayuda en el primer intento, y puntaje SUS $\ge$ 68. & Es la métrica de la restricción \textbf{usability} de \S~2.6: los profesores no recibirán capacitación. El valor 68 es el promedio de referencia de la escala SUS. & Validación de uso sobre el prototipo con 3 a 5 profesores (\S~10) \\ \hline
+\end{xltabular}
+
+\subsection{Compatibilidad e interoperabilidad}
+\begin{xltabular}{\linewidth}{|P{1.0cm}|P{3.0cm}|P{4.0cm}|L|P{2.6cm}|}
+\rnfhead\endhead
+RNF-C-1 & Navegadores soportados & Chrome, Firefox, Safari y Edge (última y penúltima versión) & Estos cuatro navegadores suman alrededor del 94\,\% del uso web en Chile, considerando todas las plataformas (StatCounter, 2026, REF-19). & Pruebas automatizadas de UI y desarrollo que excluya funcionalidades experimentales \\ \hline
+RNF-C-2 & Formatos de archivo & Validaciones estrictas por extensión y MIME type & Evita la subida de ejecutables maliciosos o formatos no evaluables, restringiendo a PDF, ZIP, DOCX, etc., según la configuración del entregable. & Pruebas de integración en endpoint de subida \\ \hline
+\end{xltabular}
+
+\subsection{Mantenibilidad y calidad interna}
+\begin{xltabular}{\linewidth}{|P{1.0cm}|P{3.0cm}|P{4.0cm}|L|P{2.6cm}|}
+\rnfhead\endhead
+RNF-M-1 & Cobertura de pruebas & $\ge$ 80\% en la lógica de negocio & Crítico para evitar bugs en transiciones de estado de entregables, permisos de revisores y reglas de inmutabilidad del profesor gestor. & Sondeo de cobertura usando SonarQube \\ \hline
+RNF-M-2 & Observabilidad & Logs centralizados de acciones críticas & Necesario para auditar disputas académicas, como por ejemplo verificar que un estudiante subió antes de la medianoche un archivo. & Guardado de Logs en la nube \\ \hline
+\end{xltabular}
+
+\subsection{Portabilidad y despliegue}
+\begin{xltabular}{\linewidth}{|P{1.0cm}|P{3.0cm}|P{4.0cm}|L|P{2.6cm}|}
+\rnfhead\endhead
+RNF-P-1 & Entornos e Infraestructura & Despliegue en contenedores de Docker & Permite mover el sistema entre proveedores de nube si cambian los costos (R-8), y a servidores de una universidad si a futuro alguna lo adopta de forma institucional (§7.3). & Revisión del pipeline CI/CD \\ \hline
+\end{xltabular}
+
+% =====================================================================
+\clearpage
+\section{Requisitos de datos}
+
+\subsection{Modelo de información (alto nivel)}
+El modelo separa el \emph{entregable} (lo que se pide) de sus \emph{entregas} (cada versión enviada) y de las \emph{revisiones} sobre cada versión, de acuerdo con las definiciones de §1.3 y la aplicación CI-2 de §2.7. El diagrama entidad-relación se incluye en el Anexo G. Los volúmenes esperados se derivan del escenario de \S~2.3, que considera 529 memorias por año y unas 265 memorias activas por semestre.
+
+\begin{xltabular}{\linewidth}{|P{2.4cm}|L|P{2.9cm}|P{2.4cm}|P{3.4cm}|}
+\hline\hrow \h{Entidad} & \h{Atributos clave} & \h{Relaciones} & \h{Volumen esperado} & \h{Reglas de calidad y validación} \\ \hline
+\endhead
+Usuario & id (PK), nombre, correo (único), tipo (profesor $|$ estudiante), credencial (hash de contraseña), estado (invitada $|$ activa), fecha y versión del consentimiento, fecha de creación. & 1–N con Participación, Entrega, Revisión, Comentario. & Hasta 675 cuentas el primer año: 529 estudiantes y 146 académicos (§2.3). & Correo con formato válido, único y normalizado a minúsculas. Tipo obligatorio. No se almacenan RUT, teléfono ni dirección (§5.3). \\ \hline
+
+Proyecto & id (PK), tipo (memoria $|$ tesis $|$ investigación), tema, estado (activo $|$ cerrado), fecha de inicio, fecha de cierre, fecha de última modificación. & 1–N con Participación e Hito. & Unos 265 activos por semestre; se agregan 529 por año. & Tema no vacío. Siempre al menos un gestor y un colaborador (RB-2). \\ \hline
+
+Participación & (usuario\_id, proyecto\_id) PK compuesta, rol (gestor $|$ colaborador), fecha de alta. & N–1 con Usuario y con Proyecto. & 2 a 4 por proyecto: 1.058 a 2.116 por año. & Un solo rol por usuario y proyecto (RB-3). \\ \hline
+
+Plantilla de hitos e ítem de plantilla & Plantilla: id, nombre, tipo de proyecto, carrera. Ítem: plantilla\_id, orden, nombre del hito. & Plantilla 1–N Ítem. Se copia a Hito al crear un proyecto (RB-13). & Decenas. & Nombre no vacío; orden único dentro de la plantilla. \\ \hline
+
+Hito & id (PK), proyecto\_id, nombre, orden, estado (pendiente $|$ en curso $|$ completado), fecha de completado. & N–1 con Proyecto; 1–N con Entregable. & $\approx$ 5 por proyecto: 2.645 por año. & Nombre no vacío; orden único dentro del proyecto. \\ \hline
+
+Entregable & id (PK), hito\_id, título, descripción, fecha límite, formatos admitidos, tamaño máximo, estado (pendiente $|$ entregado $|$ cambios solicitados $|$ aprobado). & N–1 con Hito; 1–N con Entrega y Comentario. & $\approx$ 10 por proyecto: 5.290 por año. & Campos obligatorios no vacíos; fecha límite no anterior a la fecha actual al crear o editar (RB-6). ``Atrasado'' no se almacena: se calcula (RB-10). \\ \hline
+
+Entrega & id (PK), entregable\_id, número de versión, autor\_id, fecha y hora de envío, enlace (opcional). & N–1 con Entregable; 1–N con Archivo; 1–0..1 con Revisión. & $\approx$ 25 por proyecto: cerca de 13.200 por año (§2.3). & Versión correlativa por entregable; una entrega no se modifica ni se borra después de enviada (RB-7). \\ \hline
+
+Archivo & id (PK), entrega\_id, nombre original, tipo MIME, tamaño, clave de almacenamiento en el servicio de objetos, hash SHA-256. & N–1 con Entrega. & Un archivo en la mitad de las entregas: cerca de 6.600 archivos y 33 a 66 GB por año (§2.3). & Extensión y tipo MIME dentro de los admitidos (RNF-C-2); tamaño $\le$ máximo del entregable (RB-8); el hash permite verificar integridad. \\ \hline
+
+Revisión & id (PK), entrega\_id, gestor\_id, decisión (aprobado $|$ cambios solicitados), comentario, fecha. & N–1 con Entrega y con Usuario. & $\approx$ una por entrega: cerca de 13.200 por año. & Solo la crea un gestor del proyecto (RB-11); a lo más una decisión por entrega. \\ \hline
+
+Comentario & id (PK), entregable\_id, autor\_id, texto, fecha y hora. & N–1 con Entregable y con Usuario. & Supuesto: 2 a 5 por entregable, 10.580 a 26.450 por año. & Texto no vacío; solo participantes del proyecto (RB-15). \\ \hline
+
+Notificación & id (PK), destinatario\_id, tipo de evento, referencia a la entidad, fecha de envío. & N–1 con Usuario. & Estimado en §5.2: del orden de 40.000 por año. & A lo más un correo por foro, destinatario y día (RB-14). \\ \hline
+
+Registro de auditoría & id (PK), usuario\_id, acción, entidad, entidad\_id, fecha y hora, dirección IP. & N–1 con Usuario. & Del orden de 100.000 filas por año. & Solo se agregan filas, nunca se modifican (RNF-M-2). La IP se elimina a los 90 días (§5.3). \\ \hline
+
+\end{xltabular}
+
+\begin{kv}
+\kvrow{Retención y archivado}{Mientras el proyecto está activo se conservan todos sus datos. Al cerrarse el proyecto se mantiene en modo de solo lectura durante 12 meses, para cubrir revisiones posteriores, reclamos y la defensa. Pasado ese plazo se eliminan sus archivos, entregas, revisiones y comentarios, y se conserva solo un registro anonimizado (tipo de proyecto y fechas) con fines estadísticos. Los registros de auditoría se conservan 12 meses y las direcciones IP, 90 días. El plazo de 12 meses es una decisión del equipo que se validará con la jefatura de carrera (§2.4).}
+\kvrow{Origen de los datos}{Carga manual por los propios usuarios a través de la interfaz: el profesor crea proyectos, hitos y entregables; los estudiantes suben entregas; los gestores registran revisiones. No se importan datos desde sistemas institucionales (§1.2).}
+\kvrow{Datos para desarrollo y demostración}{Sintéticos, generados por un script con personas, temas y documentos ficticios. Los entornos de desarrollo y pruebas nunca reciben copias de datos reales. La validación de uso sobre el prototipo (§2.4) también se hace con datos sintéticos.}
+\end{kv}
+
+\subsection{Interfaces externas (entrada y salida)}
+El sistema intercambia datos con los servicios externos del diagrama de contexto (§2.2) y con los proveedores elegidos en §9.3. No usa colas de mensajes externas: los avisos programados se procesan con una tarea interna del servidor.
+
+\begin{xltabular}{\linewidth}{|P{2.4cm}|P{3.0cm}|P{3.0cm}|P{2.0cm}|L|}
+\hline\hrow \h{Tipo} & \h{Sistema o proveedor} & \h{Protocolo y formato} & \h{Dirección} & \h{Frecuencia y acuerdos de servicio} \\ \hline
+\endhead
+API & Servicio de correo (AWS SES o SendGrid, §9.3) & SMTP o API REST / JSON & Out & Envío por evento (RF-17, RF-19). Con las cifras de §2.3 se estiman del orden de 40.000 correos al año, unos 110 por día en promedio: uno por cada entrega (13.200), uno por cada revisión (13.200), los avisos por cambios en hitos y entregables (cerca de 8.000) y los avisos de foro e invitaciones. Antes del despliegue se contrastará la estimación con las cuotas y el costo del servicio elegido. \\ \hline
+
+API & Almacenamiento de objetos (AWS S3, §9.3) & HTTPS, API S3; binarios & In / Out & Por subida y descarga de archivos (RF-10, RF-12). Se estima un crecimiento de 33 a 66~GB de archivos al año y hasta 100~GB almacenados (\S~2.3, RNF-R-3). Las descargas se realizan mediante URL firmadas de corta duración (\S~5.3). \\ \hline
+
+Archivo & Calendario del usuario (Google Calendar, Outlook) & iCalendar (RFC 5545), archivo .ics & Out & A demanda del usuario (RF-18), un archivo por proyecto. \\ \hline
+
+Cola o evento & - & - & - & No aplica: no se usan intermediarios de mensajería externos, por el volumen bajo de §2.3 y la restricción \textbf{cost}. \\ \hline
+
+\end{xltabular}
+
+\subsection{Protección de datos personales y consideraciones legales}
+\begin{kv}
+\kvrow{¿Trata datos personales?}{Sí. El sistema guarda datos que identifican a estudiantes y profesores (nombre, correo) y datos asociados a ellos (participación en proyectos, entregas, revisiones de su trabajo, comentarios y registros de actividad).}
+\kvrow{Datos personales tratados}{%
+\textbullet~\textbf{Identificación:} nombre, correo electrónico, tipo de usuario, credencial (hash de contraseña).\par
+\textbullet~\textbf{Académicos:} proyectos en que participa y su rol, tema del proyecto, fechas de entrega, archivos entregados (obra del estudiante), revisiones con decisión y comentario, mensajes del foro.\par
+\textbullet~\textbf{Técnicos:} registros de auditoría con fecha, acción y dirección IP.\par
+\textbf{Datos sensibles:} el sistema no los solicita. Sin embargo, un archivo entregado puede contener datos sensibles de terceros (p.~ej., respuestas de encuestas de una tesis en salud). Por eso, al subir un archivo se muestra un aviso que pide anonimizar ese tipo de datos (ver ``Minimización'').\par
+\textbf{Niños, niñas y adolescentes:} el sistema no está dirigido a menores de edad; los memoristas y tesistas son estudiantes de cursos superiores o de postgrado.}
+\kvrow{Finalidad declarada del tratamiento}{Permitir el seguimiento de la supervisión de memorias y tesis: que el profesor vea el estado de los proyectos que gestiona, que el estudiante entregue y reciba retroalimentación, y que ambos reciban avisos de plazos. Los datos no se usan para otros fines: ni publicidad, ni perfiles, ni calificación oficial, ni se comparten con la institución.}
+\kvrow{Base de licitud}{Consentimiento del titular, otorgado al activar su cuenta (ver fila siguiente). Se elige esta base porque el sistema lo adopta cada profesor por su cuenta, sin un convenio con la universidad (§2.3), por lo que no existe un contrato ni una obligación legal entre el operador del sistema y el estudiante. Los registros de auditoría se sustentan además en el interés legítimo de poder resolver disputas sobre plazos y entregas (RNF-M-2). Si a futuro una universidad adopta el sistema de forma institucional, la base de licitud debe reevaluarse.}
+\kvrow{Cómo se obtiene el consentimiento}{Al activar su cuenta desde la invitación (RF-19), el usuario ve un texto breve sobre qué datos se tratan, para qué, por cuánto tiempo y cómo ejercer sus derechos, con enlace a la política de privacidad completa. Debe marcar una casilla que no viene marcada por defecto. Se registran la fecha y la versión del texto aceptado (entidad Usuario, §5.1). Si la política cambia, se pide aceptar la nueva versión en el siguiente inicio de sesión.}
+\kvrow{Minimización}{No se recolectan: RUT, teléfono, dirección, fotografía, fecha de nacimiento ni calificaciones oficiales (restricción \textbf{legal considerations}, §2.6). No se usan herramientas de analítica o rastreo de terceros. Las direcciones IP de auditoría se eliminan a los 90 días. Se muestra un aviso al subir archivos para que no incluyan datos personales sensibles de terceros sin anonimizar.}
+\kvrow{Medidas de seguridad}{%
+\textbullet~Cifrado en tránsito con TLS 1.2 o superior (RNF-S-3).\par
+\textbullet~Cifrado en reposo del almacenamiento de objetos y de los respaldos (cifrado del lado del servidor del proveedor).\par
+\textbullet~Contraseñas almacenadas solo como hash con un algoritmo diseñado para ello (bcrypt o Argon2), y bloqueo temporal tras intentos fallidos repetidos (RNF-S-1).\par
+\textbullet~Control de acceso por rol en cada proyecto (RNF-S-2, RB-4): un usuario solo accede a proyectos en que participa.\par
+\textbullet~Descarga de archivos mediante URL firmadas que expiran en minutos; el almacenamiento no es público.\par
+\textbullet~Registro de auditoría de acciones críticas (RNF-M-2).\par
+\textbullet~Entornos separados de desarrollo, pruebas y producción; solo datos sintéticos fuera de producción.\par
+\textbullet~Respaldos diarios con prueba de restauración (RNF-D-2).}
+\kvrow{Plazo de conservación y eliminación}{Según ``Retención y archivado'' (§5.1): datos del proyecto hasta 12 meses después de su cierre, auditoría 12 meses, IP 90 días. La eliminación la ejecuta una tarea programada que borra los registros y los objetos almacenados; los respaldos que los contienen expiran a los 30 días.}
+\kvrow{Derechos del titular}{%
+El requisito RF-21 implementa el acceso, la rectificación y la supresión desde el perfil del usuario.\par
+\textbullet~\textbf{Acceso y portabilidad:} desde su perfil, el usuario descarga sus datos y sus archivos en formato estructurado (JSON y ZIP).\par
+\textbullet~\textbf{Rectificación:} edita su nombre y correo desde su perfil.\par
+\textbullet~\textbf{Supresión:} puede solicitar eliminar su cuenta. Se borran sus datos de identificación y los archivos que subió; sus comentarios y revisiones quedan como ``Usuario eliminado'' para no romper el historial de los demás participantes, y se avisa a los gestores del proyecto.\par
+\textbf{Oposición y bloqueo:} por solicitud al correo de contacto del responsable.\par
+Las solicitudes se atienden dentro del plazo que fija la Ley 21.719; el objetivo interno es 15 días hábiles. Durante el semestre, el responsable del tratamiento es el equipo del proyecto, con el líder de datos y seguridad como contacto.}
+\kvrow{Normativa considerada}{%
+\textbullet~Ley 19.628 sobre protección de la vida privada, modificada por la Ley 21.719, que entra en vigencia el 1 de diciembre de 2026, durante el desarrollo del proyecto (REF-10). El diseño se ajusta desde ya a la versión modificada.\par
+\textbullet~Ley 17.336 de Propiedad Intelectual: los archivos entregados son obra de sus autores; el sistema no los publica ni los reutiliza.\par
+\textbullet~Reglamentos de titulación de cada institución (REF-5, REF-6, REF-7): el sistema no reemplaza los registros oficiales (§1.2).\par
+No aplica el RGPD europeo, porque el sistema no está dirigido a personas en la Unión Europea.}
+\kvrow{Encargados o terceros que acceden a datos}{%
+\textbullet~\textbf{Proveedor de nube (AWS: servidor virtual y almacenamiento, §9.3):} aloja todos los datos. Se usará la región más cercana disponible. Si esa región está fuera de Chile, existe una \textbf{transferencia internacional de datos}, que se informa en la política de privacidad y se respalda en el acuerdo de tratamiento de datos del proveedor.\par
+\textbullet~\textbf{Servicio de correo:} recibe nombre, correo y el texto del aviso.\par
+No intervienen proveedores de identidad externos (RNF-S-1).}
+\kvrow{Licenciamiento de dependencias de terceros}{Política: solo dependencias con licencias permisivas (MIT, BSD, Apache 2.0, licencia de PostgreSQL), coherente con §7.3. Ejemplos de la alternativa ALT-1 (§8): React (MIT), FastAPI (MIT), PostgreSQL (PostgreSQL License), Docker Engine (Apache 2.0). La lista definitiva se fija en E2 y se verifica automáticamente en la integración continua con una herramienta que reporte las licencias de todas las dependencias. No se usarán conjuntos de datos ni recursos gráficos sin licencia de uso. La licencia del código propio del proyecto se decidirá en E2.}
+\kvrow{Consentimiento en las instancias de validación}{Antes de cada entrevista o prueba de uso se entrega a cada participante una hoja informativa y un formulario de consentimiento (Anexo H), que se firma o se confirma por correo. Las notas se guardan con códigos (P1, P2…) en vez de nombres, solo el equipo accede a ellas y se eliminan al cierre del semestre. Las pruebas sobre el prototipo usan datos sintéticos, nunca proyectos reales de los participantes.}
+\end{kv}
+
+% =====================================================================
+\clearpage
+\section{Reglas de negocio}
+Las reglas definen la lógica que el sistema debe respetar sin importar la interfaz. El ciclo de vida de los entregables (RB-9 y RB-10) corresponde a la máquina de estados de CI-1 (§2.7).
+
+\begin{xltabular}{\linewidth}{|P{1.2cm}|P{3.8cm}|L|P{2.6cm}|}
+\hline\hrow \h{ID} & \h{Regla} & \h{Descripción y condiciones} & \h{RF que la implementan} \\ \hline
+\endhead
+RB-1 & Creación de proyectos & Solo un usuario de tipo profesor puede crear un proyecto. Quien lo crea queda automáticamente como gestor. & RF-4 \\ \hline
+RB-2 & Composición mínima & Todo proyecto tiene en todo momento al menos un gestor y al menos un colaborador. No se puede guardar un proyecto que deje de cumplirlo. & RF-4, RF-5 \\ \hline
+RB-3 & Un rol por proyecto & Un usuario tiene un solo rol en cada proyecto (gestor o colaborador), pero puede tener roles distintos en proyectos distintos (§1.3). & RF-4, RF-5 \\ \hline
+RB-4 & Visibilidad por participación & Un usuario solo puede ver y acceder a los proyectos en que participa, y a sus hitos, entregables, entregas y comentarios. & RF-2, RF-3 (RNF-S-2) \\ \hline
+RB-5 & Edición de la estructura & Solo los gestores pueden crear o editar hitos y entregables, y editar la información del proyecto. & RF-5, RF-6, RF-7, RF-8, RF-9 \\ \hline
+RB-6 & Fecha límite válida & Al crear o editar un entregable, su fecha límite no puede ser anterior a la fecha y hora actuales. & RF-8, RF-9 \\ \hline
+RB-7 & Entregas versionadas e inmutables & Solo los colaboradores realizan entregas. Cada entrega crea una versión nueva con número correlativo (1, 2, 3…). Una entrega enviada no se modifica ni se borra; una corrección se hace con una nueva versión. & RF-10, RF-12 \\ \hline
+RB-8 & Formato y tamaño de archivos & Cada entregable define los formatos admitidos y un tamaño máximo por archivo (por omisión, 50 MB). Una entrega con archivos fuera de esos límites se rechaza completa. & RF-8, RF-10 (RNF-C-2) \\ \hline
+RB-9 & Transiciones de estado del entregable & Pendiente $\rightarrow$ Entregado: cuando un colaborador hace una entrega. Entregado $\rightarrow$ Aprobado o Cambios solicitados: cuando un gestor revisa. Cambios solicitados $\rightarrow$ Entregado: cuando un colaborador entrega una nueva versión. Aprobado es un estado final en el MVP. Ninguna otra transición está permitida. & RF-10, RF-13, RF-14 \\ \hline
+RB-10 & Condición de atraso & Un entregable está atrasado cuando la fecha actual supera su fecha límite y no está aprobado, y no tiene ninguna entrega anterior a la fecha límite. Se calcula en cada consulta y no se almacena (§1.3). No es uno de los estados de RB-9: la interfaz lo muestra como una marca ``Atrasado'' junto al estado. Se aceptan entregas fuera de plazo; quedan registradas con su fecha real, pasan el entregable a Entregado y mantienen la marca hasta que se apruebe. & RF-10, RF-13, RF-16 \\ \hline
+RB-11 & Revisión solo por gestores & Solo un gestor del proyecto puede aprobar o solicitar cambios, y solo sobre la última entrega de un entregable que tenga al menos una entrega. & RF-14 \\ \hline
+RB-12 & Completado de hitos & Un hito pasa a completado automáticamente cuando todos sus entregables están aprobados. Un gestor también puede marcarlo como completado manualmente (p.~ej., para hitos sin archivo, como la inscripción del tema). & RF-20 \\ \hline
+RB-13 & Uso de plantillas & Una plantilla de hitos solo se aplica al crear un proyecto. Sus hitos se copian al proyecto; cambios posteriores a la plantilla no afectan a proyectos ya creados, y viceversa. & RF-15 \\ \hline
+RB-14 & Límite de avisos del foro & Por cada foro de entregable se envía a lo más un correo por destinatario y por día. Los avisos de entregas, revisiones y cambios de plazos no tienen este límite. & RF-17 \\ \hline
+RB-15 & Participación en el foro & Solo los participantes del proyecto pueden publicar en el foro de un entregable. Un mensaje no puede estar vacío. & RF-11 \\ \hline
+RB-16 & Tablero de solo lectura & El tablero kanban solo muestra el estado calculado de cada entregable; no permite mover tarjetas para cambiar su estado. & RF-16 \\ \hline
+RB-17 & Acceso al historial de versiones & Los gestores ven todas las versiones de un entregable. Los colaboradores ven y descargan solo la última versión. & RF-12 \\ \hline
+RB-18 & Exportación de plazos & El archivo de calendario de un proyecto incluye solo los entregables con fecha límite definida. & RF-18 \\ \hline
+RB-19 & Retención y supresión & Los datos de un proyecto se eliminan 12 meses después de su cierre. Al eliminar una cuenta, sus comentarios y revisiones quedan atribuidos a ``Usuario eliminado'' (§5.3). & RF-21 \\ \hline
+RB-20 & Cuentas por invitación & No existe registro abierto. Las cuentas de tipo profesor las da de alta el equipo operador a solicitud del profesor. Las demás cuentas se crean cuando un gestor agrega a un proyecto un correo institucional que aún no tiene cuenta. El correo es el identificador único de la cuenta, y la cuenta se activa solo después de aceptar el consentimiento (§5.3). & RF-1, RF-19 \\ \hline
+\end{xltabular}
+
+% =====================================================================
+\clearpage
+\section{Consideraciones éticas, sociales, ambientales y del contexto}
+
+\subsection{Salud pública, seguridad y bienestar}
+\begin{kv}
+\kvrow{¿El sistema puede afectar la salud, la seguridad o el bienestar de alguien?}{Sí, principalmente el bienestar psicológico (estrés académico) y la exposición de privacidad.}
+\kvrow{Cómo}{La proximidad de las fechas de entrega genera altos niveles de estrés, y un fallo del sistema en esos momentos afecta gravemente la salud mental. Además, existe riesgo de exposición de datos personales y documentos de investigación no publicados. Los datos tratados (nombre, correo institucional, historial de evaluaciones y archivos) tienen como base de licitud el consentimiento del titular, otorgado al activar su cuenta, y, en el caso de los registros de auditoría, el interés legítimo por resolver disputas sobre plazos y entregas, según se detalla en §5.3, conforme a la Ley 19.628 y la Ley 21.719 (REF-10).}
+\kvrow{Qué se diseñó para prevenirlo}{Para la salud mental: El sistema permite subidas fuera de plazo marcándolas como "Atrasadas", sin generar pánico en el estudiante. Para la seguridad de la información: Implementación de RBAC estricto (RNF-S-2), cifrado TLS 1.2+ en tránsito (RNF-S-3). Los usuarios ejercen sus derechos como titulares de sus datos desde su perfil (RF-21) o por solicitud al correo de contacto del responsable (§5.3).}
+\kvrow{Qué queda como riesgo residual}{Cortes de energía locales o fallas del proveedor de internet del estudiante justo antes de la fecha límite. Este riesgo se mitiga comunicando explícitamente que los estudiantes deben mantener copias locales y no esperar al último minuto.}
+\end{kv}
+
+\subsection{Factores sociales, culturales y globales}
+\begin{kv}
+\kvrow{Quién queda excluido si el sistema funciona como está diseñado}{Estudiantes en zonas con baja conectividad que no logren subir archivos pesados, y usuarios con discapacidades severas no cubiertas por el estándar de accesibilidad WCAG 2.1 AA (RNF-U-1).}
+\kvrow{Riesgos de sesgo}{Solamente los sesgos relacionados a la persona con la que se trata, no del programa en sí mismo.}
+\kvrow{Adecuación cultural y lingüística}{Interfaz configurada con terminología académica estándar en español, adecuada para el contexto universitario sin recurrir a términos innecesarios.}
+\kvrow{Efecto sobre el trabajo de las personas}{Automatiza el seguimiento de estados, reduciendo el trabajo manual del mismo por profesores y unificando la plataforma en donde gestionan y revisan sus proyectos.}
+\kvrow{Factores globales}{El sistema está pensado para la educación superior chilena, pero tres aspectos lo conectan con un contexto más amplio. Primero, los datos se alojan con un proveedor de nube global; si la región usada está fuera de Chile, hay una transferencia internacional de datos, que se informa en la política de privacidad (§5.3). Segundo, el sistema depende de servicios y precios de proveedores extranjeros, por lo que un cambio en sus condiciones afecta la operación (R-8); el despliegue en contenedores estándar permite cambiar de proveedor. Tercero, las plantillas de hitos permiten representar procesos de titulación de otras instituciones sin cambiar el código (restricción \textbf{extensibility}, §2.6), pero usar el sistema fuera de Chile exigiría traducir la interfaz, hoy solo en español, y revisar la normativa de datos del país, por ejemplo el RGPD europeo, que hoy no aplica (§5.3). Esa extensión queda fuera del alcance de este proyecto.}
+\end{kv}
+
+\subsection{Factores ambientales y de sustentabilidad}
+\begin{kv}
+\kvrow{Consumo de cómputo, almacenamiento o energía}{Optimizado mediante la restricción de formatos admitidos y límites de tamaño por entrega. Se prioriza el uso de componentes y librerías de código abierto (que no sean del tipo \textit{Copyleft}), evitando dependencias de software propietario pesado y reduciendo el consumo de cómputo en el servidor.}
+\kvrow{Efecto ambiental del proceso que el sistema modifica}{Impacto positivo. Vuelve el proceso más eficiente para la gestión de proyectos, lo que indirectamente ahorra recursos energéticos al reducir el tiempo que el usuario usa el sistema y por tanto el dispositivo, y además ahorra recursos espaciales ya que mitiga la duplicidad de datos en distintas plataformas.}
+\kvrow{Sustentabilidad de la operación}{El sistema se despliega en contenedores Docker estándar sobre infraestructura en la nube administrada por el equipo, y su costo se controla dentro del presupuesto de nube del proyecto. Como el sistema no depende de un convenio con la universidad (§2.3), su operación no requiere apoyo institucional. Si a futuro una universidad lo adopta de forma institucional, el uso de contenedores estándar permitiría que su DTI asuma el mantenimiento con un costo marginal bajo dentro de su infraestructura actual.}
+\end{kv}
+
+\subsection{Factores económicos}
+\begin{kv}
+\kvrow{Efecto económico en el escenario}{En el escenario de la Facultad de Ingeniería (§2.3), el seguimiento centralizado puede reducir el tiempo que los profesores dedican a buscar entregas, recuperar comentarios y coordinar plazos. El ahorro se estimará con las entrevistas y la validación de uso (EV-7, §10).}
+
+\kvrow{Costo total de propiedad}{El costo total de propiedad incluye el servidor, el almacenamiento de objetos, el servicio de correo y las horas de soporte técnico. Para el escenario de \S~2.3 se estima un crecimiento de 33 a 66~GB de archivos al año y un costo de operación de USD~8 a 9,5 mensuales (\S~9.3).}
+
+\kvrow{Qué ocurre si el presupuesto supuesto no alcanza para sostener la operación}{El sistema se degradaría a un entorno de solo lectura. Se conservarían los historiales e hitos para cumplir con las auditorías de evaluación en curso, pero la recepción de nuevos documentos volvería al flujo tradicional a elección del profesor de forma provisoria.}
+\end{kv}
+
+% =====================================================================
+\section{Espacio de soluciones preliminar}
+\subsection{Alternativas candidatas}
+\begin{xltabular}{\linewidth}{|P{1.4cm}|L|P{2.8cm}|P{2.6cm}|P{2.2cm}|P{2.4cm}|}
+\hline\hrow \h{ID} & \h{Idea de solución} & \h{Arquitectura y tecnologías} & \h{Modelo de operación} & \h{Costo aproximado} & \h{Principal incertidumbre} \\ \hline
+\endhead
+ALT-1 & Desarrollo independiente desacoplado, diseñado para uso individual de cualquier profesor y de sus estudiantes supervisados, almacenando documentos ligeros y enlaces externos. & Arquitectura Cliente-Servidor. Frontend en React y API REST backend (ej. FastAPI), con base de datos relacional (PostgreSQL). & Despliegue en contenedores Docker sobre un servidor virtual (VPS) económico, administrado por el propio equipo/docente. & ~\$7.50 USD mensuales al inicio y hasta ~\$9.50 USD con el almacenamiento en régimen (§9.3). & Mayor complejidad inicial al configurar el enrutamiento y la comunicación entre frontend y backend separados, e intentar hacer la herramienta de uso ``lo más general posible'' arriesga una menor adopción contra sistemas ya integrados a la institución a la que pertenece el público objetivo (docentes). \\ \hline
+ALT-2 & Desarrollo fuertemente acoplado al contexto de la universidad, integrándose a los sistemas institucionales existentes. & Aplicación monolítica tradicional (ej. Python Flask + framework de frontend: Bootstrap, Tailwind CSS, etc.) consumiendo APIs institucionales o haciendo web scraping. & Alojamiento sobre los servidores internos de la DTI, administrado por personal de la universidad. & \$0 mensual directo (costo absorbido por la infraestructura UdeC), sujeto a un acuerdo con la DTI que hoy no existe (§2.3). & Dependencia absoluta de la autorización de la DTI para el despliegue y falta de APIs públicas estables para consumir datos oficiales. \\ \hline
+ALT-3 & Adopción y extensión de un sistema de gestión de tesis Open-Source integral existente (ej. TUM Thesis Management, REF-8). & Fork del código fuente original, adaptando su arquitectura base y modelo de datos a la normativa chilena. & Alojamiento del stack completo mediante Docker Compose en un VPS de mayor capacidad. & ~\$10 - \$20 USD mensuales (suele exigir más RAM y CPU). & Curva de aprendizaje alta para comprender, modificar y traducir una base de código ajena y compleja antes del MVP de la semana 13, y riesgo de superar el límite de USD 10 mensuales. \\ \hline
+\end{xltabular}
+
+\subsection{Criterios de evaluación previstos y su origen}
+Las restricciones de costo y plazo funcionan además como filtro: una alternativa que las incumple se descarta antes de puntuarla. Las alternativas que pasan el filtro reciben entre 1 y 3 puntos por criterio: 3 puntos al mejor caso, 1 punto al peor y 2 puntos a los casos intermedios.
+
+\begin{xltabular}{\linewidth}{|L|P{4.2cm}|P{2.8cm}|P{3.6cm}|}
+\hline\hrow \h{Criterio} & \h{Origen (RF / RNF / restricción)} & \h{Peso previsto} & \h{Cómo se puntuará} \\ \hline
+\endhead
+Viabilidad económica & Restricción: \textbf{cost} ($\le$ USD 10/mes para operación del sistema) & 25\% & 3 puntos a la alternativa con menor costo sostenido y mayor previsibilidad; 1 punto a la de mayor costo o a aquella cuyo costo depende de un acuerdo externo que no está asegurado. \\ \hline
+Curva de aprendizaje & Restricción: \textbf{schedule} (MVP demostrable en la semana 13) & 30\% & 3 puntos a la alternativa sobre la que el equipo tiene mayor control y experiencia previa; 1 punto si implica alta curva de aprendizaje. \\ \hline
+Flexibilidad y adaptabilidad a otros reglamentos institucionales & Restricción: \textbf{extensibility} (No acoplar a un único reglamento) & 20\% & 3 puntos a la arquitectura que permita crear lógicas dinámicas o plantillas sin alterar el código fuente; 1 punto si el flujo queda rígido. \\ \hline
+Despliegue y portabilidad & RNF-P-1 (Entornos e Infraestructura en contenedores Docker) & 15\% & 3 puntos a la solución que se pueda contenerizar y desplegar íntegramente de forma autónoma; 1 punto si requiere configuraciones manuales o servidores dedicados. \\ \hline
+Independencia de sistemas externos o cerrados & Restricción: \textbf{interoperability} y RF-1 (Inicio de sesión autónomo) & 10\% & 3 puntos a la opción que funcione de manera independiente, con inicio de sesión propio (RNF-S-1); 1 punto si requiere consumir APIs cerradas de la universidad. \\ \hline
+\end{xltabular}
+
+\subsection{Prueba de concepto planificada}
+\textbf{ALT-1.} La principal incertidumbre es la comunicación entre el frontend y el backend separados. Se construirá un prototipo mínimo: una vista en React que inicie sesión y suba un documento a través de una API en FastAPI, desplegado con Docker en el mismo tipo de VPS que se usaría en producción. Luego se someterá a una prueba de carga según la demanda estimada en §2.3. Se descarta ALT-1 si el prototipo no soporta la demanda estimada sin superar USD 10 mensuales.
+
+\textbf{ALT-2.} Por diseño, ALT-2 queda acoplada al reglamento de la UdeC, lo que incumple la restricción de extensibilidad, y depende de un acuerdo con la DTI que hoy no existe (§2.3). Debido a esto, se descarta ALT-2.
+
+\textbf{ALT-3.} Una revisión preliminar de la documentación de TUM Thesis Management (REF-8) muestra dos problemas de ajuste. Primero, incluye funciones fuera del alcance de este proyecto, como el proceso de postulación de estudiantes a temas de tesis. Segundo, su flujo de trabajo y su modelo de datos siguen el proceso de la TUM, que no coincide con el de las memorias de título en Chile. Si ese flujo está fijado en el código, adaptarlo significaría reemplazar el acoplamiento a un reglamento por el acoplamiento a otro, lo que incumple la restricción de extensibilidad. Además, quitar los módulos sobrantes y construir los requisitos que no cubre no cabe en el plazo del MVP (restricción \textbf{schedule}). Por estos motivos se descarta ALT-3.
+
+
+% =====================================================================
+\clearpage
+\section{Priorización, plan, presupuesto y equipo}
+
+\subsection{Matriz MoSCoW}
+\begin{xltabular}{\linewidth}{|P{2.6cm}|L|P{6.0cm}|}
+\hline\hrow \h{Categoría} & \h{Requisitos (IDs)} & \h{Justificación} \\ \hline
+\endhead
+Must (M) & RF-1, RF-2, RF-3, RF-4, RF-5, RF-6, RF-8, RF-9, RF-10, RF-12, RF-13, RF-14 & Se alinean primariamente con los objetivos de alto nivel más básicos definidos en la Sección 1, \textbf{O1} y \textbf{O2}, que definen el núcleo de la idea detrás del proyecto: crear una vista unificada para quienes revisan las entregas, permitir a colaboradores subir entregas en formatos ligeros, y mantener actualizado el estado actual de una entrega de un colaborador particular, al igual que permitir al docente o gestor fácilmente visualizar esta información. RF-12 (registro de entregas previas) se incluye porque el objetivo O2 exige conservar el historial completo y porque la prueba de aceptación PA-2 requiere que el profesor vea todas las versiones con su revisión. \\ \hline
+Should (S) & RF-7, RF-11, RF-17, RF-19, RF-20, RF-21 & RF-11 (comentarios de una entrega) es una feature presente en casi todo software moderno con algún tipo de ``buzón de entregas'', pero no es estrictamente esencial para un MVP o un prototipo de primera instancia. RF-7 se clasifica como Should porque el flujo principal de creación de hitos, entrega y revisión puede completarse sin esta función.
+
+Se puede alzar un argumento similar para RF-17 (notificaciones por correo), aunque este recibiría una prioridad mayor que RF-11, pues no se espera que los usuarios mantengan la aplicación abierta en todo instante para informarse de nuevas actualizaciones. Sin embargo, su dependencia sobre una correcta implementación de lo descrito en ``Must'', y al no ser esencial para un MVP, hace que se mueva a ``Should''.
+
+RF-19 (alta e invitación de cuentas), RF-20 (completado de hitos) y RF-21 (derechos del titular) son necesarios para operar con usuarios reales, pero no para la demostración del MVP, que usa cuentas y datos sintéticos cargados de antemano. Deben estar listos en E4, antes de cualquier uso con datos reales (§10). \\ \hline
+Could (C) & RF-15, RF-16, RF-18 & Compuesto de características Quality-of-Life no esenciales para ninguna fase del proyecto: plantillas de hitos, tablero kanban y exportación de plazos a calendario. Solo se abordan después del MVP (R-11). \\ \hline
+Won't (W) & Ver Sección 1.2 & Siguiendo más bien una metodología de modelamiento en cascada, se descartaron inmediatamente requisitos funcionales que no serían relevantes o que se escapasen del scope del proyecto, por ende no se incluye ningún RF con prioridad Won't. Sin embargo, en la sección 1.2, se describieron elementos fuera del alcance del proyecto: Se evitan integrar procesos o sistemas académicos oficiales para otorgar un enfoque más preciso: la plataforma es \textbf{sólo} de gestión y seguimiento del trabajo de los tesistas/estudiantes/investigadores/etc., no reemplaza al proceso administrativo de la organización que lo utiliza, sino que lo complementa. \\ \hline
+\end{xltabular}
+
+\begin{kv}
+\kvrow{Definición del MVP}{El MVP es la versión que se demuestra en la semana~13. Implementa los 12 requisitos ``Must'' (RF-1 a RF-6, RF-8 a RF-10 y RF-12 a RF-14) y está desplegado con Docker en el servidor de pruebas, con una base de datos poblada con datos sintéticos.\par
+\textbf{Qué se demuestra:} las pruebas de aceptación PA-1 a PA-4 de §10, ejecutadas de principio a fin con dos cuentas (un profesor y un estudiante):\par
+\textbullet~PA-1: el profesor crea un proyecto con dos hitos y un entregable con fecha límite, y el estudiante lo ve al iniciar sesión.\par
+\textbullet~PA-2: el estudiante sube la versión 1, el profesor solicita cambios, el estudiante sube la versión 2 y el profesor aprueba; el profesor ve ambas versiones en el historial.\par
+\textbullet~PA-3: un entregable vencido aparece con la marca ``Atrasado'' y acepta una entrega tardía con su fecha real.\par
+\textbullet~PA-4: un estudiante no puede abrir un proyecto en el que no participa.\par
+\textbf{Qué no incluye:} invitación de cuentas por correo (las cuentas de la demo se cargan de antemano), notificaciones, foro de comentarios, completado de hitos, plantillas, tablero kanban y exportación a calendario (requisitos ``Should'' y ``Could''). Tampoco se compromete una interfaz pulida: basta con que las tareas se completen.\par
+\textbf{Criterio de cumplimiento:} pasa el 100\,\% de los criterios de aceptación de los 12 RF ``Must'' (restricción \textbf{schedule}, §2.6).}
+\end{kv}
+
+\subsection{Hitos y carta Gantt}
+\begin{xltabular}{\linewidth}{|P{3.4cm}|P{1.8cm}|L|P{2.6cm}|P{3.2cm}|}
+\hline\hrow \h{Hito} & \h{Semana objetivo} & \h{Alcance comprometido} & \h{Responsable} & \h{Dependencias y holgura} \\ \hline
+\endhead
+E1 - Avance escrito & 9 & Los objetivos definidos en este documento. & Todo el equipo & Dependencias: definición de la problemática y validación preliminar de la propuesta.\newline Holgura: ninguna; fecha fija del curso, ya cumplida. \\ \hline
+H1 - Prueba de concepto de ALT-1 (hito interno) & 10 & Prototipo mínimo de §8.3 desplegado con Docker en el servidor virtual y sometido a la prueba de carga. & Arquitecto (Fabián), Líder de operación (Martín) & Dependencias: E1 entregado y servidor virtual contratado.\newline Holgura: 1 semana; puede cerrarse hasta la semana 11 sin afectar E2 (R-1). \\ \hline
+H2 - Validación de concepto (hito interno) & 10 & Entrevistas a 3 a 5 profesores guía con la pauta del Anexo A (§10). & Líder de calidad (Matías), Product Owner (Guillermo) & Dependencias: entrevistas agendadas desde la semana 9 (R-4).\newline Holgura: 1 semana; las entrevistas pueden terminar en la semana 11. \\ \hline
+E2 - PDR & 11 & Infraestructura y tech-stack concretados, y una arquitectura desarrollada hasta el nivel C3+UML, junto a la evaluación de distintas arquitecturas. & Product Owner (Guillermo), Arquitecto (Fabián), Líder de datos (Antonio) & Dependencias: retroalimentación de E1 recibida, H1 y H2 terminados.\newline Holgura: 2 días; el borrador completo se cierra 2 días antes de la entrega. \\ \hline
+H3 - Flujo núcleo integrado (hito interno) & 12 & RF-1 a RF-6, RF-8 y RF-10 integrados en el entorno de pruebas: un profesor crea un proyecto con hitos y entregables, y un estudiante entrega. & Todo el equipo, según la distribución de §9.4 & Dependencias: modelo de datos y contrato de API definidos en E2.\newline Holgura: 3 días; si al final de la semana 12 hay menos de la mitad de los RF ``Must'', se activa R-1. \\ \hline
+MVP demostrable & 13 & Los 12 RF de prioridad ``Must'' implementados y las pruebas PA-1 a PA-4 ejecutables de principio a fin, según la definición del MVP de §9.1. & Todo el equipo, según la distribución de §9.4 & Dependencias: H3 terminado y entorno de contenedores Docker desplegado.\newline Holgura: 2 días; las funciones se congelan 2 días antes de la demostración y ese tiempo se usa solo para corregir defectos. \\ \hline
+E3 - CDR & 14 & Correcciones del Preliminary Design Review integradas, evidencia y validación de requisitos funcionales y no funcionales a través de tests y demos con usuarios reales. En caso de requerirlo, replanificación de la línea de tiempo o de debilidades arquitectónicas. & Líder de calidad (Matías), Product Owner (Guillermo) & Dependencias: MVP demostrable funcional, plan de pruebas de software ejecutado, validación de uso realizada (§10).\newline Holgura: 2 días. \\ \hline
+E4 - Informe final & 17 & Todos los RF de prioridad ``Must'' y ``Should'' implementados, los ``Could'' que el tiempo permita, y un plan de despliegue y operación robusto aplicable más allá del fin del curso en caso de ser necesario. & Todo el equipo & Dependencias: retroalimentación de E3 (CDR) aplicada, código base congelado (code freeze).\newline Holgura: 1 semana; los RF ``Should'' se implementan en las semanas 15 y 16, y la semana 17 queda para el informe. \\ \hline
+E5 - Defensa y demo & 18 & Mismo que E4, sumado a correcciones ofrecidas. & Todo el equipo & Dependencias: informe E4 entregado, despliegue de producción estable, guion de demostración ensayado.\newline Holgura: 2 días para ensayar la demostración. \\ \hline
+\end{xltabular}
+
+
+\subsection{Presupuesto y recursos}
+\subsubsection*{Horas-hombre por rol}
+
+De acuerdo al Syllabus, el presente informe se entrega durante la Semana 9, y la entrega final durante la Semana 18, por lo que se evalúan 9 semanas de trabajo (Semanas 10-18) y 5 horas de trabajo semanal fuera de clases por integrante. El valor hora de referencia se extrae de un sueldo promedio de un ingeniero informático en Chile (\$800.000-1.200.000), fijándose en \$1.000.000 mensuales.
+
+\begin{xltabular}{\linewidth}{|P{4.2cm}|L|P{2.4cm}|P{3.0cm}|P{2.2cm}|}
+\hline\hrow \h{Rol} & \h{Integrante} & \h{Horas estimadas} & \h{Valor hora de referencia} & \h{Subtotal} \\ \hline
+\endhead
+Jefe de proyecto / Product Owner & Guillermo Oliva & 45 & \$5.556 & \$250.020 \\ \hline
+Arquitecto / Líder técnico & Fabián González & 45 & \$5.556 & \$250.020 \\ \hline
+Líder de calidad (QA) & Matías Olivas & 45 & \$5.556 & \$250.020 \\ \hline
+Líder de datos y seguridad & Antonio Skorin & 45 & \$5.556 & \$250.020 \\ \hline
+Líder de operación y despliegue & Martín Llanos & 45 & \$5.556 & \$250.020 \\ \hline
+\textbf{Total horas-hombre} & & 225 &  & \$1.250.100 \\ \hline
+\end{xltabular}
+
+\subsubsection*{Infraestructura, licencias y servicios}
+\begin{xltabular}{\linewidth}{|P{4.2cm}|L|P{2.4cm}|P{2.0cm}|P{2.4cm}|}
+\hline\hrow \h{Ítem} & \h{Proveedor} & \h{Costo mensual} & \h{Meses} & \h{Total} \\ \hline
+\endhead
+
+Servidor virtual (Linux VPS para contenedores) & AWS Lightsail & \$7.00 & 5 & \$35.00 \\ \hline
+
+Motor de base de datos relacional & PostgreSQL (Autoalojado vía Docker) & \$0.00 & 5 & \$0.00 \\ \hline
+
+Almacenamiento de archivos (Object Storage) & AWS S3. Provisión de USD~0,50 al mes: durante el semestre solo se almacenan datos sintéticos y los de la validación, muy por debajo del escenario de \S~2.3. & \$0.50 & 5 & \$2.50 \\ \hline
+
+Servicio de envío de correos (SMTP/API) & AWS SES o SendGrid. Se presupuesta USD~0 al mes sujeto a que los envíos estimados en \S~5.2 estén cubiertos por la cuota sin costo del servicio que se seleccione. & \$0.00 & 5 & \$0.00 \\ \hline
+
+\end{xltabular}
+
+\begin{kv}
+\kvrow{\textbf{Total del proyecto}}{\$37.50 USD}
+\kvrow{Costo de operación proyectado (mensual, post-semestre)}{USD~8 a 9,5 con el escenario completo de \S~2.3: servidor virtual USD~7; almacenamiento USD~1,2 a 2,3 por los 50 a 100~GB almacenados en régimen, a una tarifa de referencia de USD~0,023 por GB al mes (REF-20, por confirmar en E2 para la región elegida); y correo dentro de la cuota sin costo o con un costo menor que USD~0,5. El total se mantiene bajo el límite de USD~10 de \S~2.6, con poco margen; por eso se vigila con la alerta de presupuesto de R-8.}
+\end{kv}
+
+\subsection{Equipo y roles}
+Los roles de la tabla indican quién responde por cada área, pero no implican exclusividad. La columna \emph{Responsable de que exista} significa que esa persona vela por que el entregable se complete y tenga la calidad esperada, no que deba construirlo por su cuenta. Dado que el equipo es pequeño y el proyecto avanza de forma flexible, el desarrollo del sistema es una responsabilidad compartida: todos los integrantes apoyan en el desarrollo, implementan funcionalidades
+de cualquier módulo y revisan el trabajo de los demás antes de integrarlo.
+\begin{xltabular}{\linewidth}{|P{3.6cm}|P{3.6cm}|L|P{3.8cm}|}
+\hline\hrow \h{Integrante} & \h{Rol principal} & \h{Responsable de que exista} & \h{Secciones de este documento a su cargo} \\ \hline
+\endhead
+Guillermo Oliva & Jefe de proyecto / Product Owner & Visión del producto, matriz MoSCoW, carta Gantt, reuniones y planificación. & §5 (Datos y legales), §6 (Reglas de negocio) \\ \hline
+Fabián González & Arquitecto / Líder técnico & Diseño de la arquitectura (C4), pruebas de concepto y selección de tecnologías. & §3 (R.F.), §4 (R.N.F.). \\ \hline
+Matías Olivas & Líder de calidad (QA) & Plan de pruebas, cumplimiento de los RNF y validación con usuarios. & §7 (Ética), §11, §12 \\ \hline
+Antonio Skorin & Líder de datos y seguridad & Modelo de datos normalizado (BCNF) y cumplimiento normativo de privacidad.  & §1 (Contexto), §2 (Descripción general) \\ \hline
+Martín Llanos & Líder de operación y despliegue & Infraestructura Docker, pipeline CI/CD y control del presupuesto de nube. & §8, §9, §10 \\ \hline
+\end{xltabular}
+
+La implementación de los 12 requisitos ``Must'' del MVP se reparte entre los cinco integrantes, de modo que ninguno concentre el desarrollo. Cada bloque tiene un responsable y un revisor distinto, para que al menos dos personas conozcan cada módulo (R-7). La distribución es inicial y se ajusta en la reunión semanal según la carga de cada uno.
+
+\begin{xltabular}{\linewidth}{|P{4.2cm}|L|P{3.2cm}|P{3.2cm}|}
+\hline\hrow \h{Bloque del MVP} & \h{Requisitos} & \h{Responsable} & \h{Revisor} \\ \hline
+\endhead
+Sesión y despliegue & RF-1, entorno Docker y servidor de pruebas & Martín Llanos & Fabián González \\ \hline
+Vistas de proyecto y estado & RF-2, RF-3, RF-13 & Guillermo Oliva & Matías Olivas \\ \hline
+Proyectos y participantes & RF-4, RF-5, esquema de la base de datos & Antonio Skorin & Guillermo Oliva \\ \hline
+Hitos y entregables & RF-6, RF-8, RF-9 & Matías Olivas & Antonio Skorin \\ \hline
+Entregas, historial y revisión & RF-10, RF-12, RF-14 & Fabián González & Martín Llanos \\ \hline
+\end{xltabular}
+
+% =====================================================================
+\clearpage
+\section{Criterios de aceptación y validación}
+\begin{kv}
+\kvrow{Definición de Terminado (DoD)}{Un requisito se considera terminado cuando cumple todo lo siguiente:\par
+\textbullet~Sus criterios de aceptación (§3) están automatizados como pruebas y todas pasan en la integración continua.\par
+\textbullet~La cobertura de pruebas de la lógica de negocio se mantiene en 80\,\% o más (RNF-M-1), y las transiciones de estado se prueban de forma exhaustiva según CI-1.\par
+\textbullet~El código fue revisado por al menos otro integrante mediante \emph{pull request} antes de integrarse.\par
+\textbullet~Las reglas de negocio de §6 que le aplican tienen pruebas propias.\par
+\textbullet~Los RNF asociados en §3.2 se verificaron con el método indicado en §4 cuando corresponde (p.~ej., tiempo de respuesta medido).\par
+\textbullet~No quedan defectos abiertos de severidad alta.\par
+\textbullet~Está desplegado y funcionando en el entorno de pruebas con contenedores (RNF-P-1).\par
+\textbullet~La matriz de trazabilidad (§11) está actualizada.}
+\kvrow{Pruebas de aceptación de alto nivel}{Escenarios que un usuario de los perfiles de §2.4 reconocería. Cada uno se ejecuta sobre datos sintéticos.\par
+\textbf{PA-1. Montar un proyecto.} Un profesor crea un proyecto de memoria, agrega dos hitos y un entregable con fecha límite, e incluye a un estudiante como colaborador. El estudiante ve el proyecto al iniciar sesión. (RF-1 a RF-8)\par
+\textbf{PA-2. Ciclo completo de revisión.} El estudiante sube la versión 1; el profesor solicita cambios con un comentario; el estudiante sube la versión 2; el profesor aprueba. Al final, el entregable está aprobado, el profesor ve ambas versiones con su revisión y no se perdió nada. (RF-10, RF-12, RF-13, RF-14)\par
+\textbf{PA-3. Entrega fuera de plazo.} Vence la fecha límite sin entrega: el entregable aparece como atrasado. El estudiante entrega después y la entrega se acepta con su fecha real. (RF-10, RF-13, RB-10)\par
+\textbf{PA-4. Privacidad entre proyectos.} Un estudiante intenta abrir, mediante la dirección web, un proyecto en el que no participa, y el sistema se lo impide. (RB-4, RNF-S-2)\par
+\textbf{PA-5. Vista del profesor.} Un profesor con al menos tres proyectos activos identifica qué entregas esperan su revisión en menos de 30 segundos y sin ayuda (resultado esperado (a) de §1.2).\par
+\textbf{PA-6. Avisos.} Al hacer una entrega, el gestor recibe un correo; al revisarla, el colaborador recibe otro. (RF-17)}
+\kvrow{Plan de validación con usuarios}{%
+\textbf{A quiénes y cuántos:} 3 a 5 profesores guía del DIICC y, cuando sea posible, uno o dos estudiantes por profesor; al menos un participante de fuera de informática (§2.4).\par
+\textbf{1. Validación del concepto (semanas 9 a 10, antes de E2):} entrevista semiestructurada de 30 minutos con la pauta del Anexo A. Busca establecer: si el problema existe y con qué magnitud (EV-7), si el vocabulario de §1.3 y la plantilla de hitos se ajustan a su práctica, y si usarían el sistema. Criterio: al menos 3 de 5 profesores confirman el problema; si menos de 2 lo usarían, se revisa el alcance antes de E2 (riesgo R-10).\par
+\textbf{2. Validación de uso sobre el prototipo (semanas 13 a 14, antes de E3):} sesión de 20 a 30 minutos en que el participante realiza las tareas de PA-1, PA-2 y PA-5 sin ayuda, mientras un integrante observa. Instrumentos: guion de tareas, registro de éxito y tiempo por tarea, y el cuestionario SUS (\emph{System Usability Scale}, 10 preguntas estándar). Metas: al menos 85\,\% de las tareas completadas sin ayuda (restricción \textbf{usability}, §2.6) y puntaje SUS de 68 o más, que es el promedio de referencia de esa escala.\par
+Los resultados se registran en el Anexo B y los consentimientos en el Anexo H.}
+\kvrow{Requisitos regulatorios de verificación}{Verificación del cumplimiento de la Ley 21.719 antes de E4 (§5.3):\par
+\textbullet~La política de privacidad está publicada y el consentimiento se registra con fecha y versión.\par
+\textbullet~Las funciones de exportación y eliminación de datos personales (RF-21) funcionan (prueba automatizada).\par
+\textbullet~Una prueba automatizada sobre el esquema de la base de datos confirma que no existen campos de RUT ni de calificaciones.\par
+\textbullet~El certificado TLS y la configuración de cifrado se revisan con una herramienta de análisis externa (RNF-S-3).\par
+\textbullet~Los entornos que no son de producción contienen solo datos sintéticos.}
+\end{kv}
+
+\section{Trazabilidad}
+La matriz vincula cada necesidad (componentes del problema P1 a P5 de §2.3, objetivos O1 a O4 de §1.2 y evidencias EV) con los RF, los RNF, los casos de prueba y el módulo que los implementa. Los casos de prueba TC-\emph{n} corresponden a los criterios de aceptación del RF-\emph{n} de §3; los módulos son preliminares y se confirman con la arquitectura en E2.
+
+\begin{xltabular}{\linewidth}{|P{2.4cm}|P{1.2cm}|P{2.6cm}|P{2.2cm}|L|P{1.6cm}|}
+\hline\hrow \h{Evidencia / necesidad} & \h{RF} & \h{RNF asociados} & \h{Casos de prueba} & \h{Componente o módulo} & \h{Estado} \\ \hline
+\endhead
+Acceso por rol (§2.4, \textbf{legal}) & RF-1 & RNF-S-1, RNF-S-2 & TC-01.1 a TC-01.4 & Autenticación & Pendiente \\ \hline
+P1, O1 & RF-2 & RNF-R-1 & TC-02.1, TC-02.2, PA-5 & Proyectos & Pendiente \\ \hline
+P1, O1 & RF-3 & RNF-R-1, RNF-U-1, RNF-U-2, RNF-U-3 & TC-03.1 a TC-03.3 & Proyectos (vista de detalle) & Pendiente \\ \hline
+P1, O1 & RF-4 & RNF-R-3, RNF-S-2 & TC-04.1 a TC-04.3, PA-1 & Proyectos y participantes & Pendiente \\ \hline
+P1, O1 & RF-5 & RNF-S-2, RNF-D-2 & TC-05.1 a TC-05.3 & Proyectos y participantes & Pendiente \\ \hline
+P4, O3, EV-4 & RF-6 & RNF-S-2 & TC-06.1 a TC-06.3, PA-1 & Hitos & Pendiente \\ \hline
+P4, O3, EV-4 & RF-7 & RNF-S-2 & TC-07.1, TC-07.2 & Hitos & Pendiente \\ \hline
+P2, O2, EV-4 & RF-8 & RNF-S-2, RNF-D-2 & TC-08.1 a TC-08.4, PA-1 & Entregables & Pendiente \\ \hline
+P2, O2 & RF-9 & RNF-S-2, RNF-D-2 & TC-09.1 a TC-09.4 & Entregables & Pendiente \\ \hline
+P3, O2, EV-3 & RF-10 & RNF-R-1, RNF-R-3, RNF-C-2 & TC-10.1 a TC-10.4, PA-2, PA-3 & Entregas y archivos & Pendiente \\ \hline
+P3, O2 & RF-11 & RNF-S-2, RNF-M-2 & TC-11.1, TC-11.2 & Comentarios (foro) & Pendiente \\ \hline
+P3, O2 & RF-12 & RNF-D-2, RNF-S-2 & TC-12.1, TC-12.2, PA-2 & Entregas (historial) & Pendiente \\ \hline
+P2, O4 & RF-13 & RNF-D-1, RNF-M-1 & TC-13.1, TC-13.2, PA-3 & Lógica de estados (CI-1) & Pendiente \\ \hline
+P3, O2 & RF-14 & RNF-S-2, RNF-M-2 & TC-14.1, TC-14.2, PA-2 & Revisiones y lógica de estados & Pendiente \\ \hline
+P4, O3, EV-5 & RF-15 & RNF-M-1 & TC-15.1 a TC-15.3 & Plantillas de hitos & Pendiente \\ \hline
+P1, O1 & RF-16 & RNF-R-1, RNF-U-2 & TC-16.1 a TC-16.3, PA-5 & Tablero & Pendiente \\ \hline
+P5, O4 & RF-17 & RNF-D-1 & TC-17.1 a TC-17.4, PA-6 & Notificaciones & Pendiente \\ \hline
+P5, O4 & RF-18 & RNF-C-1 & TC-18.1, TC-18.2 & Exportación de calendario & Pendiente \\ \hline
+Acceso por rol (§2.4, \textbf{legal}) & RF-19 & RNF-S-1, RNF-S-2 & TC-19.1 a TC-19.4 & Autenticación (invitaciones) & Pendiente \\ \hline
+P4, O3, EV-4 & RF-20 & RNF-S-2, RNF-M-1 & TC-20.1 a TC-20.3 & Hitos & Pendiente \\ \hline
+\textbf{legal} (§2.6, §5.3) & RF-21 & RNF-S-2, RNF-S-3 & TC-21.1 a TC-21.3, verificación regulatoria (§10) & Datos personales (exportación y supresión) & Pendiente \\ \hline
+\end{xltabular}
+
+\section{Riesgos y supuestos}
+Escala de probabilidad e impacto: A = alto, M = medio, B = bajo. El registro se revisa en cada reunión semanal (Anexo C) y se actualiza en cada entrega.
+
+\begin{xltabular}{\linewidth}{|P{0.8cm}|P{1.9cm}|L|P{0.9cm}|P{1.1cm}|P{3.4cm}|P{3.0cm}|}
+\hline\hrow \h{ID} & \h{Categoría} & \h{Riesgo} & \h{Prob.} & \h{Impacto} & \h{Mitigación} & \h{Disparador y estado} \\ \hline
+\endhead
+R-1 & Técnica & La separación entre frontend y backend y el manejo de archivos versionados (ALT-1, §8) toman más tiempo del previsto y retrasan el MVP. & M & A & Prueba de concepto en la semana 10 (§8.3); construir primero el flujo entrega–revisión; usar una plantilla de proyecto ya probada. & Disparador: la prueba de concepto no funciona al final de la semana 10, o menos de la mitad de los RF Must está lista en la semana 12. Estado: vivo. \\ \hline
+
+R-2 & Datos & Pérdida o corrupción de archivos entregados por una falla del servidor o un borrado accidental. & B & A & Respaldos diarios con prueba de restauración (RNF-D-2); versionado activado en el almacenamiento de objetos; hash SHA-256 por archivo (§5.1). & Disparador: falla un respaldo diario o la prueba de restauración. Estado: vivo. \\ \hline
+
+R-3 & Datos & La duración efectiva de las memorias o la concentración de sus inscripciones puede elevar el número de memorias activas por sobre la estimación de §2.3. & M & M & Solicitar a la jefatura el número de memorias inscritas y de profesores con al menos una memoria asignada por semestre. Contrastar esos datos con las entrevistas y actualizar el dimensionamiento. & Si al cierre de E2 aún faltan los registros o si el volumen observado supera la estimación de §2.3, revisar el dimensionamiento y ajustar las pruebas de carga. Estado: vivo. \\ \hline
+
+R-4 & Validación con usuarios & Los profesores no tienen tiempo para entrevistas o pruebas, por la carga de fin de semestre. & A & A & Agendar desde la semana 9; sesiones cortas (20 a 30 min) y remotas si es necesario; partir por los profesores guía de los integrantes; respaldo con tesistas de magíster. & Disparador: menos de 3 profesores confirmados en la semana 11. Estado: vivo. \\ \hline
+R-5 & Legal / ética & Incumplir la Ley 21.719, que entra en vigencia durante el semestre (1 de diciembre de 2026), por ejemplo usando datos reales sin consentimiento o sin poder exportarlos o eliminarlos. & M & A & Aplicar §5.3 desde el diseño; datos sintéticos en desarrollo y demostración; verificación regulatoria de §10 antes de E4. & Disparador: aparecen datos reales en un entorno de pruebas, o la demo final requiere datos reales. Estado: vivo. \\ \hline
+R-6 & Legal / ética & Un archivo entregado contiene datos sensibles de terceros (p.~ej., encuestas de una tesis) o una obra protegida, y queda expuesto. & B & A & Aviso al subir archivos; acceso restringido al proyecto (RB-4); URL firmadas de corta duración (§5.3). & Disparador: reporte de un participante o hallazgo en la revisión de accesos. Estado: vivo. \\ \hline
+R-7 & Equipo & La disponibilidad del equipo es desigual (5 h semanales, otras asignaturas, certámenes) o un módulo depende de una sola persona. & A & M & Tareas con responsable y fecha en el tablero del equipo; revisión semanal; al menos dos personas conocen cada módulo (revisión cruzada de código). & Disparador: una tarea bloqueada más de una semana, o un integrante falta a dos reuniones seguidas. Estado: vivo. \\ \hline
+R-8 & Infraestructura / terceros & El costo de la nube supera USD 10 al mes, o cambian las condiciones de la capa gratuita del servicio de correo. & M & M & Alerta de presupuesto del proveedor al llegar a USD 8; límites de tamaño por archivo (RB-8); proveedor de correo alternativo identificado en E2. & Disparador: alerta de presupuesto, o correos rechazados por límite de envío. Estado: vivo. \\ \hline
+R-9 & Infraestructura / terceros & Los correos de aviso llegan a la carpeta de spam de las cuentas institucionales. & M & M & Configurar SPF y DKIM en un dominio propio; mostrar también los avisos dentro de la aplicación. & Disparador: un usuario de prueba no recibe un aviso en su bandeja principal. Estado: vivo. \\ \hline
+R-10 & Validación con usuarios & Los profesores no ven ventaja frente a su método actual y no adoptarían el sistema (suposición de §2.5). & M & A & Validar el concepto antes de E2; concentrar el MVP en la vista de entregas por revisar (PA-5). & Disparador: menos de 2 de los profesores entrevistados dicen que lo usarían. Estado: vivo. \\ \hline
+R-11 & Técnica & El alcance crece (foro, tablero, plantillas) y consume tiempo antes de terminar los RF Must. & M & A & Matriz MoSCoW congelada después de E1 (§9.1); los RF Could solo se abordan después del MVP. & Disparador: trabajo en un RF Could antes de completar los Must en la semana 13. Estado: vivo. \\ \hline
+\end{xltabular}
+
+\section{Aprobaciones}
+\begin{xltabular}{\linewidth}{|P{4.6cm}|L|P{3.4cm}|P{2.4cm}|}
+\hline\hrow \h{Rol} & \h{Nombre} & \h{Firma o correo de confirmación} & \h{Fecha} \\ \hline
+\endhead
+Jefe de proyecto (equipo) & Guillermo Oliva Orellana & Guillermo Oliva Orellana & 8 de octubre 2026 \\ \hline
+Líder técnico (equipo) & Fabián González Uribe & Fabián González Uribe & 8 de octubre 2026 \\ \hline
+Docente (aprobación de alcance) & & & \\ \hline
+\end{xltabular}
+
+% =====================================================================
+\clearpage
+\section{Anexos}
+\begin{xltabular}{\linewidth}{|P{1.4cm}|L|P{2.8cm}|P{3.4cm}|}
+\hline\hrow \h{Anexo} & \h{Contenido} & \h{Obligatorio en E1} & \h{Referencia en el enunciado} \\ \hline
+\endhead
+A & Instrumentos de levantamiento usados (pautas de entrevista, encuestas) y datos crudos & Sí & §9.1 \\ \hline
+B & Registros de las instancias de validación con usuarios, con sus instrumentos & Sí & Anexo G \\ \hline
+C & Bitácora de equipo y actas de reunión interna & Sí & §7.2 \\ \hline
+D & Carta Gantt completa & Sí & §9.1 \\ \hline
+E & Declaración de uso de IA generativa & Sí & Anexo H \\ \hline
+F & Propuesta de proyecto aprobada & Sí & Anexo A \\ \hline
+G & Diagramas: modelo de datos, mockups, C4 adicionales & Recomendado & - \\ \hline
+H & Constancia del consentimiento informado de los participantes en la validación & Si aplica & §11.4 \\ \hline
+I & Contrato de API (OpenAPI / Swagger) & Si aplica & - \\ \hline
+J & Glosario extendido & Opcional & Anexo I \\ \hline
+\end{xltabular}
+
+% -----------------------
+\subsection*{Anexo A. Instrumentos de levantamiento y datos crudos}
+
+\subsubsection*{A.1 Pauta de entrevista semiestructurada a profesores guía}
+Duración aproximada: 30 minutos. Modalidad: presencial o remota. Antes de comenzar se entrega la hoja informativa y se obtiene el consentimiento (Anexo H). Las respuestas se registran con un código (P1, P2…), no con el nombre.
+
+\begin{enumerate}[leftmargin=18pt,itemsep=1pt,topsep=2pt]
+\item ¿Cuántos trabajos de título y tesis supervisa actualmente y cuántos suele supervisar en un año típico? En el caso de las memorias de pregrado, ¿cuántas supervisa al mismo tiempo durante un semestre típico y cuánto tiempo suele pasar entre la inscripción y la defensa?
+\item ¿De qué tipo son (memoria de título, tesis de magíster, tesis de doctorado, proyecto de investigación)?
+\item Describa cómo sigue hoy el avance de cada trabajo: ¿qué herramientas usa (correo, mensajería, carpetas compartidas, planillas, Trello u otras)?
+\item ¿Cómo recibe las versiones de los documentos y cómo entrega sus comentarios?
+\item ¿Cuántas horas a la semana dedica, aproximadamente, a coordinar y hacer seguimiento (sin contar la lectura y corrección en sí)?
+\item ¿Le ha pasado que una entrega o un plazo de revisión se le pasó, o que no encontraba una versión o un comentario anterior? Cuente un caso reciente.
+\item ¿Qué etapas tiene una memoria o tesis en su carrera o programa? ¿Cambian de un estudiante a otro?
+\item (Se muestra el vocabulario de §1.3 y un boceto del tablero.) ¿Estos términos y esta organización coinciden con cómo usted trabaja? ¿Qué cambiaría?
+\item ¿Qué tendría que hacer una herramienta como esta para que usted la usara en lugar de su método actual? ¿Qué la haría inútil para usted?
+\item ¿Estaría dispuesto(a) a probar un prototipo con datos ficticios durante unos 20 minutos en las semanas 13 o 14?
+\end{enumerate}
+
+\subsubsection*{A.2 Encuesta breve a memoristas y tesistas}
+Formato en línea, anónima, alrededor de 5 minutos. Escala de 1 (muy en desacuerdo) a 5 (muy de acuerdo) para los ítems 3 a 6.
+
+\begin{enumerate}[leftmargin=18pt,itemsep=1pt,topsep=2pt]
+  \item Tipo de trabajo: memoria de título / tesis de magíster / tesis de doctorado / otro.
+  \item ¿Por qué medio entrega sus avances a su profesor guía? (selección múltiple: correo, mensajería, carpeta compartida, plataforma institucional, otro).
+  \item Tengo claro qué debo entregar en cada etapa y en qué fecha.
+  \item Recibo retroalimentación sobre mis entregas en un tiempo razonable.
+  \item Cuando necesito revisar un comentario antiguo de mi profesor, lo encuentro fácilmente.
+  \item Me sería útil ver en un solo lugar mis plazos, mis entregas y los comentarios recibidos.
+  \item En promedio, ¿cuántos días pasan entre que entrega un avance y recibe comentarios? (menos de 3 / 3 a 7 / 8 a 14 / más de 14).
+  \item Comentario libre: ¿qué es lo más difícil de coordinar con su profesor guía?
+\end{enumerate}
+
+\subsubsection*{A.3 Datos crudos}
+\ph{Pendiente.}
+
+% -----------------------
+\subsection*{Anexo B. Registros de las instancias de validación con usuarios}
+Las instancias y sus instrumentos están definidos en §2.4 y §10. A la fecha de esta versión no se ha realizado ninguna sesión, cada sesión se registrará con el siguiente formato.
+
+\begin{xltabular}{\linewidth}{|P{1.2cm}|P{1.6cm}|P{2.0cm}|P{2.2cm}|L|P{2.4cm}|}
+\hline\hrow \h{Sesión} & \h{Fecha} & \h{Participante (código y perfil)} & \h{Instancia e instrumento} & \h{Resultados (tareas completadas, tiempos, SUS, hallazgos)} & \h{Acción derivada} \\ \hline
+\endhead
+V-1 & \ph{Por realizar} & \ph{P1, profesor guía} & \ph{Concepto: entrevista A.1} & \ph{-} & \ph{-} \\ \hline
+V-2 & \ph{Por realizar} & \ph{P2, profesor guía} & \ph{Concepto: entrevista A.1} & \ph{-} & \ph{-} \\ \hline
+V-3 & \ph{Por realizar} & \ph{P3, profesor guía} & \ph{Concepto: entrevista A.1} & \ph{-} & \ph{-} \\ \hline
+\end{xltabular}
+
+% -----------------------
+\subsection*{Anexo C. Bitácora de equipo y actas de reunión interna}
+El equipo se reúne una vez por semana. Cada reunión la conduce un integrante distinto, en rotación, para distribuir el liderazgo (§9.4). Cada acta registra asistentes, temas, decisiones, tareas con responsable y fecha, y la revisión del registro de riesgos (§12).
+
+\begin{xltabular}{\linewidth}{|P{1.0cm}|P{1.6cm}|P{2.0cm}|P{1.8cm}|L|P{3.6cm}|}
+\hline\hrow \h{Acta} & \h{Fecha} & \h{Conduce} & \h{Asistentes} & \h{Temas y decisiones} & \h{Tareas (responsable, fecha)} \\ \hline
+\endhead
+\ph{01} & \ph{dd-mm-2026} & \ph{Nombre} & \ph{Iniciales} & \ph{Completar con las reuniones realizadas hasta E1.} & \ph{-} \\ \hline
+\ph{02} & \ph{dd-mm-2026} & \ph{Nombre} & \ph{Iniciales} & \ph{-} & \ph{-} \\ \hline
+\end{xltabular}
+
+% -----------------------
+\subsection*{Anexo D. Carta Gantt completa}
+Semanas del semestre según el syllabus. Cada integrante dedica 5 horas semanales fuera de clases, es decir, 25 horas de equipo por semana (§9.3). Las barras indican la semana en que se trabaja cada actividad, $\blacklozenge$ marca una entrega evaluada. Las dependencias y holguras de las entregas están en §9.2.
+
+\begin{center}
+\includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{graficos/gantt1.pdf}
+\end{center}
+
+\begin{center}
+\includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{graficos/gantt2.pdf}
+\end{center}
+
+% -----------------------
+\subsection*{Anexo E. Declaración de uso de IA generativa}
+\begin{kv}
+\kvrow{Herramienta}{Claude (Anthropic), a través de la aplicación Claude.}
+\kvrow{Usos}{%
+\textbullet~Búsqueda y resumen de fuentes públicas sobre soluciones existentes y datos del sistema de educación superior chileno. Cada fuente citada en §1.4 fue abierta y revisada por el equipo.\par
+\textbullet~Boceto del diagrama de contexto C4 en Mermaid.\par
+\textbullet~Revisión de consistencia entre secciones del documento.\par}
+\kvrow{Responsabilidad del equipo}{El equipo revisó, corrigió y aprobó todo el contenido generado, y es responsable de él. Las cifras de dimensionamiento de §2.3 provienen de fuentes públicas (REF-14 a REF-18) y de supuestos del equipo, marcados como tales, que se validarán con las entrevistas (EV-7). Ninguna fuente fue incluida sin verificar que existe y que respalda lo que se afirma.}
+\end{kv}
+
+% -----------------------
+\subsection*{Anexo F. Propuesta de proyecto aprobada}
+\ph{Pendiente.}
+
+% -----------------------
+\subsection*{Anexo G. Diagramas}
+\textbf{G.1 Diagrama de contexto C4 nivel 1:} incluido en §2.2.
+
+\textbf{G.2 Modelo de datos (entidad-relación, alto nivel):} entidades y relaciones descritas en §5.1.
+
+\begin{center}
+\includegraphics[width=\linewidth,height=0.8\textheight,keepaspectratio]{graficos/modelo-datos.pdf}
+\end{center}
+
+\textbf{G.3 Bocetos de interfaz y diagramas C4 de niveles 2 y 3:} se presentan en E2 (§9.2).
+
+% -----------------------
+\subsection*{Anexo H. Consentimiento informado para participantes de la validación}
+\begin{cajainfo}
+\textbf{Proyecto ``Hito: gestión de memorias y tesis'' - Proyecto Informático, DIICC, Universidad de Concepción.}\par
+\textbf{Propósito.} Un equipo de estudiantes está desarrollando, como proyecto de curso, un sistema web para ayudar a profesores guía a seguir las memorias y tesis que supervisan. Le invitamos a participar en una entrevista o en una prueba de uso del prototipo.\par
+\textbf{Qué se le pedirá.} Responder preguntas sobre cómo supervisa trabajos hoy (unos 30 minutos) o realizar algunas tareas en el prototipo con datos ficticios (20 a 30 minutos), mientras un integrante observa y toma notas.\par
+\textbf{Datos.} Sus respuestas se registrarán con un código, no con su nombre. Solo el equipo y el docente del curso accederán a ellas, se usarán únicamente para este proyecto y se eliminarán al cierre del semestre. Los resultados se presentan de forma agregada. No se graba audio ni video, salvo que usted lo autorice expresamente.\par
+\textbf{Voluntariedad.} Su participación es voluntaria. Puede no responder cualquier pregunta y retirarse en cualquier momento, sin dar explicaciones y sin consecuencia alguna.\par
+\textbf{Contacto.} \ph{[nombre y correo del líder de datos y seguridad del equipo]}.\par
+\medskip
+Declaro haber leído esta información y acepto participar.\par
+Nombre: \rule{5cm}{0.4pt}\quad Firma o confirmación por correo: \rule{4cm}{0.4pt}\quad Fecha: \rule{2.5cm}{0.4pt}
+\end{cajainfo}
+
+\textbf{Registro de consentimientos:} \ph{se adjuntarán aquí, con el código de participante, a medida que se realicen las sesiones (Anexo B).}
+
+% -----------------------
+\subsection*{Anexo I. Contrato de API}
+No aplica en E1. El contrato OpenAPI de la API REST (§2.1) se define junto con la arquitectura en E2.
+
+% -----------------------
+\subsection*{Anexo J. Glosario extendido}
+No se incluye: los términos del dominio y las siglas del documento están definidos en §1.3.
+
+%\vspace{8pt}
+%\begin{cajaverif}
+%\textbf{Antes de entregar, verifique:}
+%\begin{itemize}[label=\textbullet,leftmargin=14pt,itemsep=1pt,topsep=3pt]
+%  \item §2.3 tiene al menos dos evidencias con fuente y fecha, no solo afirmaciones.
+%  \item §2.4 define entre dos y cuatro perfiles de usuario y las instancias de validación previstas.
+%  \item §2.6 tiene seis restricciones, incluidas cost, schedule y legal considerations, cada una con una alternativa descartada.
+%  \item §2.7 declara al menos dos aplicaciones de matemática, ciencias o ciencias de la ingeniería.
+%  \item Todos los RNF de §4 tienen métrica, valor objetivo y justificación del valor.
+%  \item §5.3 está completa, incluso si concluye que no hay datos personales.
+%  \item §7 se pronuncia sobre cada factor, o explica por qué no aplica.
+%  \item §8 tiene tres alternativas genuinamente distintas.
+%  \item §9.1 no clasifica todo como Must, y el MVP está definido.
+%  \item §12 tiene ocho riesgos o más, cubriendo todas las categorías.
+%  \item Se eliminaron todas las notas en gris cursiva de esta plantilla.
+%\end{itemize}
+%\end{cajaverif}
+
+\end{document}

@@ -27,7 +27,6 @@ from app.modules.deliverables.schemas import (
     ForumMessageResponse,
     MessageCreate,
     PendingReviewResponse,
-    ReviewCreate,
     ReviewResponse,
     SubmissionFileResponse,
     SubmissionResponse,
@@ -38,6 +37,7 @@ from app.modules.projects.schemas import (
     DELIVERABLE_STATUS_DB_TO_API,
     PARTICIPANT_ROLE_DB_TO_API,
     REVIEW_DECISION_DB_TO_API,
+    ReviewDecisionApi,
 )
 from app.modules.storage.models import Archivo
 from app.modules.storage.service import get_storage
@@ -232,8 +232,13 @@ def _file_response(file: Archivo) -> SubmissionFileResponse:
 
 
 async def serialize_review(db: AsyncSession, review: Revision) -> ReviewResponse:
-    """Serializa una revisión con el nombre del gestor."""
+    """Serializa una revisión con el nombre del gestor y sus archivos."""
     reviewer = await db.get(Usuario, review.gestor_id)
+    files = (
+        await db.scalars(
+            select(Archivo).where(Archivo.revision_id == review.id).order_by(Archivo.id)
+        )
+    ).all()
     return ReviewResponse(
         id=review.id,
         decision=REVIEW_DECISION_DB_TO_API[review.decision],
@@ -241,6 +246,7 @@ async def serialize_review(db: AsyncSession, review: Revision) -> ReviewResponse
             reviewer.nombre if reviewer is not None else "Usuario eliminado"
         ),
         reviewed_at=review.fecha,
+        files=[_file_response(file) for file in files],
     )
 
 
@@ -506,9 +512,10 @@ async def submit_deliverable(
 async def review_deliverable(
     db: AsyncSession,
     context: DeliverableContext,
-    payload: ReviewCreate,
+    decision: ReviewDecisionApi,
+    files: list[UploadFile],
 ) -> Revision:
-    """Registra la decisión de un gestor sobre la última entrega."""
+    """Registra la decisión de un gestor y sus archivos adjuntos."""
     locked = await db.scalar(
         select(Entregable)
         .where(Entregable.id == context.deliverable.id)
@@ -552,34 +559,77 @@ async def review_deliverable(
             409,
         )
 
-    decision = REVIEW_DECISION_API_TO_DB[payload.decision]
+    allowed_formats = locked.formatos_admitidos
+    content_types = [_validate_upload(upload, allowed_formats) for upload in files]
+    max_bytes = locked.tamano_max_mb * 1024 * 1024
+
     review = Revision(
         entrega_id=latest.id,
         gestor_id=context.user.id,
-        decision=decision,
+        decision=REVIEW_DECISION_API_TO_DB[decision],
     )
     db.add(review)
+    await db.flush()
 
-    locked.estado = (
-        DeliverableStatus.APPROVED
-        if payload.decision == "approved"
-        else DeliverableStatus.CHANGES_REQUESTED
-    )
-    now = datetime.now(UTC)
-    if payload.decision == "approved":
-        event_text = (
-            f"{context.user.nombre} ha marcado la versión "
-            f"{latest.version} como Aprobada."
-        )
-    else:
-        event_text = (
-            f"{context.user.nombre} ha solicitado cambios en la versión "
-            f"{latest.version}."
-        )
-    _append_system_message(db, locked.id, event_text, now)
-    _touch_project(context.project, now)
+    storage = get_storage()
+    saved_keys: list[str] = []
 
-    await db.commit()
+    try:
+        for upload, content_type in zip(files, content_types, strict=True):
+            key = (
+                f"projects/{context.project.id}/deliverables/{locked.id}/"
+                f"reviews/{review.id}/{uuid.uuid4().hex}"
+            )
+            stream = _UploadStream(upload, max_bytes)
+            await storage.save(key, stream.chunks())
+            saved_keys.append(key)
+            if stream.size == 0:
+                raise AppError(
+                    "EMPTY_FILE",
+                    f"El archivo {upload.filename or 'sin nombre'} está vacío.",
+                    422,
+                )
+            db.add(
+                Archivo(
+                    revision_id=review.id,
+                    nombre=upload.filename or "archivo",
+                    tipo_mime=content_type,
+                    tamano=stream.size,
+                    clave_almacenamiento=key,
+                    sha256=stream.digest.hexdigest(),
+                )
+            )
+
+        locked.estado = (
+            DeliverableStatus.APPROVED
+            if decision == "approved"
+            else DeliverableStatus.CHANGES_REQUESTED
+        )
+        now = datetime.now(UTC)
+        if decision == "approved":
+            event_text = (
+                f"{context.user.nombre} ha marcado la versión "
+                f"{latest.version} como Aprobada"
+            )
+        else:
+            event_text = (
+                f"{context.user.nombre} ha solicitado cambios en la versión "
+                f"{latest.version}"
+            )
+        if files:
+            suffix = "s" if len(files) != 1 else ""
+            event_text += f" y adjuntó {len(files)} archivo{suffix}"
+        event_text += "."
+        _append_system_message(db, locked.id, event_text, now)
+        _touch_project(context.project, now)
+
+        await db.commit()
+    except Exception:
+        await db.rollback()
+        for key in saved_keys:
+            await storage.delete(key)
+        raise
+
     await db.refresh(review)
     return review
 

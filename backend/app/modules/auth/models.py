@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, Uuid, func, text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Uuid, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -30,6 +30,12 @@ class Usuario(TimestampMixin, Base):
         nullable=False,
         default=UserStatus.INVITED,
         server_default=text("'invitada'"),
+    )
+    intentos_fallidos: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default=text("0")
+    )
+    bloqueado_hasta: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
     consentimiento_fecha: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True

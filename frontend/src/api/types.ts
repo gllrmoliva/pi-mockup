@@ -92,6 +92,7 @@ export type Review = {
     decision: ReviewDecision;
     reviewer_name: string;
     reviewed_at: string;
+    files: SubmissionFile[];
 };
 
 export type Submission = {

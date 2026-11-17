@@ -771,7 +771,7 @@
 .email-chip__email {
     overflow-wrap: anywhere;
     font-size: 0.72rem;
-    color: var(--tenue);
+    color: var(--suave);
 }
 
 .email-chip__role {
@@ -838,6 +838,10 @@
     display: grid;
     gap: 6px;
     justify-items: start;
+}
+
+.review-files {
+    width: 100%;
 }
 
 .history-list {

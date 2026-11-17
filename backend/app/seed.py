@@ -18,7 +18,7 @@ from app.modules.projects.enums import (
 )
 from app.modules.projects.models import Hito, Participacion, Proyecto
 
-DEMO_PASSWORD = "HitoDemo123!"
+DEMO_PASSWORD = "1234"
 DEMO_USERS: list[tuple[str, str, UserType]] = [
     ("Camila Soto", "camila.soto@udec.cl", UserType.PROFESSOR),
     ("Rodrigo Peña", "rodrigo.pena@udec.cl", UserType.PROFESSOR),
