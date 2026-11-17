@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
@@ -19,10 +20,15 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base
 from app.db.mixins import TimestampMixin
 from app.db.types import pg_enum
-from app.modules.deliverables.enums import DeliverableStatus, ReviewDecision
+from app.modules.deliverables.enums import (
+    DeliverableStatus,
+    ForumMessageType,
+    ReviewDecision,
+)
 
 DELIVERABLE_STATUS_ENUM = pg_enum(DeliverableStatus, "deliverable_status")
 REVIEW_DECISION_ENUM = pg_enum(ReviewDecision, "review_decision")
+FORUM_MESSAGE_TYPE_ENUM = pg_enum(ForumMessageType, "forum_message_type")
 
 
 class Entregable(TimestampMixin, Base):
@@ -121,7 +127,7 @@ class Revision(TimestampMixin, Base):
 
 
 class Comentario(TimestampMixin, Base):
-    """Mensaje del foro de un entregable."""
+    """Mensaje del foro o evento automático de un entregable."""
 
     __tablename__ = "comentario"
 
@@ -133,10 +139,16 @@ class Comentario(TimestampMixin, Base):
         ForeignKey("entregable.id", ondelete="CASCADE"),
         nullable=False,
     )
-    autor_id: Mapped[uuid.UUID] = mapped_column(
+    autor_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey("usuario.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    tipo: Mapped[ForumMessageType] = mapped_column(
+        FORUM_MESSAGE_TYPE_ENUM,
         nullable=False,
+        default=ForumMessageType.USER,
+        server_default=text("'usuario'"),
     )
     texto: Mapped[str] = mapped_column(Text, nullable=False)
     fecha: Mapped[datetime] = mapped_column(
@@ -145,6 +157,11 @@ class Comentario(TimestampMixin, Base):
 
     __table_args__ = (
         Index("ix_comentario_entregable_id_fecha", "entregable_id", "fecha"),
+        CheckConstraint(
+            "(tipo = 'usuario' AND autor_id IS NOT NULL) OR "
+            "(tipo = 'sistema' AND autor_id IS NULL)",
+            name="ck_comentario_autor_por_tipo",
+        ),
     )
 
 

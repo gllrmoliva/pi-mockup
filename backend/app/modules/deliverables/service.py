@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.errors import AppError
 from app.modules.auth.models import Usuario
 from app.modules.deliverables.dependencies import DeliverableContext
-from app.modules.deliverables.enums import DeliverableStatus
+from app.modules.deliverables.enums import DeliverableStatus, ForumMessageType
 from app.modules.deliverables.models import (
     Comentario,
     Entrega,
@@ -19,6 +19,7 @@ from app.modules.deliverables.models import (
     Revision,
 )
 from app.modules.deliverables.schemas import (
+    FORUM_MESSAGE_TYPE_DB_TO_API,
     REVIEW_DECISION_API_TO_DB,
     DeliverableCreate,
     DeliverableDetail,
@@ -88,6 +89,24 @@ class _UploadStream:
 def _touch_project(project: Proyecto, now: datetime) -> None:
     project.fecha_ultima_modificacion = now
     project.modified_at = now
+
+
+def _append_system_message(
+    db: AsyncSession,
+    deliverable_id: uuid.UUID,
+    text: str,
+    when: datetime,
+) -> None:
+    """Agrega un evento automático al foro del entregable."""
+    db.add(
+        Comentario(
+            entregable_id=deliverable_id,
+            autor_id=None,
+            tipo=ForumMessageType.SYSTEM,
+            texto=text,
+            fecha=when,
+        )
+    )
 
 
 def _validate_payload(
@@ -256,13 +275,22 @@ async def serialize_submission(
 async def serialize_message(
     db: AsyncSession, comment: Comentario
 ) -> ForumMessageResponse:
-    """Serializa un mensaje del foro."""
-    author = await db.get(Usuario, comment.autor_id)
+    """Serializa un mensaje de usuario o un evento del foro."""
+    author = (
+        await db.get(Usuario, comment.autor_id)
+        if comment.autor_id is not None
+        else None
+    )
+    author_name: str | None = None
+    if comment.tipo == ForumMessageType.USER:
+        author_name = author.nombre if author is not None else "Usuario eliminado"
+
     return ForumMessageResponse(
         id=comment.id,
+        kind=FORUM_MESSAGE_TYPE_DB_TO_API[comment.tipo],
         body=comment.texto,
         author_id=comment.autor_id,
-        author_name=author.nombre if author is not None else "Usuario eliminado",
+        author_name=author_name,
         created_at=comment.fecha,
     )
 
@@ -312,6 +340,7 @@ async def create_deliverable(
     project: Proyecto,
     milestone: Hito,
     payload: DeliverableCreate,
+    actor: Usuario,
 ) -> Entregable:
     """Crea un entregable dentro de un hito."""
     now = datetime.now(UTC)
@@ -327,6 +356,13 @@ async def create_deliverable(
         estado=DeliverableStatus.PENDING,
     )
     db.add(deliverable)
+    await db.flush()
+    _append_system_message(
+        db,
+        deliverable.id,
+        f"{actor.nombre} ha creado el entregable.",
+        now,
+    )
     _touch_project(project, now)
 
     await db.commit()
@@ -353,6 +389,12 @@ async def update_deliverable(
     deliverable.fecha_limite = deadline
     deliverable.formatos_admitidos = formats
     deliverable.tamano_max_mb = max_size_mb
+    _append_system_message(
+        db,
+        deliverable.id,
+        f"{context.user.nombre} ha editado el entregable.",
+        now,
+    )
     _touch_project(context.project, now)
 
     await db.commit()
@@ -367,14 +409,13 @@ async def submit_deliverable(
     link_url: str | None,
 ) -> Entrega:
     """Registra una nueva versión inmutable de un entregable."""
-    if not files:
+    normalized_link = _validate_link(link_url)
+    if not files and normalized_link is None:
         raise AppError(
-            "NO_FILES",
-            "Adjunta al menos un archivo válido.",
+            "NO_FILES_OR_LINK",
+            "Adjunta al menos un archivo o ingresa un enlace HTTPS válido.",
             422,
         )
-
-    normalized_link = _validate_link(link_url)
 
     locked = await db.scalar(
         select(Entregable)
@@ -413,6 +454,12 @@ async def submit_deliverable(
     )
     db.add(submission)
     await db.flush()
+    _append_system_message(
+        db,
+        locked.id,
+        f"{context.user.nombre} ha entregado la versión {submission.version}.",
+        datetime.now(UTC),
+    )
 
     storage = get_storage()
     saved_keys: list[str] = []
@@ -518,7 +565,19 @@ async def review_deliverable(
         if payload.decision == "approved"
         else DeliverableStatus.CHANGES_REQUESTED
     )
-    _touch_project(context.project, datetime.now(UTC))
+    now = datetime.now(UTC)
+    if payload.decision == "approved":
+        event_text = (
+            f"{context.user.nombre} ha marcado la versión "
+            f"{latest.version} como Aprobada."
+        )
+    else:
+        event_text = (
+            f"{context.user.nombre} ha solicitado cambios en la versión "
+            f"{latest.version}."
+        )
+    _append_system_message(db, locked.id, event_text, now)
+    _touch_project(context.project, now)
 
     await db.commit()
     await db.refresh(review)
@@ -542,6 +601,7 @@ async def post_message(
     comment = Comentario(
         entregable_id=context.deliverable.id,
         autor_id=context.user.id,
+        tipo=ForumMessageType.USER,
         texto=body,
     )
     db.add(comment)

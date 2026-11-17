@@ -65,6 +65,7 @@ async def create_deliverable_endpoint(
         context.project,
         context.milestone,
         payload,
+        context.user,
     )
     detail_context = DeliverableContext(
         deliverable=deliverable,
@@ -124,11 +125,11 @@ async def submit_deliverable_endpoint(
         DeliverableContext, Depends(get_deliverable_collaborator_context)
     ],
     db: Annotated[AsyncSession, Depends(get_db)],
-    files: Annotated[list[UploadFile], File()],
+    files: Annotated[list[UploadFile] | None, File()] = None,
     link_url: Annotated[str | None, Form()] = None,
 ) -> SubmissionResponse:
     """Registra una nueva versión de un entregable."""
-    submission = await submit_deliverable(db, context, files, link_url)
+    submission = await submit_deliverable(db, context, files or [], link_url)
     return await serialize_submission(db, submission)
 
 

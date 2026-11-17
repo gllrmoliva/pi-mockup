@@ -178,7 +178,11 @@ async def test_create_deliverable_and_project_detail(
     assert deliverable["version_count"] == 0
     assert deliverable["latest_submission"] is None
     assert deliverable["review"] is None
-    assert deliverable["messages"] == []
+    assert len(deliverable["messages"]) == 1
+    assert deliverable["messages"][0]["kind"] == "system"
+    assert deliverable["messages"][0]["author_id"] is None
+    assert deliverable["messages"][0]["author_name"] is None
+    assert deliverable["messages"][0]["body"].endswith("ha creado el entregable.")
 
     project_detail = await client.get(f"/api/v1/projects/{project['id']}")
     assert project_detail.status_code == 200
@@ -358,6 +362,61 @@ async def test_submissions_history_and_link(client: AsyncClient) -> None:
     assert forbidden_history.status_code == 403
 
 
+async def test_link_only_submission(client: AsyncClient) -> None:
+    _, student, _, _, deliverable = await setup_project(client)
+    await login(client, student.correo)
+
+    response = await client.post(
+        f"/api/v1/deliverables/{deliverable['id']}/submissions",
+        data={"link_url": "https://example.com/entrega-solo-enlace"},
+    )
+    assert response.status_code == 201, response.text
+    submission = response.json()
+    assert submission["version"] == 1
+    assert submission["files"] == []
+    assert submission["link_url"] == "https://example.com/entrega-solo-enlace"
+
+    detail = await client.get(f"/api/v1/deliverables/{deliverable['id']}")
+    assert detail.status_code == 200
+    assert detail.json()["status"] == "submitted"
+    assert detail.json()["latest_submission"]["files"] == []
+    assert (
+        detail.json()["latest_submission"]["link_url"]
+        == "https://example.com/entrega-solo-enlace"
+    )
+
+    await login(client, "professor@example.com")
+    history = await client.get(f"/api/v1/deliverables/{deliverable['id']}/submissions")
+    assert history.status_code == 200
+    assert history.json()[0]["files"] == []
+    assert history.json()[0]["link_url"] == "https://example.com/entrega-solo-enlace"
+
+
+async def test_submission_requires_file_or_link(client: AsyncClient) -> None:
+    _, student, _, _, deliverable = await setup_project(client)
+    await login(client, student.correo)
+
+    empty = await client.post(
+        f"/api/v1/deliverables/{deliverable['id']}/submissions",
+        data={"link_url": "   "},
+    )
+    assert empty.status_code == 422
+    assert empty.json()["error"]["code"] == "NO_FILES_OR_LINK"
+    assert empty.json()["error"]["message"] == (
+        "Adjunta al menos un archivo o ingresa un enlace HTTPS válido."
+    )
+
+    invalid_link = await client.post(
+        f"/api/v1/deliverables/{deliverable['id']}/submissions",
+        data={"link_url": "http://example.com/entrega"},
+    )
+    assert invalid_link.status_code == 422
+    assert invalid_link.json()["error"]["code"] == "INVALID_LINK"
+    assert invalid_link.json()["error"]["message"] == (
+        "Ingrese un enlace HTTPS válido."
+    )
+
+
 async def test_upload_validations(client: AsyncClient) -> None:
     _, student, _, milestone, deliverable = await setup_project(client)
     small = await create_deliverable(
@@ -374,6 +433,14 @@ async def test_upload_validations(client: AsyncClient) -> None:
     )
     assert invalid_format.status_code == 422
     assert "no está permitido" in invalid_format.json()["error"]["message"]
+
+    invalid_file_with_link = await client.post(
+        f"/api/v1/deliverables/{deliverable['id']}/submissions",
+        files=[("files", ("malware.exe", b"x", "application/x-msdownload"))],
+        data={"link_url": "https://example.com/entrega-valida"},
+    )
+    assert invalid_file_with_link.status_code == 422
+    assert "no está permitido" in invalid_file_with_link.json()["error"]["message"]
 
     empty_file = await client.post(
         f"/api/v1/deliverables/{deliverable['id']}/submissions",
@@ -467,6 +534,43 @@ async def test_review_state_machine(client: AsyncClient) -> None:
         json={"decision": "approved"},
     )
     assert review_after_approval.status_code == 409
+
+
+async def test_deliverable_lifecycle_forum_events(client: AsyncClient) -> None:
+    _, student, _, _, deliverable = await setup_project(client)
+
+    edited = await client.patch(
+        f"/api/v1/deliverables/{deliverable['id']}",
+        json={
+            "title": "Entregable editado",
+            "description": "Descripción editada",
+            "deadline_at": deliverable["deadline_at"],
+            "allowed_formats": deliverable["allowed_formats"],
+            "max_file_size_mb": deliverable["max_file_size_mb"],
+        },
+    )
+    assert edited.status_code == 200, edited.text
+
+    await login(client, student.correo)
+    await upload(
+        client,
+        str(deliverable["id"]),
+        [("files", ("v1.pdf", PDF_BYTES, "application/pdf"))],
+    )
+
+    await login(client, "professor@example.com")
+    await review(client, str(deliverable["id"]), "approved")
+
+    detail = await client.get(f"/api/v1/deliverables/{deliverable['id']}")
+    assert detail.status_code == 200
+    messages = detail.json()["messages"]
+    assert [message["kind"] for message in messages] == ["system"] * 4
+    assert all(message["author_id"] is None for message in messages)
+    assert all(message["author_name"] is None for message in messages)
+    assert messages[0]["body"].endswith("ha creado el entregable.")
+    assert messages[1]["body"].endswith("ha editado el entregable.")
+    assert messages[2]["body"].endswith("ha entregado la versión 1.")
+    assert messages[3]["body"].endswith("ha marcado la versión 1 como Aprobada.")
 
 
 async def test_review_requires_submission_and_manager(
@@ -661,8 +765,18 @@ async def test_forum_messages(client: AsyncClient) -> None:
     assert second.status_code == 201, second.text
 
     detail = await client.get(f"/api/v1/deliverables/{deliverable['id']}")
-    bodies = [message["body"] for message in detail.json()["messages"]]
-    assert bodies == ["Primer mensaje", "Segundo mensaje"]
+    messages = detail.json()["messages"]
+    assert [message["kind"] for message in messages] == [
+        "system",
+        "user",
+        "user",
+    ]
+    assert messages[0]["body"].endswith("ha creado el entregable.")
+    assert [message["body"] for message in messages[1:]] == [
+        "Primer mensaje",
+        "Segundo mensaje",
+    ]
+    assert all(message["author_name"] is not None for message in messages[1:])
 
     empty = await client.post(
         f"/api/v1/deliverables/{deliverable['id']}/messages",
@@ -673,7 +787,7 @@ async def test_forum_messages(client: AsyncClient) -> None:
 
     await login(client, "professor@example.com")
     manager_detail = await client.get(f"/api/v1/deliverables/{deliverable['id']}")
-    assert len(manager_detail.json()["messages"]) == 2
+    assert len(manager_detail.json()["messages"]) == 3
 
     outsider = await create_user("outsider@example.com")
     await login(client, outsider.correo)

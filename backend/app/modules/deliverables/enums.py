@@ -11,3 +11,8 @@ class DeliverableStatus(StrEnum):
 class ReviewDecision(StrEnum):
     APPROVED = "aprobado"
     CHANGES_REQUESTED = "cambios_solicitados"
+
+
+class ForumMessageType(StrEnum):
+    USER = "usuario"
+    SYSTEM = "sistema"

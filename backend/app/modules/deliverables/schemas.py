@@ -1,9 +1,10 @@
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
-from app.modules.deliverables.enums import ReviewDecision
+from app.modules.deliverables.enums import ForumMessageType, ReviewDecision
 from app.modules.projects.schemas import (
     DeliverableStatusApi,
     ParticipantRoleApi,
@@ -11,9 +12,15 @@ from app.modules.projects.schemas import (
 )
 from app.modules.storage.enums import FileFormat
 
+ForumMessageKindApi = Literal["user", "system"]
+
 REVIEW_DECISION_API_TO_DB: dict[ReviewDecisionApi, ReviewDecision] = {
     "approved": ReviewDecision.APPROVED,
     "changes_requested": ReviewDecision.CHANGES_REQUESTED,
+}
+FORUM_MESSAGE_TYPE_DB_TO_API: dict[ForumMessageType, ForumMessageKindApi] = {
+    ForumMessageType.USER: "user",
+    ForumMessageType.SYSTEM: "system",
 }
 
 
@@ -90,12 +97,13 @@ class SubmissionResponse(BaseModel):
 
 
 class ForumMessageResponse(BaseModel):
-    """Mensaje del foro de un entregable."""
+    """Mensaje de usuario o evento automático del foro de un entregable."""
 
     id: UUID
+    kind: ForumMessageKindApi
     body: str
-    author_id: UUID
-    author_name: str
+    author_id: UUID | None
+    author_name: str | None
     created_at: datetime
 
 
